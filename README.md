@@ -1,18 +1,9 @@
 <!-- NEXT STEPS:
 - test other PDF readers & try export to Google Slides ?
-- questions pour playtesteurs: Kevin, Pierre, Simon, Matth, Elliot, Nicolas, Maxime + Thib
-  * leur demander si OK via sms à choix multiples
-  * formuler questions via https://framaforms.org/content/creez-et-diffusez-vos-formulaires-facilement
-  * A lire AVANT de jouer:
-    + gardez l'oeil sur des bugs/glitchs, les phrases bizarrement formulées, et vos ressentis/difficultés -> prendre des notes / screenshots
-  * A lire APRES avoir joué:
-    + combien de temps ça leur a pris ? ont-ils trouvé la fin ? trich ?
-    + énigme la plus dure ou frusrante ?
-    + ce qu'ils ont préféré ?
-    + visuellement moche ?
-    + truc répétitif
 - create SubReddit
-- code clean-up: rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
+- code clean-up:
+  * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
+  * reducer: TOO SLOW! 6> dump removed GVs & stop when #views_removed <= prev_views_removed
 - highscore URL on victory screen -> form where to name & enter PDF reader soft
 - trailer GIF like heroine_dusk_story_trailer_480p.gif
 - create itch.io page
@@ -63,19 +54,20 @@
 ![Title](title.png)
 
 **Undying Dusk** is a video game in a PDF format,
-that turns classical dungeon crawling into logic puzzles.
+with a gameplay based on exploration and logic puzzles,
+in the tradition of [dungeon crawlers](https://en.wikipedia.org/wiki/Dungeon_crawl#Video_games).
 
 The game is set in a fantasy realm where a curse set by the Empress keeps the world in an eternal dusk.
-You are a woman who recently found shelter in a monastery.
+You play a woman who recently found shelter in a eerie monastery.
 
 It features:
 - ~150 000 PDF pages
 - a retrogaming aesthetic: 160x120 pixels resolution and a 16 colors palette
 - a grid-based world with 36 different tiles and 10 maps to explore
-- 25 treasure items, weapons & spells to pick up in order to face 17 enemy monsters
+- 30+ treasure items, weapons & spells to pick up in order to face 17 enemy monsters
 - 21 music tracks
 - 17530 "Game Over" pages, and a single path to victory
-- 4 hidden secrets
+- 4 hidden secrets & a hidden ending
 
 It was made during the summer of 2020 by Lucas Cimon.
 To my knowledge, this is the very first video game in a PDF format.
@@ -98,13 +90,13 @@ buttons link boxes  |     ✔️      |                                |        
 CTRL+F              |     ✔️      |                                |                      |             |       |       |
 backspace key       |     ✔️      |                                |                      |             |       |       |
 "back" history size |     50      |                                |                      |             |       |       |
-a11y                |     ?       |                                |                      |             |       |       |
 
 
 ## Credits & attribution
 ### Heroine Dusk
-Undying Dusk is basically a PDF port, with different game mechanics & slightly expanded,
-of [Clint Bellanger](http://clintbellanger.net) wonderful [Heroine Dusk](http://heroinedusk.com) game.
+Undying Dusk is basically a PDF port / [total conversion](https://en.wikipedia.org/wiki/Mod_(video_games)#Total_conversion)
+of [Clint Bellanger](http://clintbellanger.net) wonderful [Heroine Dusk](http://heroinedusk.com) game,
+with different game mechanics & slightly expanded.
 
 I cannot thank him enough for providing the foundations of this game,
 under a GPL v3 / CC-BY-SA 3.0 license:
@@ -180,8 +172,8 @@ on top of black characters.
 ### Music
 Songs used in the game :
 - [M31 by Yubatake](https://soundcloud.com/yubatake/m31) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
-- [A Darkness Opus](https://opengameart.org/content/a-darkness-opus), [Audience](https://opengameart.org/content/audience), [Dark Hall](https://opengameart.org/content/north-wind-more-music-inside), [Full of memories](https://opengameart.org/content/full-of-memories), [Insight](https://opengameart.org/content/insight), [Mystery Forest](https://opengameart.org/content/mystery-forest), [Mystical Theme](https://opengameart.org/content/mystical-theme) & [Treasures Of Ancient Dungeon 2](https://opengameart.org/content/treasures-of-ancient-dungeon-2) by Alexandr Zhelanov - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
-- [Lillibullero](https://opengameart.org/content/lillibullero-simple-fantasy-song) & [10 Mysteries of The Mechanical Prince](https://opengameart.org/content/10-mysteries-of-the-mechanical-prince) by Tomasz Kucza (Magnesus) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [A Darkness Opus](https://opengameart.org/content/a-darkness-opus), [Audience](https://opengameart.org/content/audience), [Caves of sorrow](https://opengameart.org/content/caves-of-sorrow), [Dark Hall](https://opengameart.org/content/north-wind-more-music-inside), [Full of memories](https://opengameart.org/content/full-of-memories), [Insight](https://opengameart.org/content/insight), [Mystery Forest](https://opengameart.org/content/mystery-forest), [Mystical Theme](https://opengameart.org/content/mystical-theme) & [Treasures Of Ancient Dungeon 2](https://opengameart.org/content/treasures-of-ancient-dungeon-2) by Alexandr Zhelanov - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [10 Mysteries of The Mechanical Prince](https://opengameart.org/content/10-mysteries-of-the-mechanical-prince) by Tomasz Kucza (Magnesus) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [Fantasy Music - Night Town by Angus Macnaughton](https://opengameart.org/content/fantasy-music-night-town) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - [Dark Winds](https://opengameart.org/content/orchestral-epic-fantasy-music) & [Orchestral Looming Battle](https://opengameart.org/content/orchestral-battle-music) by Johan Jansen (Zefz) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [Dark Descent](https://opengameart.org/content/dark-descent), [Defying Commodus](https://opengameart.org/content/defying-commodus), [Heroic Demise](https://opengameart.org/content/heroic-demise-updated-version), [Soliloquy](https://opengameart.org/content/soliloquy), [Spiritwatcher](https://opengameart.org/content/spiritwatcher) & [The Fall of Arcana](https://opengameart.org/content/the-fall-of-arcana-epic-game-theme-music) by Matthew Pablo - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)

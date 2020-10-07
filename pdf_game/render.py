@@ -67,8 +67,6 @@ def render_page(pdf, game_view, render_victory):
             y = 50 if game_view.state.msg_place else 80
             y -= 10*newlines_count
         bitfont_render(pdf, game_view.state.message, 80, y, Justify.CENTER)
-        if game_view.state.text_msg:
-            bitfont_render(pdf, game_view.state.text_msg.text, *game_view.state.text_msg.pos, as_text=True)
     if game_view.state.music:
         assert game_view.state.music_btn_pos
         action_button_render(pdf, 'MUSIC', url=game_view.state.music, btn_pos=game_view.state.music_btn_pos)
@@ -240,7 +238,7 @@ def combat_render(pdf, game_state):
     if _enemy.hp > 0 or enemy_has_frames:  # if the enemy visual is made of several frames, assume there is one for its death
         enemy_render(pdf, _enemy, game_state.combat.round)
         if game_state.combat.boneshield_up:
-            pdf.image('enemies/bone_shield.png', x=0, y=0)  # Replicates boss_boneshield_render
+            pdf.image('assets/enemies/bone_shield.png', x=0, y=0)  # Replicates boss_boneshield_render
     elif game_state.combat.gold_treasure:
         treasure_render_gold(pdf, game_state.combat.gold_treasure)
     if game_state.combat.round:

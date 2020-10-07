@@ -42,7 +42,7 @@ def reduce_views(game_views, multipass=True):
         total_views_removed += views_removed
         pass_number += 1
         in_game_views = out_game_views
-        if not views_removed or not multipass:
+        if not views_removed or not multipass or views_removed < 25:  # Last condition avoid > 20 passes...
             break
     print(f'-{100*(total_views_removed)/len(game_views):0f}% of views were removed by the reducer')
     return out_game_views

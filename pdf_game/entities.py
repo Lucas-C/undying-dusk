@@ -117,11 +117,6 @@ class Book(NamedTuple):
     next: Optional['Book'] = None  # using a Forward Reference type hint
 
 
-class TextualMessage(NamedTuple):
-    text: str
-    pos: Position
-
-
 class GameState(NamedTuple):
     'Minimal, immutable set of properties that define a unique instant in the game'
     # Avatar info:
@@ -151,7 +146,6 @@ class GameState(NamedTuple):
     shop_id: int = -1  # meaningful only if >= 0
     message: str = ''
     msg_place: MessagePlacement = MessagePlacement.DOWN
-    text_msg: Optional[TextualMessage] = None
     book: Optional[Book] = None
     trick: Optional[Trick] = None
     fixed_id: int = 0  # sets a fixed page ID for this GameView
@@ -165,7 +159,7 @@ class GameState(NamedTuple):
     music_btn_pos: Optional[Position] = None
     # pylint: disable=no-member
     def clean_copy(self):
-        return self._replace(message='', msg_place=MessagePlacement.DOWN, text_msg=None,
+        return self._replace(message='', msg_place=MessagePlacement.DOWN,
                              milestone=GameMilestone.NONE,
                              book=None, treasure_id=0,
                              music='', music_btn_pos=None,

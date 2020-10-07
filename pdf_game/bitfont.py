@@ -12,8 +12,8 @@ RED_RGB = (208, 70, 72)
 WHITE_RGB = (222, 238, 214)
 
 _RENDER_AS_TEXT = False # Use .otf/.ttf font files. Otherwise use original image-based text rendering.
-                        # Note: enabling it reduces by ~7% the size of an output file that originally was ~160Mb,
-                        # and is required to make the PDF accessible.
+                        # Note: enabling it reduced by ~7% the size of an output file that originally was ~160Mb.
+                        # It would be required to make the PDF accessible.
                         # However the fonts are slightly less prettiers, and there is currently a bug with parens
 _FONTS_LOADED = False
 _ACTIVE_COLOR = WHITE_RGB
@@ -31,10 +31,7 @@ def bitfont_color_red():
     bitfont_set_color_red(False)
 
 
-def bitfont_render(pdf, text, x, y, justify=Justify.LEFT, as_text=False, size=8, page_id=None, url=None, link=None):
-    global _RENDER_AS_TEXT
-    if as_text:
-        _RENDER_AS_TEXT = True
+def bitfont_render(pdf, text, x, y, justify=Justify.LEFT, size=8, page_id=None, url=None, link=None):
     with trace_time('render:bitfont'):
         min_x, max_x = config().VIEW_WIDTH, 0
         lines = text.split('\n')
@@ -45,7 +42,6 @@ def bitfont_render(pdf, text, x, y, justify=Justify.LEFT, as_text=False, size=8,
         if url or page_id or link:
             return add_link(pdf, x=min_x, y=y, width=max_x - min_x, height=10*len(lines) - 4,
                             page_id=page_id, url=url, link=link)  # TODO: pass link_alt=
-    _RENDER_AS_TEXT = False
     return None
 
 
