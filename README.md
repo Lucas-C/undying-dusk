@@ -11,9 +11,11 @@
     + ce qu'ils ont préféré ?
     + visuellement moche ?
     + truc répétitif
+- create SubReddit
 - code clean-up: rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
 - highscore URL on victory screen -> form where to name & enter PDF reader soft
 - trailer GIF like heroine_dusk_story_trailer_480p.gif
+- create itch.io page
 - graphical finishing touches:
   * hides platino on victory screen with 4 secrets
   * add sprite when using spells? for boss lightining attack?
@@ -25,7 +27,8 @@
   * questions to Sandra Bruel:
     + quels lecteurs PDF vos amis emploient ?
     + comment rendre des liens de type image accessibles ?
-- PDF size improvement:
+- size improvements:
+  * 34M music/AlexandrZhelanov-ADarknessOpus.ogg
   * stats on what fights / tiles get the most rendered
   * MARGINAL EXPECTED EFFECT: pngoptimizer / optimize tilesets : many have redundant sections, a pre-rendering pass could extract tiles from tilesets and put them in a unique PNG, with mappings for the rendering step
 - ideas for another time:

@@ -1,4 +1,4 @@
-from ..entities import Book, Position, TextualMessage
+from ..entities import Book
 from ..logs import log
 
 from .scenes import tuto_spells

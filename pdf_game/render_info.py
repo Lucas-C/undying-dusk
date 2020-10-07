@@ -37,6 +37,7 @@ def info_render_equipment(pdf, game_state):
     # render worn equipment:
     info_render_equiplayer(pdf, game_state.armor, info().TYPE_ARMOR)
     info_render_equiplayer(pdf, game_state.weapon, info().TYPE_WEAPON)
+    # pylint: disable=unreachable
     return   # Removed to make the info screen less dense & cuz' it is not so useful
     # ARMOR:
     item_string = info().armors[game_state.armor].name

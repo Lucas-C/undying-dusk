@@ -123,18 +123,6 @@ def seamus_through_small_window():
     )
 
 
-def seamus_speaks(text, behind_bars=False):  # Seamus portrait speaking
-    # This cannot be placed at the top of the module to avoid a circular import:
-    # pylint: disable=import-outside-toplevel
-    from ..bitfont import bitfont_render, Justify
-    def extra_render(pdf):
-        pdf.image('assets/seamus.png', x=66, y=16)
-        if behind_bars:
-            pdf.image('assets/window-bars.png', x=62, y=13)
-        bitfont_render(pdf, text, 80, 58, Justify.CENTER)
-    return extra_render
-
-
 @cached()
 def entering_monastery_courtyard():
     minimap_tip = CutScene.new(
@@ -294,22 +282,6 @@ def seamus_in_zuruth_plains():
     )
 
 
-def seamus_speaks2(text, ctrl_f=False):  # Seamus character, standing up on the left, speaking
-    # This cannot be placed at the top of the module to avoid a circular import:
-    # pylint: disable=import-outside-toplevel
-    from ..bitfont import bitfont_color_red, bitfont_render, Justify
-    def extra_render(pdf):
-        bitfont_render(pdf, text, 158, 18, Justify.RIGHT)
-        if ctrl_f:
-            with bitfont_color_red():
-                bitfont_render(pdf, 'C', 36, 18)
-                bitfont_render(pdf, 'T', 82, 28)
-                bitfont_render(pdf, 'R', 126, 28)
-                bitfont_render(pdf, 'L', 93, 38)
-                bitfont_render(pdf, 'F', 122, 38)
-    return extra_render
-
-
 @cached()
 def risking_it_all():
     scene_6 = CutScene.new(
@@ -441,6 +413,25 @@ def the_end():
         music=BASE_MUSIC_URL + 'MatthewPablo-Soliloquy.mp3',
         next_scene_id=scene_2.id,
     )
+
+
+def seamus_speaks(text, behind_bars=False):  # Seamus portrait speaking
+    # This cannot be placed at the top of the module to avoid a circular import:
+    # pylint: disable=import-outside-toplevel
+    from ..bitfont import bitfont_render, Justify
+    def extra_render(pdf):
+        pdf.image('assets/seamus.png', x=66, y=16)
+        if behind_bars:
+            pdf.image('assets/window-bars.png', x=62, y=13)
+        bitfont_render(pdf, text, 80, 58, Justify.CENTER)
+    return extra_render
+
+
+def seamus_speaks2(text):  # Seamus character, standing up on the left, speaking
+    # This cannot be placed at the top of the module to avoid a circular import:
+    # pylint: disable=import-outside-toplevel
+    from ..bitfont import bitfont_render, Justify
+    return lambda pdf: bitfont_render(pdf, text, 158, 18, Justify.RIGHT)
 
 
 class CedarArmsSellableSwordUpgrade:

@@ -1,6 +1,6 @@
 from ..ascii import map_as_string
 from ..bitfont import bitfont_render, bitfont_set_color_red, Justify
-from ..entities import Checkpoint, CombatRound as CR, MessagePlacement, Position, RewardItem, RewardTreasure, TextualMessage, Trick
+from ..entities import Checkpoint, CombatRound as CR, MessagePlacement, Position, RewardItem, RewardTreasure, Trick
 from ..js import REL_RELEASE_DIR
 from ..logs import log, log_combat, log_path_to
 from ..mapscript import *
