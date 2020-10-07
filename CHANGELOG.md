@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.9.1] - Not yet realsed
+### Added
+- link to [SubReddit](https://www.reddit.com/r/UndyingDuskPdfGame/) in credits
+
+
 ## [0.9.0] - 2020-10-07
 First version published on GitHub.
 Pre-release aimed at playtesters.

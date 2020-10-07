@@ -1,6 +1,5 @@
 <!-- NEXT STEPS:
-- test other PDF readers & try export to Google Slides ?
-- create SubReddit
+- SubReddit: add icon & 1st post
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
   * reducer: TOO SLOW! 6> dump removed GVs & stop when #views_removed <= prev_views_removed
@@ -13,6 +12,7 @@
   * clickable reveal animation with crack?
 - post-release: publish assets & create a music collection on OGA
 - VF?
+- try export to Google Slides ?
 - a11y:
   * add alt desc on action links -> https://www.w3.org/TR/WCAG20-TECHS/pdf#PDF13
   * questions to Sandra Bruel:
@@ -77,19 +77,23 @@ To my knowledge, this is the very first video game in a PDF format.
 You will find below a comparison table of how well several PDF readers wil let you play to Undying Dusk.
 Notably, Adobe Acrobat Reader does **not** perform well to render the game.
 
-<!-- TODO: add Linux readers: Evince, Okular, XPDF -->
+PDF reader: /Criteria | [Sumatra PDF](https://www.sumatrapdfreader.org) | FoxIt | Adobe Acrobat | Firefox native (PDF.js) | Chrome native | Javelin3 | Slim | MuPDF | Xpdf | Utopia
+-|-|-|-|-|-|-|-|-|-|-
+can load the game              | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ❌ | ❌ | ✔️ | ✔️ | ❌ |
+scale graphics to fit screen   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔ | ❌ | ✔️ | ✔️ |
+full-height mode               | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔ | ✔️ | ✔️ | ✔️ |
+no visual artifact             | ✔️ | ✔️ | ☹️ | ❌ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ | ❌ |
+follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ | ✔️ |
+fast nav / ok page render time | ✔️ | ✔️ | ☹️ | ?  | ☹️ | ?  | ? | ✔️ | 🤔 | ☹️ |
+no shifting on link click      | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ?  | ✔️ | ✔️ | ✔️ |
+backspace key                  | ✔️ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+"back" history size            | 50 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
-Criteria            | Sumatra PDF | PDF.js = Firefox native reader | Chrome native reader | FoxItReader | MuPDF | Xpdf | Utopia
---------------------|-------------|--------------------------------|----------------------|-------------|-------|-------|-
-no visual artifact  |     ✔️      |                                |                      |             |       |       |
-arrows rotation     |     ✔️      |                                |                      |             |       |       |
-minimap display     |     ✔️      |                                |                      |             |       |       |
-page rendering time |     ✔️      |                                |                      |             |       |       |
-intra-PDF links     |     ✔️      |                                |                      |             |       |       |
-buttons link boxes  |     ✔️      |                                |                      |             |       |       |
-CTRL+F              |     ✔️      |                                |                      |             |       |       |
-backspace key       |     ✔️      |                                |                      |             |       |       |
-"back" history size |     50      |                                |                      |             |       |       |
+We only recommend PDF readers that meet all of the above criteria.
+
+Questions & edits on this table are welcome through _issues_ & _PRs_.
+
+<!-- TODO: add Linux readers: Evince, Okular, XPDF -->
 
 
 ## Credits & attribution
@@ -188,6 +192,10 @@ TODO
 Many thanks also to Thibault Toledano for the cheerful support and the bright suggestions
 of elements to include in the game!
 -->
+
+
+## Release notes
+_cf._ [CHANGELOG.md](CHANGELOG.md)
 
 
 ## Tools used

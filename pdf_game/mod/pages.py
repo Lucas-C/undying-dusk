@@ -64,7 +64,7 @@ def render_credit_pages(pdf, links_to_credits):
     bitfont_render(pdf, 'You can also leave a comment', 80, 85, Justify.CENTER)
     bitfont_render(pdf, 'on the                                     .', 80, 95, Justify.CENTER)
     with bitfont_color_red():
-        bitfont_render(pdf, 'dedicated subreddit', 43, 95)  # TODO: add link
+        bitfont_render(pdf, 'dedicated subreddit', 43, 95, url='https://www.reddit.com/r/UndyingDuskPdfGame/')
     bitfont_render(pdf, '-Lucas', 80, 105, Justify.CENTER)
 
     pdf.add_page()
