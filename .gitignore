@@ -1,0 +1,6 @@
+*.pdf
+*.pkl
+__pycache__/
+/minimaps/
+/small_enemies/
+/game_states.json

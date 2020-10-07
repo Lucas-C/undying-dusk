@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+
+import argparse, json, logging, os
+
+import fpdf, pikepdf
+try:  # Optional dependency:
+    from tqdm import tqdm
+except ImportError:
+    tqdm = lambda _: _
+
+from pdf_game.visit import visit_game_views
+from pdf_game.js import config
+from pdf_game.logs import quiet_logging
+from pdf_game.mapscript import mapscript_remove_all
+from pdf_game.perfs import print_perf_stats, trace_time, PerfsMonitorWrapper
+from pdf_game.render import render_page
+
+from pdf_game.mod import campaign
+from pdf_game.mod.pages import render_credit_pages, render_intro_pages, render_victory, METADATA
+# Note that there are other changes made from the "mod" package that are applied through patch* functions
+
+
+def main():
+    args = parse_args()
+    logging.basicConfig(format="%(asctime)s %(filename)s [%(levelname)s] %(message)s",
+                        datefmt="%H:%M:%S", level=logging.DEBUG)  # displays fpdf internal logs
+    logging.getLogger('PIL').setLevel(logging.INFO)
+    if not args.iter_logs:
+        quiet_logging()
+    if args.no_script:
+        mapscript_remove_all()
+    else:
+        campaign.script_it()
+    with trace_time() as trace:
+        start_view, game_views = visit_game_views(args.start_at_checkpoint, args.only_print_map,
+                                                  no_script=args.no_script, enable_reducer=not args.no_reducer,
+                                                  enable_deadend_detection=args.detect_deadends)
+    print(f'States exploration took: {trace.time:.2f}s')
+    if args.json:
+        with trace_time() as trace:
+            json_export(game_views)
+        print(f'JSON export took: {trace.time:.2f}s')
+    if args.no_pdf:
+        return
+    print('Starting PDF pages rendering')
+    pdf, links_to_credits = init_pdf(start_view.page_id)
+    with trace_time() as trace:
+        for game_view in tqdm(game_views):
+            render_page(pdf, game_view, lambda pdf, gs: render_victory(pdf, gs, links_to_credits))
+    render_credit_pages(pdf, links_to_credits)
+    print(f'Rendering of {len(pdf.pages)} pages took: {trace.time:.2f}s')
+    with trace_time() as trace:
+        pdf.output('undying-dusk.pdf', 'F')
+    print(f'Output generation took: {trace.time:.2f}s')
+    print_perf_stats()
+    pdf.print_perf_stats()
+    if args.no_metadata:
+        return
+    with trace_time() as trace:
+        set_metadata('undying-dusk.pdf', METADATA)
+    print(f'Metadata addition took: {trace.time:.2f}s')
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--start-at-checkpoint", type=int, help=" ")
+    parser.add_argument("--json", action="store_true", help=" ")
+    parser.add_argument("--iter-logs", action="store_true", help=" ")
+    parser.add_argument("--no-script", action="store_true", help=" ")
+    parser.add_argument("--no-reducer", action="store_true", help=" ")
+    parser.add_argument("--no-metadata", action="store_true", help=" ")
+    parser.add_argument("--no-pdf", action="store_true", help=" ")
+    parser.add_argument("--detect-deadends", action="store_true", help=" ")
+    parser.add_argument("--only-print-map", type=int, metavar="MAP_ID", help=" ")
+    return parser.parse_args()
+
+
+def init_pdf(start_page_id):
+    dimensions = [config().VIEW_WIDTH, config().VIEW_HEIGHT]
+    pdf = fpdf.FPDF(format=dimensions, unit='pt')
+    pdf.set_auto_page_break(False)
+    pdf = PerfsMonitorWrapper(pdf, class_name='FPDF')
+    links_to_credits = render_intro_pages(pdf, start_page_id)
+    return pdf, links_to_credits
+
+
+def json_export(game_views):
+    export = {}
+    for gv in game_views:
+        view = gv.state._asdict()
+        combat = view.get('combat')
+        if combat:  # removing non-serializable field:
+            view['combat'] = combat._replace(enemy=combat.enemy._replace(post_fight=None))
+        view['actions'] = {action: next_gv.page_id if next_gv else None
+                           for action, next_gv in gv.actions.items()}
+        export[gv.page_id] = view
+    with open('game_states.json', 'w') as json_file:
+        json.dump(export, json_file, indent=4, sort_keys=True)
+
+
+def set_metadata(filepath, metadata):
+    start_size = os.stat(filepath).st_size
+    with pikepdf.open(filepath, allow_overwriting_input=True) as pdf:
+        with pdf.open_metadata(set_pikepdf_as_editor=False) as meta:
+            for key, value in metadata.items():
+                meta[key] = value
+        pdf.save()
+    end_size = os.stat(filepath).st_size
+    print(f'Final file size: {end_size / 1024**2:.0f}Mb (metada addition added {(end_size - start_size) / 1024**2:.0f}Mb)')
+
+
+if __name__ == '__main__':
+    main()

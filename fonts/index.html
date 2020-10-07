@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Undying Dusk - Font test page</title>
+    <style>
+    @font-face { font-family: BoxyBold;      src: url('Boxy-Bold.ttf'); }
+    @font-face { font-family: BoxyBoldLight; src: url('Boxy-Bold-Light.otf'); }
+    @font-face { font-family: BoxyBoldBlack; src: url('Boxy-Bold-Black.otf'); }
+    * {
+      font-size: 1.5rem;
+      --red-color: #d04648;
+      --white-color: #deeed6;
+    }
+    pre { margin: 0; }
+    </style>
+</head>
+<body>
+    <img src="../heroine-dusk/release/images/interface/boxy_bold.png"
+         style="transform: scale(3.5); margin: 1rem 28rem; image-rendering: optimizeSpeed;">
+    <br>
+    <img src="../heroine-dusk/release/images/interface/boxy_bold_red.png"
+         style="transform: scale(3.5); margin: 1rem 28rem; image-rendering: optimizeSpeed;">
+    <pre>Original Boxy Bold:</pre>
+    <pre style="font-family: BoxyBold; color: var(--red-color);">
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+abcdefghijklmnopqrstuvwxyz
+!\#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@[\]^_`{|}~
+    </pre>
+    <pre>Boxy Bold Light:</pre>
+    <pre style="font-family: BoxyBoldLight; color: var(--red-color);">
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+abcdefghijklmnopqrstuvwxyz
+!\#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@[\]^_`{|}~
+    </pre>
+    <pre>Boxy Bold Black (OpenType SVG, renders well under Firefox, not in Chrome):</pre>
+    <pre style="font-family: BoxyBoldBlack; color: var(--white-color);">
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+abcdefghijklmnopqrstuvwxyz
+!\#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@[\]^_`{|}~
+    </pre>
+</body>
+</html>

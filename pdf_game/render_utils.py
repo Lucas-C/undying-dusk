@@ -1,0 +1,101 @@
+from .entities import Position
+from .js import action, REL_RELEASE_DIR
+
+
+BACKGROUNDS = 'black,nightsky,tempest,interior'.split(',')
+ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE'.split(',')  # order matches position in .png
+ITEMS_SPELLS_BUTTON_POS = {
+    # Unaltered:
+    'INFO': Position(x=140, y=0),
+    'ATTACK': Position(x=120, y=20),
+    'BUCKLER': Position(x=140, y=20),
+    'RUN': Position(x=140, y=20),
+    # Re-arrange spells to give space to items when rendering INFO:
+    'HEAL': Position(x=100, y=40),
+    'BURN': Position(x=120, y=40),
+    'UNLOCK': Position(x=140, y=40),
+    'LIGHT': Position(x=100, y=60),
+    'FREEZE': Position(x=120, y=60),
+    'REFLECT': Position(x=140, y=60),
+    'PUSH': Position(x=72, y=60),         # so far, aligned with box sprite
+    'NO_PUSH': Position(x=72, y=60),      # so far, aligned with box sprite
+    'EXAMINE': Position(x=66, y=72),      # so far, aligned with bookshelf & well sprites
+    'EMPTY_BOTTLE': Position(x=100, y=91),
+    'HOLY_WATER': Position(x=100, y=91),  # same (can never be carried together)
+    'CRUCIFIX': Position(x=120, y=91),
+    'SCROLL': Position(x=100, y=91),      # same (can never be carried together)
+    'BOOTS': Position(x=120, y=91),
+    'AMULET': Position(x=120, y=91),      # same (can never be carried together)
+    'PRAY': Position(x=100, y=91),        # never displayed with another item, only once in EXPLORE mode
+    'FISH': Position(x=140, y=91),
+    'BLUE_KEY': Position(x=140, y=91),    # same (can never be carried together)
+    'TALK': Position(x=76, y=30),         # so far, aligned with dungeon_wall_small_window sprite
+    'GLIMPSE': Position(x=76, y=79),      # so far, aligned with Canal Boneyard water
+}
+WHITE_ARROW_NAMES = 'BACK,NEXT'.split(',')  # order matches position in .png
+WHITE_ARROW_SIZE = 16
+
+
+def tileset_background_render(pdf, bg_id):
+    img_filepath = f'assets/backgrounds/{bg_id}.png' if isinstance(bg_id, str) else REL_RELEASE_DIR + f'images/backgrounds/{BACKGROUNDS[bg_id]}.png'
+    pdf.image(img_filepath, x=0, y=0)
+
+
+def action_button_render(pdf, btn_type, page_id=None, url='', btn_pos=None):
+    if not btn_pos:
+        btn_pos = ITEMS_SPELLS_BUTTON_POS[btn_type]
+    img_index = ACTION_BUTTONS.index(btn_type)
+    if img_index < 8:  # Original button:
+        img_filepath = REL_RELEASE_DIR + action().button_img.src
+    else:  # Newly introduced action:
+        img_index -= 8
+        img_filepath = 'assets/extra_action_buttons.png'
+    render_button(pdf, btn_pos, img_filepath, img_index, page_id=page_id, url=url, link_alt=btn_type)
+
+
+def white_arrow_render(pdf, name, x, y, page_id=None):
+    img_index = WHITE_ARROW_NAMES.index(name)
+    link = link_from_page_id(pdf, page_id) if page_id else None
+    with pdf.rect_clip(x=x, y=y, w=WHITE_ARROW_SIZE, h=WHITE_ARROW_SIZE):
+        pdf.image('assets/white_arrows.png', x=x - img_index*WHITE_ARROW_SIZE, y=y, link=link)  # TODO: pass link_alt
+
+
+def render_button(pdf, btn_pos, img_filepath, img_index=0, page_id=None, url='', link_alt=''):
+    btn_size, btn_offset = action().BUTTON_SIZE, action().BUTTON_OFFSET
+    x = btn_pos.x + btn_offset
+    y = btn_pos.y + btn_offset
+    # relies on: https://github.com/reingart/pyfpdf/pull/158
+    with pdf.rect_clip(x=x, y=y, w=btn_size, h=btn_size):
+        pdf.image(img_filepath, x=x - img_index*btn_size, y=y)  # DEBUG NOTE: passing link= here creates a bug with RUN button
+    if page_id or url:
+        return add_link(pdf, x, y, btn_size, btn_size, page_id=page_id, url=url, link_alt=link_alt)
+    return None
+
+
+def add_link(pdf, x, y, width, height, page_id=None, url='', link=None, link_alt=''):
+    if page_id is not None:
+        assert not (link or url)
+        link = link_from_page_id(pdf, page_id)
+    if url: assert isinstance(url, str)
+    if link: assert isinstance(link, int)
+    pdf.link(x, y, width, height, link or url, link_alt)
+    return link
+
+
+def link_from_page_id(pdf, page_id):
+    assert page_id and isinstance(page_id, int), page_id
+    link = pdf.add_link()
+    pdf.set_link(link, page=page_id)
+    return link
+
+
+def get_image_info(pdf, img_filepath):
+    # Replicates some logic from FPDF.images().
+    # Could be exposed as a FPDF method with a minor refactor.
+    info = pdf.images.get(img_filepath)
+    if not info:
+        # pylint: disable=protected-access
+        info = pdf._parsepng(img_filepath)  # all of this game images are PNGs
+        pdf.images[img_filepath] = info
+        info['i'] = len(pdf.images)
+    return info

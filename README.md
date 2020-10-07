@@ -1,0 +1,228 @@
+<!-- NEXT STEPS:
+- test other PDF readers & try export to Google Slides ?
+- questions pour playtesteurs: Kevin, Pierre, Simon, Matth, Elliot, Nicolas, Maxime + Thib
+  * leur demander si OK via sms à choix multiples
+  * formuler questions via https://framaforms.org/content/creez-et-diffusez-vos-formulaires-facilement
+  * A lire AVANT de jouer:
+    + gardez l'oeil sur des bugs/glitchs, les phrases bizarrement formulées, et vos ressentis/difficultés -> prendre des notes / screenshots
+  * A lire APRES avoir joué:
+    + combien de temps ça leur a pris ? ont-ils trouvé la fin ? trich ?
+    + énigme la plus dure ou frusrante ?
+    + ce qu'ils ont préféré ?
+    + visuellement moche ?
+    + truc répétitif
+- code clean-up: rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
+- highscore URL on victory screen -> form where to name & enter PDF reader soft
+- trailer GIF like heroine_dusk_story_trailer_480p.gif
+- graphical finishing touches:
+  * hides platino on victory screen with 4 secrets
+  * add sprite when using spells? for boss lightining attack?
+  * clickable reveal animation with crack?
+- post-release: publish assets & create a music collection on OGA
+- VF?
+- a11y:
+  * add alt desc on action links -> https://www.w3.org/TR/WCAG20-TECHS/pdf#PDF13
+  * questions to Sandra Bruel:
+    + quels lecteurs PDF vos amis emploient ?
+    + comment rendre des liens de type image accessibles ?
+- PDF size improvement:
+  * stats on what fights / tiles get the most rendered
+  * MARGINAL EXPECTED EFFECT: pngoptimizer / optimize tilesets : many have redundant sections, a pre-rendering pass could extract tiles from tilesets and put them in a unique PNG, with mappings for the rendering step
+- ideas for another time:
+  * perso conscient d'être dans PDF
+  * offer choices that matters on the ending
+  * enemies: griffon, moving_statue
+  * drunk/potion -> mess with direction arrows (reversed / all over the page)
+  * cloak to bypass enemy (avoid an encounter)
+  * light up torch and go to some place previously very dark
+  * place bomb on stone door doorstep (require a "broken wall" tile)
+  * item to jump/teleport over a fixed distance
+  * ACTIONS from dawnlike-level-16x16.png: bed, skull, rope, glove, diamond, snake, crown
+                 dawnlike-npcs-16x16.png: interrogation mark, shadow form
+  * try other PDF features: PrevPage ? sub-page navigation ?
+  * implement monster arrival animations & attacks & delayed log msgs using PDF `Transitions` or as a GIF (_cf._ [Patrick Gallot article](https://www.datalogics.com/blog/corporate/the-making-of-a-pdf-presentation/))
+  * use navigation node `Dur` to implement QTEs / real-time game mechanics ?
+- secrets:
+  * [x] empress soul at the bottom of the abyss
+  * [x] throwing gold piece in fountain (hint hidden on a special wall sprite)
+  * [x] beating the shadow soul once equipped with armor, giving access to the dead tree
+  * [x] konami code on last map
+- hidden in original sources:
+  * 3 monsters: goblin, storm dragon & violence demon
+  * 3 extra spells: LIGHT, FREEZE & REFLECT
+  * extra equipment: 4 armors & 4 weapons
+  * extra background: snowy forest
+-->
+[![Pull Requests Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
+[![build status](https://github.com/Lucas-C/undying-dusk/workflows/build/badge.svg)](https://github.com/Lucas-C/undying-dusk/actions?query=workflow%3Abuild)
+![GPL v3 license](https://img.shields.io/badge/License-GPL%20v3-blue.svg)
+
+![Title](title.png)
+
+**Undying Dusk** is a video game in a PDF format,
+that turns classical dungeon crawling into logic puzzles.
+
+The game is set in a fantasy realm where a curse set by the Empress keeps the world in an eternal dusk.
+You are a woman who recently found shelter in a monastery.
+
+It features:
+- ~150 000 PDF pages
+- a retrogaming aesthetic: 160x120 pixels resolution and a 16 colors palette
+- a grid-based world with 36 different tiles and 10 maps to explore
+- 25 treasure items, weapons & spells to pick up in order to face 17 enemy monsters
+- 21 music tracks
+- 17530 "Game Over" pages, and a single path to victory
+- 4 hidden secrets
+
+It was made during the summer of 2020 by Lucas Cimon.
+To my knowledge, this is the very first video game in a PDF format.
+
+
+## Compatible PDF readers
+You will find below a comparison table of how well several PDF readers wil let you play to Undying Dusk.
+Notably, Adobe Acrobat Reader does **not** perform well to render the game.
+
+<!-- TODO: add Linux readers: Evince, Okular, XPDF -->
+
+Criteria            | Sumatra PDF | PDF.js = Firefox native reader | Chrome native reader | FoxItReader | MuPDF | Xpdf | Utopia
+--------------------|-------------|--------------------------------|----------------------|-------------|-------|-------|-
+no visual artifact  |     ✔️      |                                |                      |             |       |       |
+arrows rotation     |     ✔️      |                                |                      |             |       |       |
+minimap display     |     ✔️      |                                |                      |             |       |       |
+page rendering time |     ✔️      |                                |                      |             |       |       |
+intra-PDF links     |     ✔️      |                                |                      |             |       |       |
+buttons link boxes  |     ✔️      |                                |                      |             |       |       |
+CTRL+F              |     ✔️      |                                |                      |             |       |       |
+backspace key       |     ✔️      |                                |                      |             |       |       |
+"back" history size |     50      |                                |                      |             |       |       |
+a11y                |     ?       |                                |                      |             |       |       |
+
+
+## Credits & attribution
+### Heroine Dusk
+Undying Dusk is basically a PDF port, with different game mechanics & slightly expanded,
+of [Clint Bellanger](http://clintbellanger.net) wonderful [Heroine Dusk](http://heroinedusk.com) game.
+
+I cannot thank him enough for providing the foundations of this game,
+under a GPL v3 / CC-BY-SA 3.0 license:
+high quality Javascript source code of a retro dungeon-crawler game engine,
+and numerous gorgeous visual assets of tiles, enemies & items.
+Thank you Clint!
+
+
+### Graphical assets
+First of all, this game uses the great 16 color palette made by [DawnBringer at PixelJoint](http://www.pixeljoint.com/forum/forum_posts.asp?TID=12795). 
+
+This game also makes use of the following assets, some of which I ported to the DawnBringer palette:
+- all the original art was made by Clint Bellanger for the original Heroine Dusk game - [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+- enemies come from [Redshrike remix of Heroine Dusk original ones](https://opengameart.org/content/first-person-dungeon-crawl-enemies-remixed).
+Seamus wizard & demon portrait come from his [6 More RPG Enemies spritesheet](https://opengameart.org/content/6-more-rpg-enemies) and the black bird from his [Tower Defense Prototyping Assets]( https://opengameart.org/content/tower-defense-prototyping-assets-4-monsters-some-tiles-a-background-image) - all [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+Shadow soul extra frames come from [Bosses and monsters spritesheets (Ars Notoria) by Balmer](https://opengameart.org/content/bosses-and-monsters-spritesheets-ars-notoria) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- most new sprites (direction arrow, items, tiles) come from the awesome [_Recolor all the items!!!_ spritesheet by Marcus Ihde](https://opengameart.org/content/recolor-all-the-items) - [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+- bible, fish & scroll 16x16 icons from [Kyrise's Free 16x16 RPG Icon Pack](https://opengameart.org/content/kyrises-free-16x16-rpg-icon-pack) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- cloudy town, flying demon, prie-dieu, statue, wood box & well from [GothicVania Patreon Collection](http://pixelgameart.org/web/portfolio/gothicvania/), [GothicVania Church assets](https://opengameart.org/content/gothicvania-church-pack), [GothicVania Cemetery assets](https://opengameart.org/content/gothicvania-cemetery-pack), [GothicVania Town assets](https://opengameart.org/content/gothicvania-town), [Forest Background](https://opengameart.org/content/forest-background) & [Mountain at Dusk Background](https://opengameart.org/content/mountain-at-dusk-background) by Luis Zuno (@ansimuz) - public domain
+- [forest fringe](https://opengameart.org/content/forest-and-grave) & [valley village](https://opengameart.org/content/village-in-the-valley) backgrounds by trulio - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [!$dungeon Of Sorrow Gate](https://www.deviantart.com/nicnubill/art/dungeon-Of-Sorrow-Gate-407553705) & [!$Secret Passage](https://www.deviantart.com/nicnubill/art/Secret-Passage-716158385) by Nicnubill
+- portculli from [LPC castle by Evert](https://opengameart.org/content/lpc-castle) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- fire from [[LPC] Dungeon Elements by Sharm](https://opengameart.org/content/lpc-dungeon-elements) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- [Boulder pixel art by TdeLeeuw](https://www.deviantart.com/tdeleeuw/art/Boulder-pixel-art-427731885) - [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/)
+- portal by [LetargicDev](https://opengameart.org/content/portals) - CC0
+- dead tree by [JRob774](https://opengameart.org/content/dead-tree-1) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- health bar from [Buch Golden UI](https://opengameart.org/content/golden-ui) - CC0
+- torch on wall from [Blackspire studio Medieval PixelArt assets](https://blackspirestudio.itch.io/medieval-pixel-art-asset-free)
+- small amulet & magnifying glass from [
+DawnLike 16x16 Universal Rogue-like tileset
+](https://opengameart.org/content/dawnlike-16x16-universal-rogue-like-tileset-v181) by DragonDePlatino - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- distant castle background by [jkjkke](https://opengameart.org/content/background-6) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- palace hall & ruins background from [CraftPix.net 2D Game Assets](https://opengameart.org/content/pixel-art-fantasy-game-battlegrounds) - [OGA-BY 3.0](https://opengameart.org/content/oga-by-30-faq)
+- Dominic portrait from [Blarumyrran faceset 2-bit](https://opengameart.org/content/faceset-2-bit) - CC0
+- Seamus portrait from [RPG portraits by Buch](https://opengameart.org/content/rpg-portraits) - CC0
+- Monk from [Oracle Portrait by Justin Nichol](https://opengameart.org/content/oracle-portrait) - [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+- Monk portrait from [Wizard by lylfDW](https://opengameart.org/content/wizard-7) - CC0
+- small storm dragon [by Sharm](https://opengameart.org/content/rpg-enemies-11-dragons) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [open book by Min](https://opengameart.org/content/open-book-0) - CC0
+- stump made from [Snake on an old stump by Angry Amish](https://opengameart.org/content/snake-on-an-old-stump) - CC0
+- hangman from [Fantasy Tiles by surt](https://opengameart.org/content/fantasy-tiles) - CC0
+- [Temple background by Ironthunder](https://opengameart.org/content/temple-background) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- blue trees from [Fairy-Tale 2D Backgrounds by CraftPix.net 2D Game Assets](https://opengameart.org/content/fairy-tale-2d-backgrounds) - [OGA-BY 3.0](https://opengameart.org/content/oga-by-30-faq)
+- boat from [Mythical Ruins Tileset by voec](https://opengameart.org/content/mythical-ruins-tileset) - CC0
+- knight from [Dungeon Crawl 32x32 tiles](https://opengameart.org/content/dungeon-crawl-32x32-tiles) - CC0
+- small mimics from [Chest and Mimic by IndigoFenix](https://opengameart.org/content/chest-and-mimic) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [blood splat by PWL](https://opengameart.org/content/blood-splats) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [Rose Flower by Lovecraft](https://opengameart.org/content/rose-flower-pyxeledit-document-and-image) - CC0
+<!--
+* knight from [2d Lost Garden Zelda style tiles resized to 32x32 with additions](https://opengameart.org/node/11758) by Daniel Cook, Jetrel, Saphy (TMW), Zabin, Bertram - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+* griffon: Lanea Zimmerman (AKA Sharm) https://forums.rpgmakerweb.com/index.php?threads/sharms-stuff.26278/
+* scene_cave: https://opengameart.org/content/parallax-halloween-2d-game-backgrounds
+-->
+
+### Fonts
+The Boxy Bold font was made [by Clint Bellanger for Heroine Dusk](https://opengameart.org/content/boxy-bold-font).
+
+It was packaged into a `.ttf` file by [William Thompson](https://opengameart.org/content/boxy-bold-truetype-font) and released in the public domain,
+with lowercase letters added.
+
+However this `.ttf` file has many minor differences with Clint Bellanger original font:
+it is monospaced, the character spacing is larger and the `"`, `'`, `1`, `2`, `I`, `S`, `{`, `}` & `~` characters are not rendered identically.
+
+During the development of this game, 2 new fonts were created from William Thompson `Boxy-Bold.ttf`.
+Both are released into the public domain:
+- `Boxy-Bold-Black.otf` : an [OpenType SVG font](https://fr.wikipedia.org/wiki/OpenType-SVG))
+allowing to preserve the black outline while changing the characters color.
+Sadly this kind of font cannot be embedded in a PDF, as of september 2020.
+- `Boxy-Bold-Light.otf` : a trimmed down variant of `Boxy-Bold.ttf`,
+that was used for an earlier prototype version of the game in order to add a "layer of color"
+on top of black characters.
+
+### Music
+Songs used in the game :
+- [M31 by Yubatake](https://soundcloud.com/yubatake/m31) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [A Darkness Opus](https://opengameart.org/content/a-darkness-opus), [Audience](https://opengameart.org/content/audience), [Dark Hall](https://opengameart.org/content/north-wind-more-music-inside), [Full of memories](https://opengameart.org/content/full-of-memories), [Insight](https://opengameart.org/content/insight), [Mystery Forest](https://opengameart.org/content/mystery-forest), [Mystical Theme](https://opengameart.org/content/mystical-theme) & [Treasures Of Ancient Dungeon 2](https://opengameart.org/content/treasures-of-ancient-dungeon-2) by Alexandr Zhelanov - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [Lillibullero](https://opengameart.org/content/lillibullero-simple-fantasy-song) & [10 Mysteries of The Mechanical Prince](https://opengameart.org/content/10-mysteries-of-the-mechanical-prince) by Tomasz Kucza (Magnesus) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [Fantasy Music - Night Town by Angus Macnaughton](https://opengameart.org/content/fantasy-music-night-town) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- [Dark Winds](https://opengameart.org/content/orchestral-epic-fantasy-music) & [Orchestral Looming Battle](https://opengameart.org/content/orchestral-battle-music) by Johan Jansen (Zefz) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [Dark Descent](https://opengameart.org/content/dark-descent), [Defying Commodus](https://opengameart.org/content/defying-commodus), [Heroic Demise](https://opengameart.org/content/heroic-demise-updated-version), [Soliloquy](https://opengameart.org/content/soliloquy), [Spiritwatcher](https://opengameart.org/content/spiritwatcher) & [The Fall of Arcana](https://opengameart.org/content/the-fall-of-arcana-epic-game-theme-music) by Matthew Pablo - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [Old Crypt by Janne Hanhisuanto](https://opengameart.org/content/radakan-old-crypt) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+
+Also, this game was mostly coded while listening to _Lance's Dark Mood Party Mixes_!
+
+<!--
+### Playtesters
+TODO
+
+Many thanks also to Thibault Toledano for the cheerful support and the bright suggestions
+of elements to include in the game!
+-->
+
+
+## Tools used
+- Python programming language
+- Notepad++
+- Sumatra PDF reader
+- Firefox
+- Gimp with a plugin to upscale sprites:
+[gimp-plugin-pixel-art-scalers](https://github.com/bbbbbr/gimp-plugin-pixel-art-scalers) by bbbbbr and its Scale2X filter
+<!-- Alternatives:
+* [scalepx.py](https://github.com/pixlsus/registry.gimp.org_static/blob/master/registry.gimp.org/files/scalepx.py.txt)
+Gimp plugin by VK and its Eagle2x filter, cf. https://opengameart.org/forumtopic/pixelart-scaler-scalenx-and-eaglenx-for-gimp
+* testé, très complet: https://github.com/Hawkynt/2dimagefilter
+* non testé: https://github.com/gamestdio/hqx
+-->
+
+
+## Build steps
+
+    git clone https://github.com/clintbellanger/heroine-dusk
+    pip install -r requirements.txt
+    ./gen_pdf.py
+
+To launch the original Heroine Dusk web version:
+
+    cd heroine-dusk/release/; python3 -m http.server 8888; cd -
+
+
+## License
+The code for Undying Dusk is released under [GPL v3 license](https://www.gnu.org/licenses/gpl-3.0.en.html),
+[climate-strike BSD](https://github.com/climate-strike/license/blob/master/licenses/BSD)
+and [The Hippocratic License 2.1](https://firstdonoharm.dev).
+All other content created for the game (text, images...) is under [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) license.

@@ -1,0 +1,309 @@
+from . import Proxy
+from .scenes import patch_map_shops
+
+
+MAUSOLEUM_PORTAL_COORDS = (8, 2, 12)
+VILLAGE_PORTAL_COORDS = (5, 9, 3)
+WALKABLE_BONES_AND_BOXES = False  # for --no-script mode
+
+
+def custom_can_move_to(_map, x, y, game_state):
+    'Allow to override the default tile walkability on specific coordinates'
+    if WALKABLE_BONES_AND_BOXES and _map.tiles[y][x] in (16, 33, 36):  # skull pile or interior/exterior box
+        return True
+    if _map.name == 'Monastery Trail':
+        if (x, y) == (6, 1):
+            return False  # removing exit to Monastery
+        if (x, y) in ((11, 7), (11, 8), (11, 9)):
+            return True  # secret passage through a tree to access a chest
+    if _map.name == 'Cedar Village':
+        if (x, y) == VILLAGE_PORTAL_COORDS[1:]:
+            return game_state.tile_override_at(VILLAGE_PORTAL_COORDS) and not is_instinct_preventing_to_pass_village_portal(game_state)
+    if _map.name == 'Zuruth Plains':
+        if (x, y) == (3, 15) and 'RUMOR_HEARD' in game_state.hidden_triggers:
+            return True  # give access to the hidden chest, if avatar heard the rumor about it
+        if (x, y) == (13, 14) and 'BOOTS' in game_state.items:
+            return True  # can enter shallow waters to access the chest
+        if (x, y) == (4, 2):
+            return not is_instinct_preventing_to_enter_village(game_state)
+    if _map.name == 'Canal Boneyard':
+        if (x, y) == (3, 2) and 'BOOTS' in game_state.items:
+            return True  # can enter shallow waters to access the hint sign
+        if (x, y) == (11, 5):
+            return False  # forbid to move behind exit to Mausoleum
+    if _map.name == 'Mausoleum':
+        if (x, y) == (0, 7):
+            return False  # forbid to move behind exit to Canal Boneyard
+        if _map.tiles[y][x] == 15 and 'BOOTS' in game_state.items:
+            return True  # can walk on shallow waters
+        if (x, y) == MAUSOLEUM_PORTAL_COORDS[1:]:
+            return game_state.tile_override_at(MAUSOLEUM_PORTAL_COORDS) and not is_instinct_preventing_to_pass_mausoleum_portal(game_state)
+    return None
+
+
+def is_instinct_preventing_to_enter_village(game_state):
+    # The village must be accessed from Zuruth Plains 3 times:
+    # - when avatar has 2 MP and the scroll, to go see Sage Therel
+    # - when avatar has 20 gold, to buy the boots
+    # - when avatar has 60 gold, to repair the sword & get a nigth of rest
+    return (game_state.mp < 2 or 'SCROLL' not in game_state.items) and game_state.gold < 10
+
+
+def is_instinct_preventing_to_pass_mausoleum_portal(game_state):
+    # We forbid to get back to village if the heroine has the UNLOCK spell,
+    # but hasn't collected all the armor parts yet:
+    return game_state.spellbook == 3 and game_state.items.count('ARMOR_PART') < 4
+
+
+def is_instinct_preventing_to_pass_village_portal(game_state):
+    # We forbid to get back to Mausoleum if the heroine hasn't picked the UNLOCK spell yet,
+    # or hasn't taken a night of rest at the inn:
+    return game_state.spellbook < 3 or game_state.gold >= 10
+
+
+def patch_tileset(tileset):
+    # Defining new tiles "walkablity":
+    return Proxy(draw_area=tileset.draw_area, walkable=list(tileset.walkable) + [
+        False,  # 20 = boulder_floor
+        False,  # 21 = boulder_ceiling
+        False,  # 22 = boulder_grass
+        True,   # 23 = sign_grass
+        False,  # 24 = fountain
+        False,  # 25 = portcullis_exterior
+        False,  # 26 = portcullis_interior
+        True,   # 27 = portal_interior
+        False,  # 28 = portal_interior_closed
+        False,  # 29 = dead_tree
+        False,  # 30 = dungeon_wall_tagged
+        False,  # 31 = well
+        False,  # 32 = dungeon_wall_torch
+        False,  # 33 = box_interior
+        False,  # 34 = dungeon_wall_bookshelf
+        False,  # 35 = dungeon_wall_bookshelf_torch
+        False,  # 36 = box_exterior
+        True,   # 37 = hay_pile_exterior
+        False,  # 38 = statue
+        False,  # 39 = statue_with_amulet
+        True,   # 40 = fire
+        False,  # 41 = dungeon_wall_small_window
+        True,   # 42 = stump
+        True,   # 43 = stump_with_bottle
+        True,   # 44 = seamus_on_grass
+        True,   # 45 = seamus_on_floor
+    ])
+
+
+def patch_atlas(atlas):
+    maps = [Proxy(name=_patch_map_name(_map.name),
+                  background=_map.background,
+                  tiles=_patch_tiles(_map),
+                  exits=_patch_exits(_map),
+                  shops=patch_map_shops(_map)) for _map in atlas.maps]
+    return Proxy(maps=maps)
+
+
+def _patch_map_name(name):
+    if name == 'Serf Quarters':
+        return 'Your cell'
+    if name == 'Monk Quarters':
+        return 'Scriptorium'
+    if name == 'Meditation Point':
+        return 'Library'
+    if name == 'Trade Tunnel':
+        return 'Templar Academy'
+    return name
+
+
+def _patch_tiles(_map):
+    tiles = [list(row) for row in _map.tiles]
+    # if _map.name == 'Serf Quarters':  tiles[3][1] = 34  # test bookshelf
+    if _map.name == 'Monk Quarters':  # new map: Scriptorium
+        return [  # This is meant as a simple enigma & tutorial map
+          [ 2, 2, 2,32, 2],
+          [ 2, 5,33, 5, 2],
+          [ 3, 5,33, 5, 3],
+          [ 2, 5,33, 5, 2],
+          [ 2,32, 2,41, 2],
+        ]
+    if _map.name == 'Meditation Point':  # renamed: Library
+        return [
+          [ 0, 0, 0, 0, 0],
+          [ 0,34,34,34, 0],
+          [34, 5, 5, 5,34],
+          [34, 5, 5, 5,34],
+          [ 2, 7, 5, 7, 2],
+          [ 2, 2, 3, 2, 2]
+        ]
+    if _map.name == "Gar'ashi Monastery":
+        x, y = 1, 5;   tiles[y][x] = 6   # grass
+        x, y = 1, 6;   tiles[y][x] = 31  # well
+        x, y = 1, 7;   tiles[y][x] = 6   # grass
+    if _map.name == 'Monastery Trail':
+        x, y = 2, 2;   tiles[y][x] = 31  # well
+        x, y = 11, 9;  tiles[y][x] = 43  # adding stump hidden in the forest
+    if _map.name == 'Cedar Village':
+        x, y = 1, 10;  tiles[y][x] = 6   # allowing space for the boulder so that it does not block the passage
+        x, y = 2, 3;   tiles[y][x] = 23  # adding a sign
+        x, y = 6, 6;   tiles[y][x] = 24  # placing foutain
+    if _map.name == 'Zuruth Plains':
+        x, y = 1, 9;   tiles[y][x] = 44  # Seamus hidden among the trees on the west
+        x, y = 9, 4;   tiles[y][x] = 38  # replacing chest by statue
+        x, y = 7, 15;  tiles[y][x] = 32  # torch on left side of door to Templar Academy
+        x, y = 9, 15;  tiles[y][x] = 32  # torch on right side of door to Templar Academy
+        x, y = 14, 15; tiles[y][x] = 3   # locked door aside chest on south-east
+        # Adding an extra line of dungeon_wall at the bottom of the map, for hidden scroll:
+        tiles.append([2]*len(tiles[0]))
+    if _map.name == 'Trade Tunnel':
+        return [  # Massive redesign of the east (right) side to replace locked doors, chests & shops with a maze:
+          [ 2, 2, 3, 2, 2, 2,32, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+          [34, 5, 5, 5, 2, 5, 5, 5, 2, 5, 5, 5, 5, 2, 5, 2],
+          [32, 5, 5, 5,16, 5,15, 5, 2, 5, 2, 2, 5, 2, 5, 2],
+          [34, 5, 5, 5, 2, 5,15, 5, 2, 8, 2, 2, 5, 2, 5, 2],
+          [ 2, 2,16, 2, 2, 5,15, 5,18 ,2, 5, 5, 5, 2, 5, 2],
+          [34, 5, 5, 5, 2, 5,15, 5, 2, 5, 5, 2, 5, 2, 5, 2],
+          [32, 5, 5, 5,32, 5, 1, 5, 2, 5, 2, 5, 5, 2, 5, 2],
+          [34, 5, 5, 5, 2, 5,15, 5, 2, 5, 2, 2, 2, 2, 5, 2],
+          [ 2, 7, 5, 7, 2, 5,15, 5, 2, 5, 2, 5, 5, 2, 5, 2],
+          [34, 5, 5, 5, 2, 5,15, 5, 2, 5, 5, 5, 2, 2, 5, 2],
+          [32, 5, 5, 5,32, 5, 1, 5, 2, 5, 2, 5, 5, 5, 5, 2],
+          [34, 5, 5, 5, 2, 5,15, 5, 2, 2, 2, 2, 2, 5, 2, 2],
+          [ 2, 2, 5, 2, 2, 5,15, 5, 5, 5, 5, 5, 5, 5, 5, 2],
+          [35, 1, 1, 7, 2, 5,15,15, 1,15,15, 1,15,15, 5,32],
+          [35, 1, 9, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2],
+          [ 2,35,35, 2, 2, 2, 2, 2,32, 2, 2,32, 2, 2, 2, 2],
+        ]
+    if _map.name == 'Canal Boneyard':
+        x, y = 1, 5;   tiles[y][x] = 25  # portcullis blocking the way back
+        x, y = 4, 2;   tiles[y][x] = 6   # grass instead of grave, so that sign/water can be reached
+        x, y = 2, 2;   tiles[y][x] = 23  # sign in the water
+        x, y = 4, 9;   tiles[y][x] = 6   # grass instead of tree, so that glimpse can be seen
+        x, y = 13, 5;  tiles[y][x] = 40  # chest_interior -> fire
+        x, y = 14, 4;  tiles[y][x] = 32  # torch on wall, on left side of chest
+        x, y = 14, 6;  tiles[y][x] = 32  # torch on wall, on right side of chest
+        x, y = 10, 5;  tiles[y][x] = 5   # passage to Mausoleum (used to be a door)
+        x, y = 11, 5;  tiles[y][x] = 5   # passage to Mausoleum (used to be a wall)
+    if _map.name == 'Mausoleum':
+        x, y = 0, 7;   tiles[y][x] = 5   # removing entrance door
+        x, y = 1, 6;   tiles[y][x] = 2   # side wall on the entrance, for continuity with the Boneyard passage
+        x, y = 1, 8;   tiles[y][x] = 2   # side wall on the entrance, for continuity with the Boneyard passage
+        x, y = 4, 6;   tiles[y][x] = 7   # pillar in the entrance hall
+        x, y = 4, 8;   tiles[y][x] = 7   # pillar in the entrance hall
+        x, y = 6, 0;   tiles[y][x] = 32  # torch on wall
+        x, y = 11, 0;  tiles[y][x] = 32  # torch on wall
+        x, y = 6, 14;  tiles[y][x] = 32  # torch on wall
+        x, y = 11, 14; tiles[y][x] = 32  # torch on wall
+        x, y = 3, 5;   tiles[y][x] = 5   # opening to the abyss
+        x, y = 3, 9;   tiles[y][x] = 32  # torch on wall
+        x, y = 3, 11;  tiles[y][x] = 34  # adding bookshelf
+        x, y = 3, 12;  tiles[y][x] = 5   # removing chest
+        x, y = 3, 13;  tiles[y][x] = 34  # adding bookshelf
+        x, y = MAUSOLEUM_PORTAL_COORDS[1:]; tiles[y][x] = 28  # adding portal, closed (south-west)
+        x, y = 4, 2;   tiles[y][x] = 5   # removing bone pile
+        x, y = 4, 7;   tiles[y][x] = 5   # removing bone pile
+        x, y = 13, 7;  tiles[y][x] = 5   # removing bone pile
+        x, y = 11, 5;  tiles[y][x] = 5   # removing bone pile
+        x, y = 6, 9;   tiles[y][x] = 5   # moving up chest (mimic) in central room...
+        x, y = 7, 4;   tiles[y][x] = 8   # ... to block the path north
+        x, y = 9, 3;   tiles[y][x] = 8   # adding a chest (mimic) in the northern corridor, behind water
+        x, y = 2, 2;   tiles[y][x] = 34  # bookshelf
+        x, y = 3, 3;   tiles[y][x] = 30  # dungeon_wall_tagged with FOUNTAIN_HINT
+        x, y = 7, 11;  tiles[y][x] = 2   # wall after warp south-west in central room
+        x, y = 10, 3;  tiles[y][x] = 2   # wall after warp north-east in central room
+        x, y = 12, 7;  tiles[y][x] = 32  # replacing straight path to exit by torch on wall
+    if _map.name == 'Dead Walkways':
+        x, y = 1, 5;   tiles[y][x] = 0   # no going back
+        x, y = 4, 8;   tiles[y][x] = 4   # pillar, for symetry
+        x, y = 5, 7;   tiles[y][x] = 4   # pillar, for sokoban puzzle
+        x, y = 4, 5;   tiles[y][x] = 18  # locked door
+        x, y = 5, 4;   tiles[y][x] = 7   # interior pillar
+        x, y = 5, 5;   tiles[y][x] = 5   # removing bone pile
+        x, y = 5, 6;   tiles[y][x] = 7   # interior pillar
+        x, y = 6, 6;   tiles[y][x] = 37  # hay pile, allow to access sokoban sokoban but prevent boxes to go up
+        x, y = 5, 7;   tiles[y][x] = 36  # box, for sokoban puzzle
+        x, y = 6, 7;   tiles[y][x] = 36  # box, for sokoban puzzle
+        x, y = 5, 8;   tiles[y][x] = 36  # box, for sokoban puzzle
+        x, y = 6, 8;   tiles[y][x] = 36  # box, for sokoban puzzle
+        x, y = 4, 9;   tiles[y][x] = 0   # shifting chest...
+        x, y = 6, 9;   tiles[y][x] = 9   # ...here 2 tiles on the right
+        x, y = 7, 9;   tiles[y][x] = 0   # useless space
+        x, y = 8, 9;   tiles[y][x] = 0   # useless space
+        x, y = 7, 2;   tiles[y][x] = 18  # locked door
+        x, y = 8, 1;   tiles[y][x] = 7   # interior pillar
+        x, y = 8, 3;   tiles[y][x] = 7   # interior pillar
+        x, y = 8, 2;   tiles[y][x] = 5   # removing bone pile
+        x, y = 9, 3;   tiles[y][x] = 45  # seamus
+    return tiles
+
+
+def _patch_exits(_map):
+    # We introduce a "facing" field on every exit, in order to force the avatar orientation when entering a map.
+    # This forbid to enter a fight backward with an enemy on a map doorstep, which can allow to bypass it by running away.
+    if _map.name == "Serf Quarters":  # renamed: "Your cell"
+        return [Proxy(exit_x=0, exit_y=2, dest_map=2, dest_x=3, dest_y=2, facing='west')]  # to Scriptorium
+    if _map.name == "Monk Quarters":  # new map: Scriptorium
+        return [
+            Proxy(exit_x=4, exit_y=2, dest_map=0, dest_x=1, dest_y=2, facing='east'),  # to Serf Quarters
+            Proxy(exit_x=0, exit_y=2, dest_map=1, dest_x=6, dest_y=6, facing='west'),  # to Gar'ashi Monastery
+        ]
+    if _map.name == "Gar'ashi Monastery":
+        return [
+            Proxy(exit_x=7, exit_y=6, dest_map=2, dest_x=1, dest_y=2, facing='east'),  # to Scriptorium
+            # _set_exit_facing(map.exits[0], 'east'),  # to Serf Quarters
+            # _set_exit_facing(map.exits[1], 'west'),  # to Monk Quarters
+            _set_exit_facing(_map.exits[2], 'north'),  # to Library (Meditation Point)
+            _set_exit_facing(_map.exits[3], 'south'),  # to Monastery Trail
+        ]
+    if _map.name == "Meditation Point":  # renamed: Library
+        return [_set_exit_facing(_map.exits[0], 'south')]
+    if _map.name == "Monastery Trail":
+        # Skipping useless exit to Gar'ashi Monastery
+        return [_set_exit_facing(_map.exits[1], 'south')]  #
+    if _map.name == "Cedar Village":
+        return [
+            _set_exit_facing(_map.exits[0], 'north'),  # to Monastery Trail
+            _set_exit_facing(_map.exits[1], 'south'),  # to Zuruth Plains
+            Proxy(exit_x=9, exit_y=3, dest_map=8, dest_x=3, dest_y=12, facing='east'),   # to Mausoleum through portal
+        ]
+    if _map.name == "Zuruth Plains":
+        return [
+            _set_exit_facing(_map.exits[0], 'north'),  # to Cedar Village
+            _set_exit_facing(_map.exits[1], 'east'),   # to Canal Boneyard
+            _set_exit_facing(_map.exits[2], 'south'),  # to Trade Tunnel
+            Proxy(exit_x=14, exit_y=15, dest_map=10, dest_x=7, dest_y=4, facing='west'),  # to Trade Tunnel through door
+        ]
+    if _map.name == "Canal Boneyard":
+        return [
+            _set_exit_facing(_map.exits[0], 'west'),   # to Zuruth Plains
+            _set_exit_facing(_map.exits[1], 'east'),   # to Mausoleum
+        ]
+    if _map.name == "Mausoleum":
+        return [
+            Proxy(exit_x=1, exit_y=7, dest_map=7, dest_x=10, dest_y=5, facing='west'),   # to Canal Boneyard
+            Proxy(exit_x=15, exit_y=7, dest_map=9, dest_x=2, dest_y=5, facing='east'),   # to Dead Walkways
+            Proxy(exit_x=2, exit_y=12, dest_map=5, dest_x=9, dest_y=4, facing='south'),  # to Cedar Village through portal
+        ]
+    if _map.name == "Dead Walkways":
+        return [
+            _set_exit_facing(_map.exits[0], 'west'),   # to Mausoleum
+        ]
+    if _map.name == "Trade Tunnel":
+        return [
+            _set_exit_facing(_map.exits[0], 'north'),  # to Zuruth Plains
+            Proxy(exit_x=8, exit_y=4, dest_map=6, dest_x=14, dest_y=14, facing='north'),  # to Zuruth Plains through 2nd door
+        ]
+    raise RuntimeError(f'Exits "facing" not defined yet for map: {_map.name}')
+
+def _set_exit_facing(_exit, facing):
+    return Proxy(exit_x=_exit.exit_x, exit_y=_exit.exit_y,
+                 dest_map=_exit.dest_map, dest_x=_exit.dest_x, dest_y=_exit.dest_y, facing=facing)
+
+
+def patch_enemy_name(enemy_name):
+    if enemy_name == 'death_speaker':
+        return 'empress'
+    return enemy_name
+
+
+def make_bones_and_boxes_walkables():
+    global WALKABLE_BONES_AND_BOXES
+    WALKABLE_BONES_AND_BOXES = True

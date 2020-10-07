@@ -1,0 +1,40 @@
+name: release
+
+on: [push]
+
+jobs:
+  build:
+    name: Build & release PDF
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1.1.1
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Build PDF
+        run: |
+          git clone https://github.com/clintbellanger/heroine-dusk
+          ./gen_pdf.py
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./undying-dusk.pdf
+          asset_name: undying-dusk.pdf
+          asset_content_type: application/pdf

@@ -1,0 +1,6 @@
+humanfriendly  # purely optional
+git+git://github.com/Lucas-C/pyfpdf.git@master
+pikepdf
+pillow
+pyduktape
+tqdm  # purely optional

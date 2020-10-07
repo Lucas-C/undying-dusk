@@ -1,0 +1,25 @@
+name: build
+
+on: [push]
+
+jobs:
+  build:
+    name: Lint & build PDF
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1.1.1
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          pip install pylint -r requirements.txt
+      - name: Linter
+        run: |
+          pylint pdf_game/ gen_pdf.py
+      - name: Build PDF
+        run: |
+          git clone https://github.com/clintbellanger/heroine-dusk
+          ./gen_pdf.py
