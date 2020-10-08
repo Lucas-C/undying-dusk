@@ -73,6 +73,10 @@ It was made during the summer of 2020 by Lucas Cimon.
 To my knowledge, this is the very first video game in a PDF format.
 
 
+## Download
+_cf._ [Releases](https://github.com/Lucas-C/undying-dusk/releases)
+
+
 ## Compatible PDF readers
 You will find below a comparison table of how well several PDF readers wil let you play to Undying Dusk.
 Notably, Adobe Acrobat Reader does **not** perform well to render the game.
@@ -86,8 +90,8 @@ no visual artifact             | ✔️ | ✔️ | ☹️ | ❌ | ✔️ | ✔�
 follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ | ✔️ |
 fast nav / ok page render time | ✔️ | ✔️ | ☹️ | ?  | ☹️ | ?  | ? | ✔️ | 🤔 | ☹️ |
 no shifting on link click      | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ?  | ✔️ | ✔️ | ✔️ |
-backspace key                  | ✔️ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-"back" history size            | 50 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+ALT+🡄 shortcut                 | ✔️ | ☹️ | ✔️ | ?  | ?  | ?  | ?  | ?  | ?  | ?  |
+"back" history size            | 50 | ?  | 31 | ?  | ?  | ?  | ?  | ?  | ?  | ?  |
 
 We only recommend PDF readers that meet all of the above criteria.
 
@@ -200,10 +204,10 @@ _cf._ [CHANGELOG.md](CHANGELOG.md)
 
 ## Tools used
 - Python programming language
-- Notepad++
-- Sumatra PDF reader
-- Firefox
-- Gimp with a plugin to upscale sprites:
+- [Notepad++](https://notepad-plus-plus.org)
+- [Sumatra PDF reader](https://www.sumatrapdfreader.org)
+- [Firefox](https://www.mozilla.org/fr/firefox/)
+- [Gimp](https://www.gimp.org) with a plugin to upscale sprites:
 [gimp-plugin-pixel-art-scalers](https://github.com/bbbbbr/gimp-plugin-pixel-art-scalers) by bbbbbr and its Scale2X filter
 <!-- Alternatives:
 * [scalepx.py](https://github.com/pixlsus/registry.gimp.org_static/blob/master/registry.gimp.org/files/scalepx.py.txt)

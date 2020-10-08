@@ -190,7 +190,8 @@ def power_unlock(game_state, next_pos_facing=None):
 
 
 def item_crucifix(game_state):
-    combat = game_state.combat._replace(avatar_log=CombatLog(action="throw crucifix", result="imp dodged it"))
+    result = f'{game_state.combat.enemy.name} dodged it'
+    combat = game_state.combat._replace(avatar_log=CombatLog(action="throw crucifix", result=result))
     new_items = tuple(item for item in game_state.items if item != 'CRUCIFIX')
     return game_state._replace(combat=combat, items=new_items)
 

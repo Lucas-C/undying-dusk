@@ -102,8 +102,8 @@ def intro(scene_id):
 @cached()
 def seamus_through_small_window():
     dialog_5 = CutScene.new(
-        extra_render=seamus_speaks('In case of trouble\nuse your arcane talent:\nBACKSPACE will rewind time', behind_bars=True),
-        treasure_id=32,
+        extra_render=seamus_speaks('In case of trouble\nuse your arcane talent:\nALT + LEFT ARROW KEY \nwill rewind time', behind_bars=True),
+        # treasure_id=32,
     )
     dialog_4 = CutScene.new(
         extra_render=seamus_speaks('You must get out\nand meet me at the door.', behind_bars=True),
