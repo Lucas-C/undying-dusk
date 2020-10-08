@@ -36,7 +36,10 @@ def dialog_render(pdf, game_view):
         action_name = option.btn_type.action_name(i)
         if not action_name:
             continue
-        page_id = game_view.actions[action_name].page_id if option.can_buy else None
+        page_id = None
+        if option.can_buy:
+            assert action_name in game_view.actions, f'DialogScene with id={shop_id} name="{_shop.name}" has an action {action_name} but the corresponding GameView does not'
+            page_id = game_view.actions[action_name].page_id
         if option.btn_type == DialogButtonType.NEXT:
             white_arrow_render(pdf, 'NEXT', 142, 104, page_id=page_id)
         elif option.btn_type in (DialogButtonType.DRINK_RED, DialogButtonType.DRINK_GREEN):

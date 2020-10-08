@@ -58,16 +58,16 @@ with a gameplay based on exploration and logic puzzles,
 in the tradition of [dungeon crawlers](https://en.wikipedia.org/wiki/Dungeon_crawl#Video_games).
 
 The game is set in a fantasy realm where a curse set by the Empress keeps the world in an eternal dusk.
-You play a woman who recently found shelter in a eerie monastery.
+You play a woman who recently found shelter in an eerie monastery.
 
 It features:
 - ~150 000 PDF pages
 - a retrogaming aesthetic: 160x120 pixels resolution and a 16 colors palette
-- a grid-based world with 36 different tiles and 10 maps to explore
+- a grid-based world with 45 different tiles and 10 maps to explore
 - 30+ treasure items, weapons & spells to pick up in order to face 17 enemy monsters
 - 21 music tracks
 - 17530 "Game Over" pages, and a single path to victory
-- 4 hidden secrets & a hidden ending
+- 4 hidden secrets & a concealed epilogue
 
 It was made during the summer of 2020 by Lucas Cimon.
 To my knowledge, this is the very first video game in a PDF format.
