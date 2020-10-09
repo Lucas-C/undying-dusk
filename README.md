@@ -1,18 +1,18 @@
 <!-- NEXT STEPS:
 - SubReddit: add icon & 1st post
+- hides platino on victory screen with 4 secrets
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
-  * reducer: TOO SLOW! 6> dump removed GVs & stop when #views_removed <= prev_views_removed
 - highscore URL on victory screen -> form where to name & enter PDF reader soft
 - trailer GIF like heroine_dusk_story_trailer_480p.gif
 - create itch.io page
+- reducer: TOO SLOW! 6> dump removed GVs & stop when #views_removed <= prev_views_removed
 - graphical finishing touches:
-  * hides platino on victory screen with 4 secrets
   * add sprite when using spells? for boss lightining attack?
   * clickable reveal animation with crack?
 - post-release: publish assets & create a music collection on OGA
 - VF?
-- try export to Google Slides ?
+- convert to .ppt / Google Slides ?
 - a11y:
   * add alt desc on action links -> https://www.w3.org/TR/WCAG20-TECHS/pdf#PDF13
   * questions to Sandra Bruel:
@@ -76,22 +76,22 @@ To my knowledge, this is the very first video game in a PDF format.
 ## Download
 _cf._ [Releases](https://github.com/Lucas-C/undying-dusk/releases)
 
+Release notes: [CHANGELOG.md](CHANGELOG.md)
+
 
 ## Compatible PDF readers
 You will find below a comparison table of how well several PDF readers wil let you play to Undying Dusk.
 Notably, Adobe Acrobat Reader does **not** perform well to render the game.
 
-PDF reader: /Criteria | [Sumatra PDF](https://www.sumatrapdfreader.org) | FoxIt | Adobe Acrobat | Firefox native (PDF.js) | Chrome native | Javelin3 | Slim | MuPDF | Xpdf | Utopia
+PDF reader: /Criteria | [Sumatra PDF](https://www.sumatrapdfreader.org) | [Xpdf](https://www.xpdfreader.com) | [FoxIt](https://www.foxitsoftware.com/downloads/pdf-reader-thanks.html?product=Foxit-Reader&platform=Windows&language=English&formId=download-reader) | Adobe Acrobat | MuPDF | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia
 -|-|-|-|-|-|-|-|-|-|-
-can load the game              | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ❌ | ❌ | ✔️ | ✔️ | ❌ |
-scale graphics to fit screen   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔ | ❌ | ✔️ | ✔️ |
-full-height mode               | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔ | ✔️ | ✔️ | ✔️ |
-no visual artifact             | ✔️ | ✔️ | ☹️ | ❌ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ | ❌ |
-follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ | ✔️ |
-fast nav / ok page render time | ✔️ | ✔️ | ☹️ | ?  | ☹️ | ?  | ? | ✔️ | 🤔 | ☹️ |
-no shifting on link click      | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ?  | ✔️ | ✔️ | ✔️ |
-ALT+🡄 shortcut                 | ✔️ | ☹️ | ✔️ | ?  | ?  | ?  | ?  | ?  | ?  | ?  |
-"back" history size            | 50 | ?  | 31 | ?  | ?  | ?  | ?  | ?  | ?  | ?  |
+can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ❌ |
+scale graphics to fit screen   | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ | ✔️ | ✔ | ✔️ |
+no visual artifact             | ✔️ | ✔️ | ✔️ | ☹️ | ✔️ | ✔️ | ❌ | ✔️ | ❌ | ❌ |
+follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ |
+fast nav / ok page render time | ✔️ | 🤔 | ✔️ | ☹️ | ✔️ | ☹️ | -  | -  | -  | -  |
+ALT+🡄 shortcut                | ✔️ | ✔️ | ☹️ | ✔️ | ❌ | ❌ | ✔️ | ?  | ?  | ?  |
+"back" history size            | 50 | 49 | ?  | 31 | ❌ | ❌ | 49 | ?  | ?  | ?  |
 
 We only recommend PDF readers that meet all of the above criteria.
 
@@ -196,10 +196,6 @@ TODO
 Many thanks also to Thibault Toledano for the cheerful support and the bright suggestions
 of elements to include in the game!
 -->
-
-
-## Release notes
-_cf._ [CHANGELOG.md](CHANGELOG.md)
 
 
 ## Tools used
