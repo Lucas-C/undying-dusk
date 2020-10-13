@@ -1,4 +1,5 @@
 <!-- NEXT STEPS:
+- better hint for holy well puzzle
 - SubReddit: add icon & 1st post
 - hides platino on victory screen with 4 secrets
 - code clean-up:
@@ -83,21 +84,23 @@ Release notes: [CHANGELOG.md](CHANGELOG.md)
 You will find below a comparison table of how well several PDF readers wil let you play to Undying Dusk.
 Notably, Adobe Acrobat Reader does **not** perform well to render the game.
 
-PDF reader: /Criteria | [Sumatra PDF](https://www.sumatrapdfreader.org) | [Xpdf](https://www.xpdfreader.com) | [FoxIt](https://www.foxitsoftware.com/downloads/pdf-reader-thanks.html?product=Foxit-Reader&platform=Windows&language=English&formId=download-reader) | Adobe Acrobat | MuPDF | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia
+PDF reader: /Criteria | Sumatra PDF \* | Xpdf | FoxIt | Adobe Acrobat | MuPDF | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia
 -|-|-|-|-|-|-|-|-|-|-
 can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ❌ |
 scale graphics to fit screen   | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ | ✔️ | ✔ | ✔️ |
 no visual artifact             | ✔️ | ✔️ | ✔️ | ☹️ | ✔️ | ✔️ | ❌ | ✔️ | ❌ | ❌ |
 follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ |
 fast nav / ok page render time | ✔️ | 🤔 | ✔️ | ☹️ | ✔️ | ☹️ | -  | -  | -  | -  |
-ALT+🡄 shortcut                | ✔️ | ✔️ | ☹️ | ✔️ | ❌ | ❌ | ✔️ | ?  | ?  | ?  |
-"back" history size            | 50 | 49 | ?  | 31 | ❌ | ❌ | 49 | ?  | ?  | ?  |
+ALT+🡄 "back" shortcut          | ✔️<br><em>backspace</em> also works | ✔️ | ❌<br>[(issue)](https://kb.foxitsoftware.com/hc/en-us/requests/51046) | ✔️ | ❌ | ❌ | ✔️ | ?  | ?  | ?  |
+"back" history size            | 50 | 49 | ❌ | 31 | ❌ | ❌ | 49 | ?  | ?  | ?  |
+
+\* Please use Sumatra PDF version 3.1.2, that can be download on [this page](https://www.sumatrapdfreader.org/download-prev.html). The latest 3.2 version [has difficulties opening Undying Dusk](https://github.com/Lucas-C/undying-dusk/issues/3).
 
 We only recommend PDF readers that meet all of the above criteria.
 
 Questions & edits on this table are welcome through _issues_ & _PRs_.
 
-<!-- TODO: add Linux readers: Evince, Okular, XPDF -->
+<!-- TODO: add Linux & Mac readers: Evince, Okular... -->
 
 
 ## Credits & attribution
@@ -138,7 +141,7 @@ DawnLike 16x16 Universal Rogue-like tileset
 ](https://opengameart.org/content/dawnlike-16x16-universal-rogue-like-tileset-v181) by DragonDePlatino - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - distant castle background by [jkjkke](https://opengameart.org/content/background-6) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - palace hall & ruins background from [CraftPix.net 2D Game Assets](https://opengameart.org/content/pixel-art-fantasy-game-battlegrounds) - [OGA-BY 3.0](https://opengameart.org/content/oga-by-30-faq)
-- Dominic portrait from [Blarumyrran faceset 2-bit](https://opengameart.org/content/faceset-2-bit) - CC0
+- Dominik portrait from [Blarumyrran faceset 2-bit](https://opengameart.org/content/faceset-2-bit) - CC0
 - Seamus portrait from [RPG portraits by Buch](https://opengameart.org/content/rpg-portraits) - CC0
 - Monk from [Oracle Portrait by Justin Nichol](https://opengameart.org/content/oracle-portrait) - [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - Monk portrait from [Wizard by lylfDW](https://opengameart.org/content/wizard-7) - CC0
