@@ -1,19 +1,20 @@
 <!-- NEXT STEPS:
+- highscore URL on victory screen -> form where to name & enter PDF reader soft -> use a SQLite db
+- trailer GIF like heroine_dusk_story_trailer_480p.gif
+- release zip avec Sumatra PDF 3.1.2 & heroine_dusk.bat
+- redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
 - better hint for holy well puzzle
 - SubReddit: add icon & 1st post
-- hides platino on victory screen with 4 secrets
+- create itch.io page
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
-- highscore URL on victory screen -> form where to name & enter PDF reader soft
-- trailer GIF like heroine_dusk_story_trailer_480p.gif
-- create itch.io page
-- reducer: TOO SLOW! 6> dump removed GVs & stop when #views_removed <= prev_views_removed
+- reducer: TOO SLOW! -> dump removed GVs & stop when #views_removed <= prev_views_removed
 - graphical finishing touches:
   * add sprite when using spells? for boss lightining attack?
   * clickable reveal animation with crack?
 - post-release: publish assets & create a music collection on OGA
+- release pyfpdf2 & make a quine (a program generating a PDF displaying its own source code)
 - VF?
-- convert to .ppt / Google Slides ?
 - a11y:
   * add alt desc on action links -> https://www.w3.org/TR/WCAG20-TECHS/pdf#PDF13
   * questions to Sandra Bruel:
@@ -87,20 +88,17 @@ Notably, Adobe Acrobat Reader does **not** perform well to render the game.
 PDF reader: /Criteria | Sumatra PDF \* | Xpdf | FoxIt | Adobe Acrobat | MuPDF | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia
 -|-|-|-|-|-|-|-|-|-|-
 can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ❌ |
-scale graphics to fit screen   | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ | ✔️ | ✔ | ✔️ |
-no visual artifact             | ✔️ | ✔️ | ✔️ | ☹️ | ✔️ | ✔️ | ❌ | ✔️ | ❌ | ❌ |
+no visual artifact             | ✔️ | ✔️ | ✔️ | ☹️ | 🤔 | ✔️ | ❌ | ✔️ | ❌ | ❌ |
 follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ |
 fast nav / ok page render time | ✔️ | 🤔 | ✔️ | ☹️ | ✔️ | ☹️ | -  | -  | -  | -  |
-ALT+🡄 "back" shortcut          | ✔️<br><em>backspace</em> also works | ✔️ | ❌<br>[(issue)](https://kb.foxitsoftware.com/hc/en-us/requests/51046) | ✔️ | ❌ | ❌ | ✔️ | ?  | ?  | ?  |
-"back" history size            | 50 | 49 | ❌ | 31 | ❌ | ❌ | 49 | ?  | ?  | ?  |
+ALT+🡄 "back" shortcut          | ✔️<br><em>backspace</em> also works | ✔️ | ❌ | ✔️ | `t` must be used instead | ❌ | ✔️ | ?  | ?  | ?  |
+"back" history size            | 50 | 49 | ❌ | 31 | 256 | ❌ | 49 | ?  | ?  | ?  |
 
 \* Please use Sumatra PDF version 3.1.2, that can be download on [this page](https://www.sumatrapdfreader.org/download-prev.html). The latest 3.2 version [has difficulties opening Undying Dusk](https://github.com/Lucas-C/undying-dusk/issues/3).
 
 We only recommend PDF readers that meet all of the above criteria.
 
 Questions & edits on this table are welcome through _issues_ & _PRs_.
-
-<!-- TODO: add Linux & Mac readers: Evince, Okular... -->
 
 
 ## Credits & attribution
