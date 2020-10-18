@@ -71,6 +71,8 @@ It features:
 It was made during the summer of 2020 by Lucas Cimon.
 To my knowledge, this is the very first video game in a PDF format.
 
+[Dedicated SubReddit](https://www.reddit.com/r/UndyingDuskPdfGame)
+
 
 ## Download
 Download links for all versions can be found here: [GitHub Releases](https://github.com/Lucas-C/undying-dusk/releases)

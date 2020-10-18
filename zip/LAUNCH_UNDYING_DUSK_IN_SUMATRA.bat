@@ -1,1 +1,1 @@
-%~dp0\SumatraPDF.exe %~dp0\undying-dusk.pdf
+start %~dp0\SumatraPDF.exe %~dp0\undying-dusk.pdf

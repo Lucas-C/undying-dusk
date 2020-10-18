@@ -18,7 +18,7 @@ jobs:
           python-version: 3.7
       - name: Install dependencies
         run: |
-          pip install pylint -r requirements.txt
+          pip install flask pylint -r requirements.txt
       - name: Linter
         run: |
           pylint pdf_game/ gen_pdf.py hall_of_fame/hof_app.py
