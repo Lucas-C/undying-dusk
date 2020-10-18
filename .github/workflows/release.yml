@@ -24,6 +24,7 @@ jobs:
           git clone https://github.com/clintbellanger/heroine-dusk
           echo "__version__ = '$GITHUB_REF'" > pdf_game/__init__.py
           ./gen_pdf.py
+          zip/gen_zip.sh
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -33,8 +34,8 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: cf. [CHANGELOG.md](https://github.com/Lucas-C/undying-dusk/blob/main/CHANGELOG.md)
-      - name: Upload Release Asset
-        id: upload-release-asset 
+      - name: Upload Release PDF
+        id: upload-release-pdf
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,3 +44,13 @@ jobs:
           asset_path: ./undying-dusk.pdf
           asset_name: undying-dusk.pdf
           asset_content_type: application/pdf
+      - name: Upload Release ZIP
+        id: upload-release-zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./zip/undying-dusk.zip
+          asset_name: undying-dusk-with-sumatra-windows.zip
+          asset_content_type: application/zip

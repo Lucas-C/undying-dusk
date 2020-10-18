@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Undying Dusk Hall of Fame</title>
+  <style>
+  @font-face { font-family: BoxyBoldBlack; src: url('fonts/Boxy-Bold-Black.otf'); }
+  * {
+    --black-color: rgb(20, 12, 28);
+    --white-color: rgb(222, 238, 214);
+    --blue-color: rgb(89, 125, 206);
+    --red-color: rgb(208, 70, 72);
+  }
+  html { background-color: var(--black-color); }
+  body {
+    max-width: 80rem;
+    margin: 0 auto;
+    font-family: BoxyBoldBlack;
+    font-size: 5vh;
+    color: var(--white-color);
+    line-height: 1.4;
+    text-align: center;
+  }
+  h1 { max-width: 60rem; margin: 5rem auto; font-size: 8vh; text-transform: uppercase; }
+  a { text-decoration: none; }
+  table { margin: 3rem auto; }
+  thead td { border-bottom: 2px solid var(--white-color); color: var(--blue-color); }
+  td { width: 50%; }
+  .secrets { width: 100%; height: 64px; display: flex; align-items: center; justify-content: space-evenly; }
+  .secret { image-rendering: optimizeSpeed; }
+  .ABYSS_BOTTOM { width: 32px; height: 32px; background: url('assets/extra_treasure.png'); transform: scale(2); background-position-x: calc(-14 * 32px); }
+  .DEAD_TREE { width: 50px; height: 50px; background: url('assets/dead_tree.png'); transform: scale(1.25); }  .FOUNTAIN_WISH { width: 32px; height: 32px; background: url('assets/fountain.png'); transform: scale(2); }
+  .KONAMI_CODE { width: 32px; height: 32px; background: url('assets/extra_treasure.png'); transform: scale(2); background-position-x: calc(-15 * 32px); }
+  .congrats { color: var(--red-color); text-transform: uppercase; }
+  form {
+    border: 2px solid var(--white-color);
+    max-width: 40rem;
+    margin: 2rem auto;
+    padding: 1rem;
+    margin-bottom: 10rem;
+  }
+  input {
+    background-color: var(--black-color);
+    font-family: BoxyBoldBlack;
+    font-size: 5vh;
+    color: var(--white-color);
+    max-width: 90%;
+    margin: 1rem 2vw;
+    text-align: center;
+    border: 2px solid var(--white-color);
+  }
+  input[type="text"] { margin-bottom: 2rem; }
+  input[type="submit"] {
+    background-color: var(--red-color);
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    white-space: inherit;
+  }
+  footer { font-size: 2rem; margin-top: 5rem; }
+  </style>
+</head>
+<body>
+  <h1>Undying Dusk Hall of Fame</h1>
+  {% if display_form %}
+  <p class="congrats">Congratulations<br>on beating the game !!!</p>
+  <p>Enter your name<br>to appear in this hall of fame:</p>
+  <form onsubmit="return this.name.value.length >= 3 && this.name.value.length <= 20 && this.pdf_reader.value.length <= 20" method="POST">
+    <div>
+      <label for="name">Name:</label>
+      <input type="text" minlength="3" maxlength="20" name="name">
+    </div>
+    <div>
+      <label for="pdf_reader">PDF reader:</label>
+      <input type="text" maxlength="20" name="pdf_reader">
+    </div>
+    <input type="submit" value="Submit score">
+  </form>
+  {% endif %}
+  <p>Here are the names of the champions who defeated the Empress!</p>
+  <table>
+    <thead><tr>
+      <td>Name</td>
+      <td>Secrets found</td>
+    </tr></thead>
+    <tbody>
+    {% for score in scores | sort(attribute='submission_date') %}
+      <tr>
+        <td>{{score.player_name}}</td>
+        <td class="secrets">
+        {% for secret in score.secrets_found.split(',') %}
+          <div class="secret {{secret}}"></div>
+        {% endfor %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <footer><a href="https://github.com/Lucas-C/undying-dusk">Undying Dusk @ GitHub</a></footer>
+</body>
+</html>

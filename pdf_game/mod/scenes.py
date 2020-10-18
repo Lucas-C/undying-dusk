@@ -5,7 +5,7 @@ from . import Proxy
 from ..entities import CutScene, DialogButtonType, DialogOption, GameMode, ShopMessageItem
 
 
-BASE_MUSIC_URL = 'https://chezsoi.org/lucas/undying-dusk/'
+BASE_MUSIC_URL = 'https://chezsoi.org/lucas/undying-dusk/music/'
 
 
 def patch_shop(shop, shop_id):

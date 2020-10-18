@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.9.3] - 2020-10-18
+### Added
+- now also releasing a ZIP file including Sumatra PDF and a `.bat` launcher
+- Platino sprite on victory screen with 4 secrets
+- URL on victory page poiting to the new [hall of fame](https://chezsoi.org/lucas/undying-dusk/hall-of-fame) page
+### Changed
+- base music URL now is <https://chezsoi.org/lucas/undying-dusk/music/>
+
 ## [0.9.2] - 2020-10-08
 ### Added
 - Now mentioning more largely supported _ALT+🡄_ pdf reader shortcut, instead of _backspace_ only supported by Sumatra

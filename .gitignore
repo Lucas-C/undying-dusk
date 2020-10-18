@@ -1,6 +1,7 @@
 *.pdf
 *.pkl
 __pycache__/
+/hall_of_fame/undying-dusk-hof.db
 /minimaps/
 /small_enemies/
 /game_states.json

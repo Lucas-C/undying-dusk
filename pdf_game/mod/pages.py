@@ -1,4 +1,3 @@
-import json
 from base64 import urlsafe_b64encode
 
 from .. import __version__
@@ -36,11 +35,14 @@ def render_victory(pdf, game_state, links_to_credits):
         pdf.image('assets/yellow-star.png', x=x, y=y)
     bitfont_render(pdf, 'VICTORY !', 80, 48, Justify.CENTER, size=24)
     bitfont_render(pdf, f'Secrets found: {len(game_state.secrets_found)}/4', 80, 80, Justify.CENTER)
-    query_param = urlsafe_b64encode(json.dumps(game_state.secrets_found).encode()).decode()
-    url = f'https://chezsoi.org/lucas/undying-dusk?v={__version__}&gs={query_param}'
+    query_param = urlsafe_b64encode(','.join(secrets_found).encode()).decode()
+    url = f'https://chezsoi.org/lucas/undying-dusk/hall-of-fame?v={__version__}&gs={query_param}'
     with bitfont_color_red():
         bitfont_render(pdf, 'Online hall of fame', 80, 90, Justify.CENTER, url=url)
     bitfont_render(pdf, 'Credits', 80, 100, Justify.CENTER, link=links_to_credits)
+    if len(game_state.secrets_found) >= 4:
+        # as requested in "DAWNLIKE 16x16 Universal Rogue-like tileset v1.81" README.txt ;)
+        action_button_render(pdf, 'PLATINO', btn_pos=Position(x=140, y=100))
 
 
 def render_credit_pages(pdf, links_to_credits):

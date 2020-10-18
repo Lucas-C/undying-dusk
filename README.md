@@ -1,9 +1,10 @@
 <!-- NEXT STEPS:
-- highscore URL on victory screen -> form where to name & enter PDF reader soft -> use a SQLite db
-- trailer GIF like heroine_dusk_story_trailer_480p.gif
-- release zip avec Sumatra PDF 3.1.2 & heroine_dusk.bat
-- redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
+- rapport de bug #2 (from who ?)
+  * barre de vie du zombie à la sortie du village peut dépasser (v0.9.2 - page 121562)
 - better hint for holy well puzzle
+- better hint for glimpse in canal
+- trailer GIF like heroine_dusk_story_trailer_480p.gif
+- redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
 - SubReddit: add icon & 1st post
 - create itch.io page
 - code clean-up:
@@ -38,7 +39,7 @@
   * try other PDF features: PrevPage ? sub-page navigation ?
   * implement monster arrival animations & attacks & delayed log msgs using PDF `Transitions` or as a GIF (_cf._ [Patrick Gallot article](https://www.datalogics.com/blog/corporate/the-making-of-a-pdf-presentation/))
   * use navigation node `Dur` to implement QTEs / real-time game mechanics ?
-- secrets:
+- secrets: ABYSS_BOTTOM, DEAD_TREE, FOUNTAIN_WISH, KONAMI_CODE
   * [x] empress soul at the bottom of the abyss
   * [x] throwing gold piece in fountain (hint hidden on a special wall sprite)
   * [x] beating the shadow soul once equipped with armor, giving access to the dead tree
@@ -70,29 +71,39 @@ It features:
 - 21 music tracks
 - 17530 "Game Over" pages, and a single path to victory
 - 4 hidden secrets & a concealed epilogue
+- an online [hall of fame](https://chezsoi.org/lucas/undying-dusk/hall-of-fame)
 
 It was made during the summer of 2020 by Lucas Cimon.
 To my knowledge, this is the very first video game in a PDF format.
 
 
 ## Download
-_cf._ [Releases](https://github.com/Lucas-C/undying-dusk/releases)
+Download links for all versions can be found here: [GitHub Releases](https://github.com/Lucas-C/undying-dusk/releases)
 
 Release notes: [CHANGELOG.md](CHANGELOG.md)
+
+### For Windows gamers
+There is ZIP archive you can download for every version on the [GitHub Releases](https://github.com/Lucas-C/undying-dusk/releases) page:
+it contains the PDF game **and** Sumatra PDF 3.1.2.
+
+Once the ZIP content is extracted in a folder, you just have to double-click on the `LAUNCH_UNDYING_DUSK_IN_SUMATRA.bat` file to start the game.
+
+This will allow you to play with the PDF reader that is best compatible with the game,
+**without** installing it globally on your computer.
 
 
 ## Compatible PDF readers
 You will find below a comparison table of how well several PDF readers wil let you play to Undying Dusk.
 Notably, Adobe Acrobat Reader does **not** perform well to render the game.
 
-PDF reader: /Criteria | Sumatra PDF \* | Xpdf | FoxIt | Adobe Acrobat | MuPDF | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia
+PDF reader: /Criteria | Sumatra PDF \* | MuPDF | Xpdf | FoxIt | Adobe Acrobat | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia
 -|-|-|-|-|-|-|-|-|-|-
 can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ❌ |
-no visual artifact             | ✔️ | ✔️ | ✔️ | ☹️ | 🤔 | ✔️ | ❌ | ✔️ | ❌ | ❌ |
+no visual artifact             | ✔️ | 🤔 | ✔️ | ✔️ | ☹️ | ✔️ | ❌ | ✔️ | ❌ | ❌ |
 follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ |
-fast nav / ok page render time | ✔️ | 🤔 | ✔️ | ☹️ | ✔️ | ☹️ | -  | -  | -  | -  |
-ALT+🡄 "back" shortcut          | ✔️<br><em>backspace</em> also works | ✔️ | ❌ | ✔️ | `t` must be used instead | ❌ | ✔️ | ?  | ?  | ?  |
-"back" history size            | 50 | 49 | ❌ | 31 | 256 | ❌ | 49 | ?  | ?  | ?  |
+fast nav / ok page render time | ✔️ | ✔️ | 🤔 | ✔️ | ☹️ | ☹️ | -  | -  | -  | -  |
+ALT+🡄 "back" key binding       | ✔️<br><em>backspace</em> also works | `t` must be used instead | ✔️ | ❌ | ✔️ | ❌ | ✔️ | ?  | ?  | ?  |
+"back" history size            | 50 | 256 | 49 | ❌ | 31 | ❌ | 49 | ?  | ?  | ?  |
 
 \* Please use Sumatra PDF version 3.1.2, that can be download on [this page](https://www.sumatrapdfreader.org/download-prev.html). The latest 3.2 version [has difficulties opening Undying Dusk](https://github.com/Lucas-C/undying-dusk/issues/3).
 
