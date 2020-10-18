@@ -10,8 +10,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - now also releasing a ZIP file including Sumatra PDF and a `.bat` launcher
 - Platino sprite on victory screen with 4 secrets
 - URL on victory page poiting to the new [hall of fame](https://chezsoi.org/lucas/undying-dusk/hall-of-fame) page
+- extra hint on the Monastery Trail:
+> The whispering wind tells you that demons fear blessed liquids.
+- Seamus no provides an extra hint in the Zuruth Plains:
+> The Empress castle stands further behind the canal. Go look if you can see it despite the darkness.
 ### Changed
 - base music URL now is <https://chezsoi.org/lucas/undying-dusk/music/>
+### Fixed
+- `HP drain` can no longer bring a monster HP above its maximum
 
 ## [0.9.2] - 2020-10-08
 ### Added

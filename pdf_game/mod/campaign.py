@@ -113,6 +113,7 @@ def script_it():
     mapscript_add_message((4, 6, 2), 'The Monastery doors\nare closed', facing='north')
     # The door is closed by mod.world:patched_can_move_to
     mapscript_add_message((4, 9, 3), 'The whispering wind\ntells you of hidden\npassages in the forest', facing='east')
+    mapscript_add_message((4, 3, 9), 'The whispering wind\ntells you that demons\nfear blessed liquids', facing='west')
 
     def _examine_forest_well(game_view, _GameView):
         gs = game_view.state

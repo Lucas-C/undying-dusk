@@ -6,7 +6,7 @@ from base64 import urlsafe_b64decode
 from datetime import datetime
 from urllib.parse import parse_qsl
 
-from flask import Flask, g, jsonify, render_template, request
+from flask import Flask, g, render_template, request
 
 
 DB_FILEPATH = 'undying-dusk-hof.db'
@@ -27,6 +27,7 @@ def index():
     return render_template('index.html', display_form=bool(display_form), scores=scores)
 
 def extract_secrets(query):
+    # pylint: disable=bare-except
     try:
         return set(urlsafe_b64decode(query.get('gs', '')).decode().split(','))
     except:  # Failsafe in case of invalid "gs" query param
@@ -57,16 +58,16 @@ def get_db():
     return db
 
 @FLASK_APP.teardown_appcontext
-def close_connection(exception):
+def close_connection(_):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
 
 def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)
-    rv = cur.fetchall()
+    return_values = cur.fetchall()
     cur.close()
-    return (rv[0] if rv else None) if one else rv
+    return (return_values[0] if return_values else None) if one else return_values
 
 
 if __name__ == '__main__':

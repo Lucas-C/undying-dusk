@@ -1,11 +1,6 @@
 <!-- NEXT STEPS:
-- rapport de bug #2 (from who ?)
-  * barre de vie du zombie à la sortie du village peut dépasser (v0.9.2 - page 121562)
-- better hint for holy well puzzle
-- better hint for glimpse in canal
 - trailer GIF like heroine_dusk_story_trailer_480p.gif
 - redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
-- SubReddit: add icon & 1st post
 - create itch.io page
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem

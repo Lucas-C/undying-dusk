@@ -265,7 +265,7 @@ def the_inn_evening_tale():
 def seamus_in_zuruth_plains():
     dialog_3 = CutScene.new(
         background='forest_trees_with_seamus',
-        extra_render=seamus_speaks2("And there may be secrets\nhiding in the pillars shadow..."),
+        extra_render=seamus_speaks2('And secrets may be hiding\nin its pillars shadow...\n\nThe Empress castle stands\nfurther behind the canal.\n\nGo look if you can see it\ndespite the darkness.'),
         # Using a custom DialogOption to be able to alter GameState:
         dialog_options=(DialogOption.exit('Leave', lambda gs: gs.with_hidden_trigger('RUMOR_HEARD')
                                                                 .with_tile_override(6, (6, 1, 9))),),
@@ -380,7 +380,7 @@ def the_end():
     )
     scene_7 = CutScene.new(
         background='bloodsplat',
-        text='Are you the Impress?\nDid Seamus knew?',
+        text='Are you the Empress?\nDid Seamus knew?',
         next_scene_id=scene_8.id,
     )
     scene_6 = CutScene.new(
@@ -508,7 +508,7 @@ class RoomForTheNight:
                              hp=gs.max_hp, mp=gs.max_mp)
             if 'FIRST_NIGHT_OF_REST' not in gs.hidden_triggers:
                 gs = gs.with_hidden_trigger('FIRST_NIGHT_OF_REST')\
-                       ._replace(mode=GameMode.DIALOG, shop_id=the_inn_evening_tale().id)
+                       ._replace(mode=GameMode.DIALOG, shop_id=the_inn_evening_tale().id, message='')
             return gs
         return DialogOption(btn_type=DialogButtonType.BUY, msg=msg, can_buy=can_buy, buy=buy)
 

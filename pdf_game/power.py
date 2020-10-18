@@ -49,7 +49,8 @@ def power_enemy_attack(game_state, parried=False):
         else:
             game_state = game_state._replace(hp=game_state.hp - attack_damage)
             if _round.hp_drain:
-                combat = combat._replace(enemy=combat.enemy._replace(hp=combat.enemy.hp + attack_damage))
+                new_hp = min(combat.enemy.hp + attack_damage, combat.enemy.max_hp)
+                combat = combat._replace(enemy=combat.enemy._replace(hp=new_hp))
         if _round.boneshield_up:
             combat = combat._replace(boneshield_up=True)
     if combat.enemy.hp > 0 or log_result == "-1 MP" or attack_damage:
