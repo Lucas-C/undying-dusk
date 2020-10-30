@@ -102,6 +102,7 @@ CHEST_OVERRIDES = {
     17: 17,  # hay pile -> hay pile
     40: 40,  # fire -> fire
     43: 42,  # stump_with_bottle -> stump
+    46: 40,  # cauldron -> fire
 }
 def _mapscript_open_chest(game_view, _GameView, treasure_id, grant_func=None, secret=None):
     if game_view.tile_override(game_view.state.coords):

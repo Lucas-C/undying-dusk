@@ -18,7 +18,7 @@ def info_render(pdf, game_state):
     info_render_hpmp(pdf, game_state)
     info_render_gold(pdf, game_state)
     if game_state.items:
-        bitfont_render(pdf, "Items", 100, 83, Justify.LEFT)
+        bitfont_render(pdf, "Items", 100, 81, Justify.LEFT)
     # Note: items & spells are rendered by render.action_render
 
 
@@ -28,7 +28,7 @@ def info_render_hpmp(pdf, game_state):
 
 
 def info_render_gold(pdf, game_state, page_id=None):
-    bitfont_render(pdf, f"{game_state.gold} Gold", 158, 110, Justify.RIGHT, page_id=page_id)
+    bitfont_render(pdf, f"{game_state.gold} Gold", 142, 110, Justify.RIGHT, page_id=page_id)
 
 
 def info_render_equipment(pdf, game_state):

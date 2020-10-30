@@ -54,7 +54,7 @@ class Assigner:
                     self.out_game_views.append(trick_game_view)
                     self._increment_next_page_id()
                     for _ in range(trick.filler_pages):
-                        filler_game_view = GameView(renderer=render_filler_page)
+                        filler_game_view = GameView(renderer=_render_filler_page(trick, i))
                         filler_game_view.set_page_id(self.next_page_id)
                         self.out_game_views.append(filler_game_view)
                         self._increment_next_page_id()
@@ -84,8 +84,8 @@ class Assigner:
                 if game_view.next_page_trick_game_view:
                     trick = game_view.next_page_trick_game_view.state.trick
                     assert trick
-                    for _ in range(trick.filler_pages):
-                        filler_game_view = GameView(renderer=render_filler_page)
+                    for i in range(trick.filler_pages):
+                        filler_game_view = GameView(renderer=_render_filler_page(trick, i))
                         filler_game_view.set_page_id(self.next_page_id)
                         self.out_game_views.append(filler_game_view)
                         self._increment_next_page_id()
@@ -122,6 +122,11 @@ class Assigner:
 def _render_trick(trick_game_view):
     # Note: inlining this lambda triggers a justified cell-var-from-loop Pylint warning
     return lambda pdf: render_trick(pdf, trick_game_view)
+
+
+def _render_filler_page(trick, i):
+    filler_renderer = trick.filler_renderer or render_filler_page
+    return lambda pdf: filler_renderer(pdf, i)
 
 
 def _reverse_number(number):

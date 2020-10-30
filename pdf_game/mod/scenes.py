@@ -2,7 +2,7 @@ from functools import lru_cache as cached
 
 from . import Proxy
 
-from ..entities import CutScene, DialogButtonType, DialogOption, GameMode, ShopMessageItem
+from ..entities import CutScene, DialogButtonType, DialogOption, GameMode, Position, SFX, ShopMessageItem
 
 
 BASE_MUSIC_URL = 'https://chezsoi.org/lucas/undying-dusk/music/'
@@ -27,7 +27,7 @@ def patch_shop(shop, shop_id):
         ])
     if shop.name == 'Sage Therel':  # shop 3 at Cedar Village
         return Proxy(background=shop.background, name=shop.name, item=[
-            ShopMessageItem('Fire magic is effective\nagainst undead and bone.'),
+            SageTherelAdvice,
             SageTherelSellableSpell,
         ])
     if shop.name == 'The Pilgrim Inn':  # shop 2 at Cedar Village
@@ -161,7 +161,7 @@ def looking_for_hope():
             DialogOption(btn_type=DialogButtonType.NEXT, msg='', can_buy=True,
                          buy=lambda gs: gs.without_hidden_trigger('TALKED_TO_SEAMUS, ')
                                           ._replace(max_hp=gs.max_hp + 5, hp=gs.hp + 5, shop_id=dialog_4.id))),
-        treasure_id=36,
+        sfx=SFX(id=3, pos=Position(64, 88)),
         no_exit=True,
     )
     dialog_2 = CutScene.new(
@@ -191,7 +191,7 @@ def chapel_in_the_woods(scene_id):
         name='Chapel In The Woods',
         background='chapel_with_monk',
         text='\n' * 7 + 'What have you done ?\n\n\nNow the Empress curse\nwill befall us!\n\nFool!',
-        treasure_id=38,
+        treasure_id=36,
         exit_msg='Leave',
     )
     def take_crucifix(gs):
@@ -296,7 +296,7 @@ def risking_it_all():
         background='distant_castle',
         name='Risking it all',
         text='Then I offer you\nthis first fragment:',
-        treasure_id=39,
+        treasure_id=37,
         next_scene_id=scene_6.id,
     )
     scene_4 = CutScene.new(
@@ -313,15 +313,23 @@ def risking_it_all():
     )
     scene_2 = CutScene.new(
         background='hangman',
-        name='Risking it all',
         extra_render=seamus_speaks('You rid the plains\nof all the monsters.\nYour bravery will be praised!\nYou really deserve\nthis legendary blade.'),
         next_scene_id=scene_3.id,
     )
-    return CutScene.new(
+    scene_1 = CutScene.new(
         background='hangman',
-        name='Risking it all',
         extra_render=seamus_speaks('Impressive my lady!\nYou are a sly arcanist,\nand a fine sword.'),
         next_scene_id=scene_2.id,
+    )
+    scene_0 = CutScene.new(
+        background='hangman',
+        extra_render=skeleton_speaks(with_explosion=True),
+        next_scene_id=scene_1.id,
+    )
+    return CutScene.new(
+        background='hangman',
+        extra_render=skeleton_speaks('Noooooo!'),
+        next_scene_id=scene_0.id,
     )
 
 
@@ -330,7 +338,7 @@ def abyss_bottom():  # Did the Empress made a pact with the Deep Ones?
     return CutScene.new(
         name='Abyss bottom',
         text='The empress soul\nrests in the dark\n(you found a SECRET)',
-        treasure_id=30,
+        sfx=SFX(id=6, pos=Position(64, 88)),
         exit_msg='Climb back up',
         music=BASE_MUSIC_URL + 'AlexandrZhelanov-MysticalTheme.mp3',
     )
@@ -419,13 +427,26 @@ def seamus_speaks(text, behind_bars=False):  # Seamus portrait speaking
     # This cannot be placed at the top of the module to avoid a circular import:
     # pylint: disable=import-outside-toplevel
     from ..bitfont import bitfont_render, Justify
+    from ..render_utils import portrait_render
     def extra_render(pdf):
-        pdf.image('assets/seamus.png', x=66, y=16)
+        portrait_render(pdf, 0, x=66, y=16)
         if behind_bars:
             pdf.image('assets/window-bars.png', x=62, y=13)
         bitfont_render(pdf, text, 80, 58, Justify.CENTER)
     return extra_render
 
+def skeleton_speaks(text='', with_explosion=False):  # Skeleton portrait speaking
+    # This cannot be placed at the top of the module to avoid a circular import:
+    # pylint: disable=import-outside-toplevel
+    from ..bitfont import bitfont_render, Justify
+    from ..render_utils import portrait_render
+    def extra_render(pdf):
+        portrait_render(pdf, 1, x=66, y=22)
+        if text:
+            bitfont_render(pdf, text, 80, 58, Justify.CENTER)
+        if with_explosion:
+            pdf.image('assets/explosion.png', x=54, y=0)
+    return extra_render
 
 def seamus_speaks2(text):  # Seamus character, standing up on the left, speaking
     # This cannot be placed at the top of the module to avoid a circular import:
@@ -438,9 +459,11 @@ class CedarArmsSellableSwordUpgrade:
     @staticmethod
     def dialog_option(game_state):
         if game_state.weapon == 7:
-            return DialogOption.only_msg('')
+            if game_state.tile_override_at((5, 9, 3)):  # VILLAGE_PORTAL_COORDS
+                return DialogOption.only_msg('')
+            return DialogOption.only_msg('No creature of darkness\ncan match this weapon!')
         return DialogOption(btn_type=DialogButtonType.BUY, can_buy=game_state.weapon == 4 and game_state.gold >= 50,
-                            msg="Polish a rusty sword anew\nfor 50 gold",  # TODO: test text rendering
+                            msg="Polish a rusty sword\nfor 50 gold",
                             buy=lambda gs: gs._replace(gold=gs.gold - 50,
                                                        treasure_id=21, weapon=7,
                                                        message="Acquired Great Sword"))
@@ -473,6 +496,14 @@ class SimmonsSellableArmor:
                                                        message="Acquired St Knight armor"))
 
 
+class SageTherelAdvice:
+    @staticmethod
+    def dialog_option(game_state):
+        if game_state.spellbook <= 3 and 'SCROLL' not in game_state.items:
+            return DialogOption.only_msg('Fire magic is effective\nagainst undead and bone.')
+        return DialogOption.only_msg("You opened a magic\nportal, I'm impressed!")
+
+
 class SageTherelSellableSpell:
     @staticmethod
     def dialog_option(game_state):
@@ -482,7 +513,7 @@ class SageTherelSellableSpell:
                                     buy=lambda gs: gs._replace(items=tuple(i for i in gs.items if i != 'SCROLL'),
                                                                spellbook=2, message='New spell learned: BURN'))
             if game_state.spellbook < 3:
-                return DialogOption(btn_type=DialogButtonType.BUY, can_buy=True, msg="A mechanical spell\nin exchange for a scroll?",
+                return DialogOption(btn_type=DialogButtonType.BUY, can_buy=True, msg="For another scroll, I can\nteach you a thief spell.",
                                     buy=lambda gs: gs._replace(items=tuple(i for i in gs.items if i != 'SCROLL'),
                                                                spellbook=3, message='New spell learned: UNLOCK'))
             assert False, 'Sage There has no more spell to teach'

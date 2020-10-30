@@ -21,7 +21,7 @@ jobs:
           pip install flask pylint -r requirements.txt
       - name: Linter
         run: |
-          pylint pdf_game/ gen_pdf.py hall_of_fame/hof_app.py
+          pylint pdf_game/ gen_pdf.py hall_of_fame/hof_app.py trailer/*.py
       - name: Build PDF
         run: |
           git clone https://github.com/clintbellanger/heroine-dusk

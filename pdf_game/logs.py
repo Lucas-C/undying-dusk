@@ -75,7 +75,7 @@ def _print_action(gv, action_name):
             print(f'{action_name:>6} @ {gv.state.coords}')
         elif action_name == 'END-COMBAT-AFTER-VICTORY':
             gs = gv.src_view.state
-            print(f'{action_name} on {gs.combat.enemy.name} (HP={gs.hp} - gold_treasure={gs.combat.gold_treasure})')
+            print(f'{action_name} on {gs.combat.enemy.name} (HP={gs.hp} - +gold={gs.combat.enemy.gold})')
         else:
             print(action_name)
     elif gv.state.mode == GameMode.COMBAT:

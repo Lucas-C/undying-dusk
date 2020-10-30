@@ -35,6 +35,11 @@ class GameMilestone(IntEnum):
     VICTORY = 3
 
 
+class SFX(NamedTuple):  # Special Effects !
+    id : int
+    pos : Position
+
+
 class CombatRound(NamedTuple):
     attack_name : str = ''
     atk : int = 0  # value already includes Critical bonus
@@ -46,6 +51,8 @@ class CombatRound(NamedTuple):
     run_away : bool = False
     ask_for_mercy : tuple = ()  # (offer_msg, func[GameState->GameState])
     boneshield_up : bool = False
+    treasure_id : int = 0
+    sfx : SFX = None
 
 
 class RewardItem(NamedTuple):
@@ -59,6 +66,14 @@ class RewardTreasure(NamedTuple):
     grant : Callable[['GameState'], 'GameState']  # GameState -> GameState
 
 
+class Bribe(NamedTuple):
+    result_msg: str
+    item: str = ''
+    gold: int = 0
+    successful: bool = True
+    handshake : Callable[['GameState'], 'GameState'] = None
+
+
 class Enemy(NamedTuple):
     name : str
     type : Optional[int]
@@ -67,7 +82,7 @@ class Enemy(NamedTuple):
     max_hp : int
     rounds : Tuple[CombatRound]
     intro_msg : str = ''
-    bribes : Tuple[str] = ()
+    bribes : Tuple[Bribe] = ()
     allows_running_away : bool = False
     max_rounds : int = 4
     gold : int = 0
@@ -92,7 +107,6 @@ class CombatState(NamedTuple):
     avatar_log: Optional[CombatLog] = None
     enemy_log: Optional[CombatLog] = None
     boneshield_up: bool = False
-    gold_treasure: int = 0
 
 
 class RollingBoulder(NamedTuple):
@@ -107,7 +121,7 @@ class Trick(NamedTuple):
     filler_pages: int = 0
     background: str = ''
     music: str = ''
-
+    filler_renderer : Optional[Callable[['FPDF', int], None]] = None
 
 class Book(NamedTuple):
     text: str
@@ -115,6 +129,8 @@ class Book(NamedTuple):
     treasure_id: int = 0
     bird_index: Optional[int] = None
     next: Optional['Book'] = None  # using a Forward Reference type hint
+    portrait : Optional[int] = None
+    sfx : SFX = None
 
 
 class GameState(NamedTuple):
@@ -147,21 +163,23 @@ class GameState(NamedTuple):
     message: str = ''
     msg_place: MessagePlacement = MessagePlacement.DOWN
     book: Optional[Book] = None
+    treasure_id: int = 0
+    sfx : SFX = None
+    music: str = ''
+    music_btn_pos: Optional[Position] = None
+    extra_render: Optional[Callable[['FPDF'], None]] = None
     trick: Optional[Trick] = None
     fixed_id: int = 0  # sets a fixed page ID for this GameView
     reverse_id: bool = False  # indicates this GameView ID must be the symetrical of its src_view
-    treasure_id: int = 0
     milestone: GameMilestone = GameMilestone.NONE
     last_checkpoint: int = 0
     tile_overrides: Tuple[tuple] = ()  # pairs: ((map_id, x, y), tile_id)
     secrets_found: Tuple[str] = ()
-    music: str = ''
-    music_btn_pos: Optional[Position] = None
     # pylint: disable=no-member
     def clean_copy(self):
         return self._replace(message='', msg_place=MessagePlacement.DOWN,
                              milestone=GameMilestone.NONE,
-                             book=None, treasure_id=0,
+                             book=None, treasure_id=0, extra_render=None, sfx=None,
                              music='', music_btn_pos=None,
                              trick=None, reverse_id=False, fixed_id=0,
                              combat=self.combat and self.combat._replace(
@@ -245,6 +263,7 @@ class CutScene(NamedTuple):
     name: str = ''
     background: Union[int, str] = 0  # integer => original ones, cf. render_utils.BACKGROUNDS for their IDs
     treasure_id: int = 0
+    sfx : SFX = None
     exit_msg: str = ''
     music: str = ''
     dialog_options: Tuple[DialogOption] = ()
@@ -347,6 +366,7 @@ class GameView:
 
 class Checkpoint(NamedTuple):
     coords: Tuple[int]
+    description: str = ''
     condition: Optional[Callable[[GameState], bool]] = None  # GameState -> bool
     def matches(self, game_state):
         # pylint: disable=not-callable

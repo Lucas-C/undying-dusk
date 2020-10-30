@@ -3,12 +3,11 @@ from .js import action, REL_RELEASE_DIR
 
 
 BACKGROUNDS = 'black,nightsky,tempest,interior'.split(',')
-ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE'.split(',')  # order matches position in .png
+ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE,FISH_ON_A_STICK,COMBINE_WITH_TWIG,SMOKED_FISH_ON_A_STICK'.split(',')  # order matches position in .png
 ITEMS_SPELLS_BUTTON_POS = {
     # Unaltered:
     'INFO': Position(x=140, y=0),
     'ATTACK': Position(x=120, y=20),
-    'BUCKLER': Position(x=140, y=20),
     'RUN': Position(x=140, y=20),
     # Re-arrange spells to give space to items when rendering INFO:
     'HEAL': Position(x=100, y=40),
@@ -17,23 +16,40 @@ ITEMS_SPELLS_BUTTON_POS = {
     'LIGHT': Position(x=100, y=60),
     'FREEZE': Position(x=120, y=60),
     'REFLECT': Position(x=140, y=60),
-    'PUSH': Position(x=72, y=60),         # so far, aligned with box sprite
-    'NO_PUSH': Position(x=72, y=60),      # so far, aligned with box sprite
-    'EXAMINE': Position(x=66, y=72),      # so far, aligned with bookshelf & well sprites
-    'EMPTY_BOTTLE': Position(x=100, y=91),
-    'HOLY_WATER': Position(x=100, y=91),  # same (can never be carried together)
-    'CRUCIFIX': Position(x=120, y=91),
-    'SCROLL': Position(x=100, y=91),      # same (can never be carried together)
-    'BOOTS': Position(x=120, y=91),
-    'AMULET': Position(x=120, y=91),      # same (can never be carried together)
-    'PRAY': Position(x=100, y=91),        # never displayed with another item, only once in EXPLORE mode
-    'FISH': Position(x=140, y=91),
-    'BLUE_KEY': Position(x=140, y=91),    # same (can never be carried together)
-    'TALK': Position(x=76, y=30),         # so far, aligned with dungeon_wall_small_window sprite
-    'GLIMPSE': Position(x=76, y=79),      # so far, aligned with Canal Boneyard water
+    # Extra actions
+    'TALK': Position(x=76, y=30),              # so far, aligned with dungeon_wall_small_window sprite
+    'PUSH': Position(x=72, y=60),              # so far, aligned with box sprite
+    'NO_PUSH': Position(x=72, y=60),           # so far, aligned with box sprite
+    'EXAMINE': Position(x=66, y=72),           # so far, aligned with bookshelf & well sprites
+    'GLIMPSE': Position(x=76, y=79),           # so far, aligned with Canal Boneyard water
+    'BUCKLER': Position(x=140, y=20),
+    # Items:
+    'EMPTY_BOTTLE': Position(x=100, y=88),
+    'HOLY_WATER': Position(x=100, y=88),       # same (can never be carried together)
+    'CRUCIFIX': Position(x=120, y=88),
+    'SCROLL': Position(x=100, y=88),           # same (can never be carried together)
+    'AMULET': Position(x=120, y=88),
+    'BOOTS': Position(x=120, y=88),            # same (can never be carried together)
+    'PRAY': Position(x=100, y=88),             # never displayed with another item, only once in EXPLORE mode
+    'FISH': Position(x=140, y=88),
+    'FISH_ON_A_STICK': Position(x=140, y=88),  # same (can never be carried together)
+    'SMOKED_FISH_ON_A_STICK': Position(x=140, y=88),  # same (can never be carried together)
+    'BLUE_KEY': Position(x=100, y=88),         # same (can never be carried together)
+    # Combining on info page:
+    'COMBINE_WITH_TWIG': Position(x=141, y=100),  # aligned below FISH item
 }
 WHITE_ARROW_NAMES = 'BACK,NEXT'.split(',')  # order matches position in .png
 WHITE_ARROW_SIZE = 16
+
+
+def portrait_render(pdf, portrait_id, x=0, y=0):
+    with pdf.rect_clip(x=x, y=y, w=32, h=32):
+        pdf.image('assets/portraits.png', x=x - portrait_id * 32, y=y)
+
+
+def sfx_render(pdf, sfx):
+    with pdf.rect_clip(x=sfx.pos.x, y=sfx.pos.y, w=32, h=32):
+        pdf.image('assets/sfx.png', x=sfx.pos.x - sfx.id * 32, y=sfx.pos.y)
 
 
 def tileset_background_render(pdf, bg_id):

@@ -2,7 +2,7 @@ from .bitfont import bitfont_render, Justify
 from .entities import DialogButtonType, Position
 from .js import dialog, shop, REL_RELEASE_DIR
 from .render_info import info_render_gold
-from .render_utils import action_button_render, add_link, render_button, tileset_background_render, white_arrow_render
+from .render_utils import action_button_render, add_link, render_button, sfx_render, tileset_background_render, white_arrow_render
 from .render_treasure import treasure_render_item
 
 from .shop_dialog import build_dialog_options, resolve_redirect
@@ -73,6 +73,13 @@ def dialog_render(pdf, game_view):
     if treasure_id:
         assert isinstance(treasure_id, int)
         treasure_render_item(pdf, treasure_id, Position(x=64, y=80))
+
+    try:
+        if _shop.sfx:
+            sfx_render(pdf, _shop.sfx)
+    except (AttributeError, KeyError):
+        pass
+
     try:
         if _shop.music:
             action_button_render(pdf, 'MUSIC', url=_shop.music, btn_pos=Position(2, 30))

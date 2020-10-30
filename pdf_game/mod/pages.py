@@ -62,7 +62,7 @@ def render_credit_pages(pdf, links_to_credits):
     bitfont_render(pdf, 'You can support my work', 80, 65, Justify.CENTER)
     bitfont_render(pdf, 'through a tip on             .', 80, 75, Justify.CENTER)
     with bitfont_color_red():
-        bitfont_render(pdf, 'itch.io', 105, 75)  # TODO: add link
+        bitfont_render(pdf, 'itch.io', 105, 75, url='https://lucas-c.itch.io/undying-dusk')
     bitfont_render(pdf, 'You can also leave a comment', 80, 85, Justify.CENTER)
     bitfont_render(pdf, 'on the                                     .', 80, 95, Justify.CENTER)
     with bitfont_color_red():

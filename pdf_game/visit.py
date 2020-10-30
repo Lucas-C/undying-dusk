@@ -25,37 +25,41 @@ from .mod.pages import SECRET_ENDING_ID, render_secret_ending
 from .mod.world import make_bones_and_boxes_walkables
 
 
-def visit_game_views(start_at_checkpoint=None, print_only_map_id=None, no_script=False, enable_reducer=True, enable_deadend_detection=True):
-    initial_state = GameState(x=avatar().x,
-                              y=avatar().y,
-                              map_id=avatar().map_id,
-                              facing=avatar().facing,
-                              # map_id=9, x=11, y=5,  # to directly access final cut-scene & credits
-                              weapon=avatar().weapon,
-                              armor=avatar().armor,
-                              hp=avatar().hp,
-                              max_hp=avatar().max_hp,
-                              mp=avatar().mp,
-                              max_mp=avatar().max_mp,
-                              gold=avatar().gold,
-                              bonus_atk=avatar().bonus_atk,
-                              bonus_def=avatar().bonus_def,
-                              spellbook=avatar().spellbook,
-                              # mode=GameMode.EXPLORE)  # to bypass intro
-                              mode=GameMode.DIALOG, shop_id=8)  # "hardcoded" at heroine-dusk/release/js/title.js:153
-    # Fast start in Mausoleum:
-    # initial_state = GameState(map_id=8, x=2, y=7, facing='east',
-    #                           hp=4, max_hp=30, mp=0, max_mp=3, weapon=7, armor=1, spellbook=2, gold=14, items=('BOOTS', 'FISH'),
-    #                           hidden_triggers=('BEEN_TO_VILLAGE', 'RUMOR_HEARD', 'TOMB_HEALED'),
-    #                           triggers_activated=((5, 3, 1), (5, 3, 10)),
-    #                           tile_overrides=(((4, 2, 2), 1), ((4, 9, 11), 12), ((4, 10, 9), 1), ((4, 10, 11), 29), ((4, 10, 15), 18), ((5, 1, 10), 22), ((5, 7, 10), 1), ((8, 1, 7), 18)))  # extra tile override to prevent going back
+def build_initial_state():
+    return GameState(x=avatar().x,
+                     y=avatar().y,
+                     map_id=avatar().map_id,
+                     facing=avatar().facing,
+                     weapon=avatar().weapon,
+                     armor=avatar().armor,
+                     hp=avatar().hp,
+                     max_hp=avatar().max_hp,
+                     mp=avatar().mp,
+                     max_mp=avatar().max_mp,
+                     gold=avatar().gold,
+                     bonus_atk=avatar().bonus_atk,
+                     bonus_def=avatar().bonus_def,
+                     spellbook=avatar().spellbook,
+                     mode=GameMode.DIALOG, shop_id=8)  # "hardcoded" at heroine-dusk/release/js/title.js:153
+
+
+def visit_game_views(inbetween_checkpoints=None, print_only_map_id=None, no_script=False, enable_reducer=True, enable_deadend_detection=True):
+    global CHECKPOINTS, VICTORY_POS
+    initial_state = build_initial_state()
 
     if print_only_map_id is not None:
         print(map_as_string(GameView(initial_state._replace(map_id=print_only_map_id, x=0, y=0), src_view=None)))
         sys.exit(0)
 
+    start_at_checkpoint = 0
+    if inbetween_checkpoints:
+        start_cp, end_cp = inbetween_checkpoints.split('-')
+        start_at_checkpoint = int(start_cp) if start_cp else 0
+        end_cp = int(end_cp) if end_cp else len(CHECKPOINTS)
+        CHECKPOINTS = CHECKPOINTS[:end_cp]
+        VICTORY_POS = CHECKPOINTS[-1]
+
     if no_script:  # "spectator" / "empty world" mode
-        global CHECKPOINTS
         CHECKPOINTS = (CHECKPOINTS[-1],)
         # We need to be able to open all doors with the UNLOCK spell:
         initial_state = initial_state._replace(spellbook=3, max_mp=100, mp=100)

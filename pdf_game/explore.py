@@ -123,6 +123,11 @@ def _show_info(game_view, game_state, _GameView):
                 # Prefer a redirect from the INFO page to a page without milestone:
                 del info_view.actions['SHOW-INFO']
                 info_view.actions['SHOW-INFO'] = game_view
+        elif info_view.actions['SHOW-INFO'].state.trick:
+            if not game_view.state.trick:
+                # Prefer a redirect from the INFO page to a page without trick:
+                del info_view.actions['SHOW-INFO']
+                info_view.actions['SHOW-INFO'] = game_view
         else:
             assert info_view.actions['SHOW-INFO'].state == game_state, f"\n{info_view.actions['SHOW-INFO'].state}\n!=\n{game_state}"
     else:

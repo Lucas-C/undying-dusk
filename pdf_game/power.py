@@ -25,7 +25,7 @@ def power_enemy_attack(game_state, parried=False):
     if _round.ask_for_mercy:
         assert combat.enemy.hp > 0, f'Dead enemies cannot ask for mercy: {game_state.coords} round={combat.round} eHP={combat.enemy.hp}'
         offer_msg, agreed_func = _round.ask_for_mercy
-        next_state = game_state._replace(message=f'\n{offer_msg}')  # TODO: check rendering
+        next_state = game_state._replace(message=f'\n{offer_msg}')
         state_if_agreed = next_state._replace(combat=combat._replace(enemy=combat.enemy._replace(hp=0, gold=0, reward=None)))
         actions = {'END-COMBAT-AFTER-VICTORY': agreed_func(state_if_agreed)}
         return next_state, actions

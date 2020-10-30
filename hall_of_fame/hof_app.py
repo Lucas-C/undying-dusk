@@ -20,7 +20,7 @@ def index():
     secrets_found = extract_secrets(query)
     version = query.get('v', '')
     display_form = secrets_found is not None and version
-    if display_form and request.method == 'POST':
+    if display_form and request.method == 'POST' and params_are_safe(request.form, secrets_found, version):
         upsert_score(request.form['name'], request.form['pdf_reader'], secrets_found, version)
         display_form = False
     scores = query_db('SELECT * FROM scores')
@@ -33,14 +33,23 @@ def extract_secrets(query):
     except:  # Failsafe in case of invalid "gs" query param
         return None
 
+def params_are_safe(form, secrets_found, version):
+    if len(form['name']) >= 20 or len(form['pdf_reader']) >= 20:
+        return False
+    if any(len(secret) > 13 for secret in secrets_found):
+        return False
+    return len(version) < 10
+
 def upsert_score(player_name, pdf_reader, secrets_found, version):
+    submission_date = datetime.now()
     pdf_readers = ({pdf_reader} if pdf_reader else set())
     existing_score = query_db('SELECT * FROM scores WHERE player_name = ?', (player_name,), one=True)
     if existing_score:
+        submission_date = existing_score['submission_date']
         pdf_readers |= set(existing_score['pdf_readers'].split(','))
         secrets_found |= set(existing_score['secrets_found'].split(','))
     get_db().execute('INSERT OR REPLACE INTO scores VALUES (?, ?, ?, ?, ?)',
-                     (player_name, ','.join(sorted(pdf_readers)), ','.join(sorted(secrets_found)), version, datetime.now()))
+                     (player_name, ','.join(sorted(pdf_readers)), ','.join(sorted(secrets_found)), version, submission_date))
 
 
 ###############################################################################

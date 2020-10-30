@@ -22,6 +22,11 @@ from pdf_game.mod.pages import render_credit_pages, render_intro_pages, render_v
 
 def main():
     args = parse_args()
+    if args.list_checkpoints:
+        from pdf_game.mod.campaign import CHECKPOINTS
+        for i, cp in enumerate(CHECKPOINTS):
+            print(f'{i + 1}: {cp.description}')
+        return
     logging.basicConfig(format="%(asctime)s %(filename)s [%(levelname)s] %(message)s",
                         datefmt="%H:%M:%S", level=logging.DEBUG)  # displays fpdf internal logs
     logging.getLogger('PIL').setLevel(logging.INFO)
@@ -32,7 +37,7 @@ def main():
     else:
         campaign.script_it()
     with trace_time() as trace:
-        start_view, game_views = visit_game_views(args.start_at_checkpoint, args.only_print_map,
+        start_view, game_views = visit_game_views(args.inbetween_checkpoints, args.only_print_map,
                                                   no_script=args.no_script, enable_reducer=not args.no_reducer,
                                                   enable_deadend_detection=args.detect_deadends)
     print(f'States exploration took: {trace.time:.2f}s')
@@ -63,7 +68,8 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--start-at-checkpoint", type=int, help=" ")
+    parser.add_argument("--list-checkpoints", action="store_true", help="List checkpoints and exit")
+    parser.add_argument("--inbetween-checkpoints", type=str, help="Only render the game inbetween the specified range of checkpoints. Example of valid values: 1-2 or 17-")
     parser.add_argument("--json", action="store_true", help=" ")
     parser.add_argument("--iter-logs", action="store_true", help=" ")
     parser.add_argument("--no-script", action="store_true", help=" ")

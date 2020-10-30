@@ -1,4 +1,4 @@
-from ..entities import Position
+from ..entities import Position, SFX
 
 from .scenes import BASE_MUSIC_URL
 
@@ -38,7 +38,7 @@ def custom_explore_logic(action_name, gs, new_gs):
         elif facing == FACING_SIDE and action_name == 'TURN-RIGHT':
             if konami_step == 7:
                 return new_gs.with_secret('KONAMI_CODE')\
-                             ._replace(treasure_id=31,
+                             ._replace(sfx=SFX(id=7, pos=Position(64, 88)),
                                        message='You feel empowered\nby a mystical force!\n(you found a SECRET)',
                                        music=BASE_MUSIC_URL + 'AlexandrZhelanov-TreasuresOfAncientDungeon2.mp3',
                                        music_btn_pos=Position(x=72, y=25))

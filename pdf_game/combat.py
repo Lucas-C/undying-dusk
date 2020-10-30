@@ -40,12 +40,13 @@ def combat_logic(game_view, actions, _GameView):
     if 'BUCKLER' in game_state.items:
         next_gs, parried = power_hero_parry(game_state, 'BUCKLER')
         actions['BUCKLER'] = combat_round(next_gs, _GameView, parried=parried)
-    for bribe_item in _enemy.bribes:
-        if bribe_item in game_state.items:
-            actions[bribe_item] = combat_bribe(game_state, bribe_item, _GameView)
-        elif bribe_item.endswith('_gold'):
-            gold_amount = int(bribe_item.split('_')[0])
-            actions['THROW-COIN'] = combat_bribe(game_state, bribe_item, _GameView, gold_amount) if gold_amount <= game_state.gold else None
+    for bribe in _enemy.bribes:
+        if bribe.item and bribe.item in game_state.items:
+            assert bribe.item not in actions, f'Several bribes can be offered to {_enemy.name}@{game_state.coords} with the same item: {bribe.item}'
+            actions[bribe.item] = combat_bribe(game_state, bribe, _GameView)
+        elif bribe.gold and bribe.gold <= game_state.gold:
+            assert 'THROW-COIN' not in actions, f'Several gold bribes can be offered {_enemy.name}@{game_state.coords} at the same time'
+            actions['THROW-COIN'] = combat_bribe(game_state, bribe, _GameView)
     if _is_enemy_running_away(game_state.combat):
         # This is a hack, but we don't want to allow the player to stupidly loose a MP
         # if the enemy is running away anyway.
@@ -100,14 +101,22 @@ def combat_round(game_state, _GameView, parried=False):
     return next_gv
 
 
-def combat_bribe(game_state, bribe_item, _GameView, gold_amount=None):
+def combat_bribe(game_state, bribe, _GameView):
     combat = game_state.combat
-    log(game_state, f'bribed with {bribe_item}')
-    msg = f'You offer {bribe_item.replace("_", " ").lower()}\nThe enemy runs away with it'
-    combat = combat._replace(enemy=combat.enemy._replace(hp=0, gold=0, reward=None), round=combat.round + 1)
-    return _GameView(game_state._replace(combat=combat, message=msg,
-                                         gold=game_state.gold - gold_amount if gold_amount else game_state.gold,
-                                         items=tuple(i for i in game_state.items if i != bribe_item)))
+    bribe_name = ('a ' + bribe.item.replace('_', ' ').lower()) if bribe.item else f'{bribe.gold} gold'
+    log(game_state, f'bribe attempt with {bribe_name}')
+    if bribe.successful:
+        combat = combat._replace(enemy=combat.enemy._replace(hp=0, gold=0, reward=None))
+    message = 'You offer'
+    message += '\n' if len(bribe_name) >= 19 else ' '
+    message += f'{bribe_name}.\n{bribe.result_msg}'
+    game_state = game_state._replace(combat=combat,
+                                     message=message,
+                                     gold=game_state.gold - bribe.gold,
+                                     items=tuple(i for i in game_state.items if i != bribe.item))
+    if bribe.handshake:
+        game_state = bribe.handshake(game_state)
+    return _GameView(game_state)
 
 
 def combat_determine_reward(game_state):
@@ -134,5 +143,4 @@ def combat_determine_reward(game_state):
         msg += f"\n+{_enemy.gold} gold"
     return game_state._replace(
         message = game_state.message or msg,
-        gold=game_state.gold + _enemy.gold,   # Original: round(random() * (gold_max - gold_min)) + gold_min
-            combat=game_state.combat._replace(gold_treasure=_enemy.gold))
+        gold=game_state.gold + _enemy.gold)   # Original: round(random() * (gold_max - gold_min)) + gold_min

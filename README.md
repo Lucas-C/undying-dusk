@@ -1,13 +1,25 @@
 <!-- NEXT STEPS:
-- trailer GIF like heroine_dusk_story_trailer_480p.gif
+- add SFX for spells
+- final fight extra phases (must add checkpoints):
+  + empress-defeated: "Noooo! Come to me my minions!"
+  -> face 2 enemies => 2 health bars & 2 attacks
+  -> one is sometimes looting, which is key to victory
+  + empress-defeated: "Noooo!" -> "Come back to help me Dominik!"
+  -> face undead Dominik, with impress in foreground
+  -> he reflects all attacks
+  -> winning strategy: HEAL + click him? keep parying?
+- feedback Maxime:
+  * MUSIC: certaines sont trop rapprochées
+  * seamus fight without buckler frustrating
+  * skeleton fight : too hard ? hint at critical ?
+  * SCENARIO: aurait aimé avoir plus de réponses
+  * glitch boulder rendering with tree (GIF from Maxime ?)
+  * secret de l'arbre pas comptabilisé ??
 - redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
 - create itch.io page
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
-- reducer: TOO SLOW! -> dump removed GVs & stop when #views_removed <= prev_views_removed
-- graphical finishing touches:
-  * add sprite when using spells? for boss lightining attack?
-  * clickable reveal animation with crack?
+- reducer: TOO SLOW! -> dump GVs removed in last step to help identify logical improvements & stop when #views_removed <= prev_views_removed
 - post-release: publish assets & create a music collection on OGA
 - release pyfpdf2 & make a quine (a program generating a PDF displaying its own source code)
 - VF?
@@ -21,19 +33,24 @@
   * stats on what fights / tiles get the most rendered
   * MARGINAL EXPECTED EFFECT: pngoptimizer / optimize tilesets : many have redundant sections, a pre-rendering pass could extract tiles from tilesets and put them in a unique PNG, with mappings for the rendering step
 - ideas for another time:
-  * perso conscient d'être dans PDF
-  * offer choices that matters on the ending
-  * enemies: griffon, moving_statue
+  * clickable reveal animation with crack
+  * for a sequel, start off with Empress chasing player! (not doable due to #states explosion with secrets)
+    -> must go back through whole level without slowing down, with Empress following
+    -> pickup itemX * 3 (with buckler?) on the way, in order to face Empress again with 3 throwable weapons
+  * dialogs choices inspired by Monkey Island Insult Sword Fighting,    where there's a unique set of answers that leads to victory
   * drunk/potion -> mess with direction arrows (reversed / all over the page)
   * cloak to bypass enemy (avoid an encounter)
   * light up torch and go to some place previously very dark
   * place bomb on stone door doorstep (require a "broken wall" tile)
   * item to jump/teleport over a fixed distance
+  * offer choices that matters on the ending
+  * perso conscient d'être dans PDF
   * ACTIONS from dawnlike-level-16x16.png: bed, skull, rope, glove, diamond, snake, crown
                  dawnlike-npcs-16x16.png: interrogation mark, shadow form
   * try other PDF features: PrevPage ? sub-page navigation ?
   * implement monster arrival animations & attacks & delayed log msgs using PDF `Transitions` or as a GIF (_cf._ [Patrick Gallot article](https://www.datalogics.com/blog/corporate/the-making-of-a-pdf-presentation/))
   * use navigation node `Dur` to implement QTEs / real-time game mechanics ?
+  * enemies: griffon
 - secrets: ABYSS_BOTTOM, DEAD_TREE, FOUNTAIN_WISH, KONAMI_CODE
   * [x] empress soul at the bottom of the abyss
   * [x] throwing gold piece in fountain (hint hidden on a special wall sprite)
@@ -72,6 +89,10 @@ It was made during the summer of 2020 by Lucas Cimon.
 To my knowledge, this is the very first video game in a PDF format.
 
 [Dedicated SubReddit](https://www.reddit.com/r/UndyingDuskPdfGame)
+
+
+## Trailer
+![GIF trailer](trailer/undying-dusk-trailer.gif)
 
 
 ## Download
@@ -128,15 +149,16 @@ First of all, this game uses the great 16 color palette made by [DawnBringer at 
 This game also makes use of the following assets, some of which I ported to the DawnBringer palette:
 - all the original art was made by Clint Bellanger for the original Heroine Dusk game - [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - enemies come from [Redshrike remix of Heroine Dusk original ones](https://opengameart.org/content/first-person-dungeon-crawl-enemies-remixed).
-Seamus wizard & demon portrait come from his [6 More RPG Enemies spritesheet](https://opengameart.org/content/6-more-rpg-enemies) and the black bird from his [Tower Defense Prototyping Assets]( https://opengameart.org/content/tower-defense-prototyping-assets-4-monsters-some-tiles-a-background-image) - all [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+Fossil dino come from [Fossil (Undead) RPG Enemy Sprites](https://opengameart.org/content/fossil-undead-rpg-enemy-sprites),
+flying demon with daggers from [More RPG enemies!](https://opengameart.org/content/more-rpg-enemies), Seamus wizard & demon portrait from his [6 More RPG Enemies spritesheet](https://opengameart.org/content/6-more-rpg-enemies), black bird from his [Tower Defense Prototyping Assets]( https://opengameart.org/content/tower-defense-prototyping-assets-4-monsters-some-tiles-a-background-image) and blowfish from his [3 RPG enemy remixes](https://opengameart.org/content/3-rpg-enemy-remixes) - all [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 Shadow soul extra frames come from [Bosses and monsters spritesheets (Ars Notoria) by Balmer](https://opengameart.org/content/bosses-and-monsters-spritesheets-ars-notoria) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - most new sprites (direction arrow, items, tiles) come from the awesome [_Recolor all the items!!!_ spritesheet by Marcus Ihde](https://opengameart.org/content/recolor-all-the-items) - [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - bible, fish & scroll 16x16 icons from [Kyrise's Free 16x16 RPG Icon Pack](https://opengameart.org/content/kyrises-free-16x16-rpg-icon-pack) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-- cloudy town, flying demon, prie-dieu, statue, wood box & well from [GothicVania Patreon Collection](http://pixelgameart.org/web/portfolio/gothicvania/), [GothicVania Church assets](https://opengameart.org/content/gothicvania-church-pack), [GothicVania Cemetery assets](https://opengameart.org/content/gothicvania-cemetery-pack), [GothicVania Town assets](https://opengameart.org/content/gothicvania-town), [Forest Background](https://opengameart.org/content/forest-background) & [Mountain at Dusk Background](https://opengameart.org/content/mountain-at-dusk-background) by Luis Zuno (@ansimuz) - public domain
+- cloudy town, animated flying demon, prie-dieu, statue, wood box & well from [GothicVania Patreon Collection](http://pixelgameart.org/web/portfolio/gothicvania/), [GothicVania Church assets](https://opengameart.org/content/gothicvania-church-pack), [GothicVania Cemetery assets](https://opengameart.org/content/gothicvania-cemetery-pack), [GothicVania Town assets](https://opengameart.org/content/gothicvania-town), [Forest Background](https://opengameart.org/content/forest-background) & [Mountain at Dusk Background](https://opengameart.org/content/mountain-at-dusk-background) by Luis Zuno (@ansimuz) - public domain
 - [forest fringe](https://opengameart.org/content/forest-and-grave) & [valley village](https://opengameart.org/content/village-in-the-valley) backgrounds by trulio - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [!$dungeon Of Sorrow Gate](https://www.deviantart.com/nicnubill/art/dungeon-Of-Sorrow-Gate-407553705) & [!$Secret Passage](https://www.deviantart.com/nicnubill/art/Secret-Passage-716158385) by Nicnubill
 - portculli from [LPC castle by Evert](https://opengameart.org/content/lpc-castle) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
-- fire from [[LPC] Dungeon Elements by Sharm](https://opengameart.org/content/lpc-dungeon-elements) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- cauldron & fire from [[LPC] Dungeon Elements by Sharm](https://opengameart.org/content/lpc-dungeon-elements) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - [Boulder pixel art by TdeLeeuw](https://www.deviantart.com/tdeleeuw/art/Boulder-pixel-art-427731885) - [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/)
 - portal by [LetargicDev](https://opengameart.org/content/portals) - CC0
 - dead tree by [JRob774](https://opengameart.org/content/dead-tree-1) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
@@ -162,6 +184,10 @@ DawnLike 16x16 Universal Rogue-like tileset
 - small mimics from [Chest and Mimic by IndigoFenix](https://opengameart.org/content/chest-and-mimic) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [blood splat by PWL](https://opengameart.org/content/blood-splats) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [Rose Flower by Lovecraft](https://opengameart.org/content/rose-flower-pyxeledit-document-and-image) - CC0
+- fish-on-a-stick from [496 pixel art icons for medieval/fantasy RPG by Henrique Lazarini (7Soul1)](https://opengameart.org/content/496-pixel-art-icons-for-medievalfantasy-rpg) - CC0
+- knight & skeleton portrait from [32x32 Fantasy portrait set by CobraLad](https://opengameart.org/content/32x32-fantasy-portrait-set) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- explosion from [Lots of free 2d tiles and sprites by Hyptosis](https://opengameart.org/content/lots-of-free-2d-tiles-and-sprites-by-hyptosis) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- attacks SFXs from [Dungeon Crawl Stone Soup](http://crawl.develz.org/wordpress/) - CC0
 <!--
 * knight from [2d Lost Garden Zelda style tiles resized to 32x32 with additions](https://opengameart.org/node/11758) by Daniel Cook, Jetrel, Saphy (TMW), Zabin, Bertram - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 * griffon: Lanea Zimmerman (AKA Sharm) https://forums.rpgmakerweb.com/index.php?threads/sharms-stuff.26278/
@@ -198,13 +224,11 @@ Songs used in the game :
 
 Also, this game was mostly coded while listening to _Lance's Dark Mood Party Mixes_!
 
-<!--
 ### Playtesters
-TODO
+A huge THANK YOU to Henri Crouzet & Maxime Lemanach for their precious feedbacks!
 
 Many thanks also to Thibault Toledano for the cheerful support and the bright suggestions
 of elements to include in the game!
--->
 
 
 ## Tools used

@@ -5,6 +5,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.9.4] - 2020-10-30
+Special thanks to Maxime Lemanach for the detailed feedbacks that helped me
+to improve the game in this new release!
+
+### Added
+- hint in templar library on treasure hidden behind boulder trap
+- hint after polishing the sword:
+> No creature of darkness can match this weapon!
+- Sage Therel new dialog line
+- made goblin & fish enigma lengthier & funnier (hopefully)
+- SFXs for last 2 enemies attacks
+- GIF trailer (& script to generate it)
+
+### Changed
+- blocked Templar Academy entrance once player has > 30 gold || great sword
+
+### Fixed
+- _Mido Sesame_ password destination fix
+- made enigma to pass over Mausoleum easier to figure out
+
 ## [0.9.3] - 2020-10-18
 ### Added
 - now also releasing a ZIP file including Sumatra PDF and a `.bat` launcher

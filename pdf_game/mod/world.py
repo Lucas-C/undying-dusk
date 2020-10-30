@@ -26,6 +26,8 @@ def custom_can_move_to(_map, x, y, game_state):
             return True  # can enter shallow waters to access the chest
         if (x, y) == (4, 2):
             return not is_instinct_preventing_to_enter_village(game_state)
+        if (x, y) in ((8, 15), (14, 15)):
+            return not is_instinct_preventing_to_enter_templar_academy(game_state)
     if _map.name == 'Canal Boneyard':
         if (x, y) == (3, 2) and 'BOOTS' in game_state.items:
             return True  # can enter shallow waters to access the hint sign
@@ -47,6 +49,11 @@ def is_instinct_preventing_to_enter_village(game_state):
     # - when avatar has 20 gold, to buy the boots
     # - when avatar has 60 gold, to repair the sword & get a nigth of rest
     return (game_state.mp < 2 or 'SCROLL' not in game_state.items) and game_state.gold < 10
+
+
+def is_instinct_preventing_to_enter_templar_academy(game_state):
+    # No need to get back there once Templar treasure has been found (and later the sword is bought with it)
+    return game_state.weapon >= 7 or game_state.gold > 30
 
 
 def is_instinct_preventing_to_pass_mausoleum_portal(game_state):
@@ -90,6 +97,7 @@ def patch_tileset(tileset):
         True,   # 43 = stump_with_bottle
         True,   # 44 = seamus_on_grass
         True,   # 45 = seamus_on_floor
+        True,   # 46 = cauldron
     ])
 
 
@@ -177,7 +185,7 @@ def _patch_tiles(_map):
         x, y = 4, 2;   tiles[y][x] = 6   # grass instead of grave, so that sign/water can be reached
         x, y = 2, 2;   tiles[y][x] = 23  # sign in the water
         x, y = 4, 9;   tiles[y][x] = 6   # grass instead of tree, so that glimpse can be seen
-        x, y = 13, 5;  tiles[y][x] = 40  # chest_interior -> fire
+        x, y = 13, 5;  tiles[y][x] = 46  # chest_interior -> cauldron
         x, y = 14, 4;  tiles[y][x] = 32  # torch on wall, on left side of chest
         x, y = 14, 6;  tiles[y][x] = 32  # torch on wall, on right side of chest
         x, y = 10, 5;  tiles[y][x] = 5   # passage to Mausoleum (used to be a door)
@@ -218,7 +226,7 @@ def _patch_tiles(_map):
         x, y = 5, 4;   tiles[y][x] = 7   # interior pillar
         x, y = 5, 5;   tiles[y][x] = 5   # removing bone pile
         x, y = 5, 6;   tiles[y][x] = 7   # interior pillar
-        x, y = 6, 6;   tiles[y][x] = 37  # hay pile, allow to access sokoban sokoban but prevent boxes to go up
+        x, y = 6, 6;   tiles[y][x] = 37  # hay pile, allow to access sokoban but prevent boxes to go up
         x, y = 5, 7;   tiles[y][x] = 36  # box, for sokoban puzzle
         x, y = 6, 7;   tiles[y][x] = 36  # box, for sokoban puzzle
         x, y = 5, 8;   tiles[y][x] = 36  # box, for sokoban puzzle

@@ -13,12 +13,12 @@ from .perfs import trace_time
 from .render_dialog import dialog_render
 from .render_info import info_render, info_render_button, info_render_gold, info_render_hpmp
 from .render_treasure import treasure_render_collectible, treasure_render_gold, treasure_render_item
-from .render_utils import add_link, action_button_render, get_image_info, link_from_page_id, tileset_background_render, white_arrow_render, ACTION_BUTTONS
+from .render_utils import add_link, action_button_render, get_image_info, link_from_page_id, portrait_render, sfx_render, tileset_background_render, white_arrow_render, ACTION_BUTTONS
 
 from .mod.world import patch_enemy_name
 
 
-TILES = ',dungeon_floor,dungeon_wall,dungeon_door,pillar_exterior,dungeon_ceiling,grass,pillar_interior,chest_interior,chest_exterior,medieval_house,medieval_door,tree_evergreen,grave_cross,grave_stone,water,skull_pile,hay_pile,locked_door,death_speaker,boulder_floor,boulder_ceiling,boulder_grass,sign_grass,fountain,portcullis_exterior,portcullis_interior,portal_interior,portal_interior_closed,dead_tree,dungeon_wall_tagged,well,dungeon_torch,box_interior,dungeon_bookshelf,dungeon_bookshelf_torch,box_exterior,hay_pile_exterior,statue,statue_with_amulet,fire,dungeon_wall_small_window,stump,stump_with_bottle,seamus_on_grass,seamus_on_floor'.split(',')
+TILES = ',dungeon_floor,dungeon_wall,dungeon_door,pillar_exterior,dungeon_ceiling,grass,pillar_interior,chest_interior,chest_exterior,medieval_house,medieval_door,tree_evergreen,grave_cross,grave_stone,water,skull_pile,hay_pile,locked_door,death_speaker,boulder_floor,boulder_ceiling,boulder_grass,sign_grass,fountain,portcullis_exterior,portcullis_interior,portal_interior,portal_interior_closed,dead_tree,dungeon_wall_tagged,well,dungeon_torch,box_interior,dungeon_bookshelf,dungeon_bookshelf_torch,box_exterior,hay_pile_exterior,statue,statue_with_amulet,fire,dungeon_wall_small_window,stump,stump_with_bottle,seamus_on_grass,seamus_on_floor,cauldron'.split(',')
 ARROW_BUTTONS_POS = {
     'TURN-LEFT': Position(x=98, y=8, angle=180),
     'TURN-RIGHT': Position(x=114, y=8, angle=0),
@@ -38,70 +38,73 @@ MINIATURES_ALREADY_GENERATED = set()
 
 
 def render_page(pdf, game_view, render_victory):
+    game_state = game_view.state
     if game_view.renderer:
         game_view.renderer(pdf)
         return
     bitfont_set_color_red(False)
     pdf.add_page()
-    if game_view.state.milestone == GameMilestone.VICTORY:
-        render_victory(pdf, game_view.state)
+    if game_state.milestone == GameMilestone.VICTORY:
+        render_victory(pdf, game_state)
         return
-    if game_view.state.mode == GameMode.DIALOG:
+    if game_state.mode == GameMode.DIALOG:
         with trace_time('render:0:dialog'):
             dialog_render(pdf, game_view)
         return
-    bitfont_set_color_red(game_view.state.hp <= game_view.state.max_hp/3)
+    bitfont_set_color_red(game_state.hp <= game_state.max_hp/3)
     with trace_time('render:1:mazemap'):
         mazemap_render(pdf, game_view)
-    if game_view.state.mode == GameMode.INFO:
+    if game_state.combat:
+        with trace_time('render:3:combat'):
+            combat_render(pdf, game_state)
+    # Combat rendering must be done mefore .message rendering, for bribes messages to display well
+    if game_state.mode == GameMode.INFO:
         with trace_time('render:2:info_page'):
             minimap_render(pdf, game_view)
-            info_render(pdf, game_view.state)
-            action_render(pdf, game_view.state.spellbook, game_view.state.items)
-            if game_view.state.message:
-                bitfont_render(pdf, game_view.state.message, 2, 30)
-    elif game_view.state.message and not game_view.state.combat:  # 2nd condition avoid displaying map name when facing an enemy
-        y = 70 if game_view.state.msg_place else 100  # only handling UP/DOWN for now
-        newlines_count = game_view.state.message.count('\n')
+            info_render(pdf, game_state)
+            action_render(pdf, game_state.spellbook, game_state.items)
+            if game_state.message:
+                bitfont_render(pdf, game_state.message, 2, 30)
+    elif game_state.message and (not game_state.combat or (game_state.combat.enemy.bribes and 'END-COMBAT-AFTER-VICTORY' not in game_view.actions)):  # 2nd condition avoid displaying map name when facing an enemy, e.g. for storm dragon, except for bribe messages
+        y = 70 if game_state.msg_place else 100  # only handling UP/DOWN for now
+        newlines_count = game_state.message.count('\n')
         if newlines_count > 1:
-            y = 50 if game_view.state.msg_place else 80
+            y = 50 if game_state.msg_place else 80
             y -= 10*newlines_count
-        bitfont_render(pdf, game_view.state.message, 80, y, Justify.CENTER)
-    if game_view.state.music:
-        assert game_view.state.music_btn_pos
-        action_button_render(pdf, 'MUSIC', url=game_view.state.music, btn_pos=game_view.state.music_btn_pos)
-    if game_view.state.combat:
-        with trace_time('render:3:combat'):
-            combat_render(pdf, game_view.state)
-    if game_view.state.treasure_id:
-        if isinstance(game_view.state.treasure_id, str):
-            gold_str, gold_found = game_view.state.treasure_id.split('_')
+        bitfont_render(pdf, game_state.message, 80, y, Justify.CENTER)
+    if game_state.music:
+        assert game_state.music_btn_pos
+        action_button_render(pdf, 'MUSIC', url=game_state.music, btn_pos=game_state.music_btn_pos)
+    if game_state.treasure_id:  # EXPLORE | COMBAT
+        if isinstance(game_state.treasure_id, str):
+            gold_str, gold_found = game_state.treasure_id.split('_')
             assert gold_str == 'gold'
             treasure_render_gold(pdf, int(gold_found))
         else:
-            treasure_render_item(pdf, game_view.state.treasure_id)
+            treasure_render_item(pdf, game_state.treasure_id)
+    elif game_state.sfx:  # only used in EXPLORE mode so far
+        sfx_render(pdf, game_state.sfx)
     with trace_time('render:4:actions'):
         for action_name, next_game_view in game_view.actions.items():
             if action_name == 'SHOW-INFO':
-                info_render_button(pdf, next_game_view.page_id, down=game_view.state.mode == GameMode.INFO)
+                info_render_button(pdf, next_game_view.page_id, down=game_state.mode == GameMode.INFO)
             elif action_name == 'THROW-COIN':
-                info_render_gold(pdf, game_view.state,
+                info_render_gold(pdf, game_state,
                                  page_id=next_game_view.page_id if next_game_view else None)
             elif action_name == 'END-COMBAT-AFTER-VICTORY':
-                assert game_view.state.message
-                bitfont_render(pdf, game_view.state.message, 80, 50, Justify.CENTER,
+                assert game_state.message, f'No end-combat message: {game_state.combat}'
+                bitfont_render(pdf, game_state.message, 80, 50, Justify.CENTER,
                                page_id=next_game_view.page_id)
             elif action_name == 'CLOSING-BOOK':
-                assert game_view.state.book
-                render_book(pdf, game_view.state.book, next_game_view.page_id, game_view.state.treasure_id)
+                assert game_state.book
+                render_book(pdf, game_state.book, next_game_view.page_id, game_state.treasure_id)
             elif action_name in ACTION_BUTTONS:
-                if action_name == 'RUN':
-                    assert not next_game_view.state.combat
-                    _enemy = game_view.state.combat.enemy
                 action_button_render(pdf, action_name,
                                      page_id=next_game_view.page_id if next_game_view else None)
             else:
                 arrow_button_render(pdf, action_name, next_game_view.page_id)
+    if game_state.extra_render:
+        game_state.extra_render(pdf)
 
 
 def mazemap_render(pdf, game_view):
@@ -239,9 +242,9 @@ def combat_render(pdf, game_state):
         enemy_render(pdf, _enemy, game_state.combat.round)
         if game_state.combat.boneshield_up:
             pdf.image('assets/enemies/bone_shield.png', x=0, y=0)  # Replicates boss_boneshield_render
-    elif game_state.combat.gold_treasure:
-        treasure_render_gold(pdf, game_state.combat.gold_treasure)
-    if game_state.combat.round:
+    if _enemy.hp <= 0 and game_state.combat.enemy.gold:
+        treasure_render_gold(pdf, game_state.combat.enemy.gold)
+    if game_state.combat.round > 0:
         render_bar(pdf, _enemy.hp, _enemy.max_hp)
     else:  # == combat round 0
         bitfont_render(pdf, patch_enemy_name(_enemy.name).replace('_', ' '), 80, 2, Justify.CENTER)
@@ -249,7 +252,8 @@ def combat_render(pdf, game_state):
             bitfont_render(pdf, _enemy.intro_msg, 2, 13)
         if _enemy.music:
             assert not game_state.music
-            action_button_render(pdf, 'MUSIC', url=_enemy.music, btn_pos=Position(72, 9))
+            # Beware not to hide Empress face (around x=72)
+            action_button_render(pdf, 'MUSIC', url=_enemy.music, btn_pos=Position(50, 9))
     info_render_hpmp(pdf, game_state)
     combat_render_log(pdf, "You:", game_state.combat.avatar_log, 20)
     combat_render_log(pdf, "Enemy:", game_state.combat.enemy_log, 60)
@@ -273,6 +277,9 @@ def enemy_render(pdf, _enemy, _round=0):
     frames = get_image_info(pdf, img_filepath)['w'] / config().VIEW_WIDTH
     x = - config().VIEW_WIDTH * (_round % frames if (_enemy.loop_frames or _round < frames) else frames - 1)
     pdf.image(img_filepath, x=x, y=0)
+    _combat_round = _enemy.rounds[(_round - 1) % len(_enemy.rounds)]
+    if _round and _combat_round.sfx:
+        sfx_render(pdf, _combat_round.sfx)
 
 
 def enemy_render_small(pdf, _enemy, scale=2/3):
@@ -299,8 +306,9 @@ def render_bar(pdf, value, max_value, y=1, color_index=0):
         pdf.image('assets/healthbar.png', x=start_x, y=y)
     with pdf.rect_clip(x=start_x + 10 + max_value, y=y, w=10, h=14):
         pdf.image('assets/healthbar.png', x=start_x + max_value - 140, y=y)
-    with pdf.rect_clip(x=start_x + 10, y=y, w=value, h=14):
-        pdf.image('assets/healthbar.png', x=start_x + 10, y=y-(1 + color_index)*14)
+    if value > 0:
+        with pdf.rect_clip(x=start_x + 10, y=y, w=value, h=14):
+            pdf.image('assets/healthbar.png', x=start_x + 10, y=y-(1 + color_index)*14)
 
 
 def arrow_button_render(pdf, direction, page_id=None, shift_x=0, shift_y=0):
@@ -326,6 +334,10 @@ def render_book(pdf, book, page_id, treasure_id):
         if book.img:
             pdf.image(book.img, x=32, y=32)
             y += 16
+        if book.portrait is not None:
+            portrait_render(pdf, book.portrait)
+        if book.sfx:
+            sfx_render(pdf, book.sfx)
         if book.treasure_id:
             treasure_render_item(pdf, book.treasure_id, Position(x=86, y=76))
         if book.bird_index is not None:
@@ -338,7 +350,7 @@ def render_book(pdf, book, page_id, treasure_id):
         white_arrow_render(pdf, 'NEXT', x=120, y=100, page_id=page_id)
 
 
-def render_filler_page(pdf):
+def render_filler_page(pdf, _):
     pdf.add_page()
     pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
 

@@ -4,9 +4,9 @@ from .js import treasure, REL_RELEASE_DIR
 from .render_utils import action_button_render, get_image_info
 
 
-COLLECTIBLE_IMG_POS = Position(x=130, y=74)
+COLLECTIBLE_IMG_POS = Position(x=130, y=70)
 COLLECTIBLE_TXT_POS_X = 147
-COLLECTIBLE_TXT_POS_Y = 83
+COLLECTIBLE_TXT_POS_Y = 82
 
 
 def treasure_render_gold(pdf, total_value):

@@ -1,4 +1,4 @@
-from ..entities import Book
+from ..entities import Book, Position, SFX
 from ..logs import log
 
 from .scenes import tuto_spells
@@ -21,7 +21,7 @@ BOOKS = {
     (10, 0, 3): Book('During all their\nformation, young templars\nwear a sapphire amulet,\nsymbolizing the moral purity\nthey are trying to acquire.\n\n', treasure_id=12),
     # Templar Academy: next 4 bookshelves
     (10, 0, 5): Book('The Saint Knight was\nmurdered in his sleep\nby a cabal of druids\njealous of his influence.\n',
-                    img='assets/tomb-stone.png', next=Book('Following a grand funeral,\nhis body and armor were\nburied in the Mausoleum,\nwhile his sword was stored\nat the Templar Academy.')),
+                    img='assets/tomb-stone.png', next=Book('Following a grand funeral,\nhis body and armor were\nburied in the Mausoleum,\nwhile his sword was hidden\nin the Templar Academy maze.')),
     (10, 0, 7): Book('The Empress is said to have\nan interest in the occult,\nand to sometimes perform\narcane dark magic rituals.\n', img='assets/small-pentacle.png'),
     (10, 0, 9): Book('Drawings were made,\non empty pages corners',
                     next=Book(' ', bird_index=0,
@@ -29,12 +29,12 @@ BOOKS = {
                             next=Book(' ', bird_index=2,
                                 next=Book(' ', bird_index=3,
                                     next=Book(' ', bird_index=4)))))),
-    (10, 0, 11): False,  # templar academy history?
+    (10, 0, 11): Book('A trap mechanism is detailed,\ninvolving a giant boulder.\nIt appears to protect\na secret part of the library\nand the Templars treasure.\n\n', treasure_id=9),
     # Templar Academy: final 4 bookshelves
     (10, 0, 13): Book('Mimics are\nmagical creatures\nthat take the shape\nof mundane objects,\nlike chests.\n', img='assets/mimics.png', next=Book('They are as strong\nas the furniture item\nthey imitate,\nbut they also\nshare the same\nvulnerabilities.')),
-    (10, 0, 14): Book('Seamus Mc Lornan is\na powerful wizard,\nand a reknown advisor\nof the late Emperor.', img='assets/seamus.png'),
+    (10, 0, 14): Book('Seamus Mc Lornan is\na powerful wizard,\nand a reknown advisor\nof the late Emperor.', portrait=0),  # TODO: check renders OK
     (10, 1, 15): Book('An encyclopedia mentions\na sorcerer thief that\nmastered a spell to unlock\nall doors & chests...', img='assets/open-chest-and-treasure.png'),
-    (10, 2, 15): Book('The secret of the Saint\nKnight victory over the\nStorm Dragon was\nhis armor : it was made\nof electric-proof steel.\n\n', treasure_id=28),
+    (10, 2, 15): Book('The secret of the Saint\nKnight victory over the\nStorm Dragon was\nhis armor : it was made\nof electric-proof steel.\n\n', sfx=SFX(id=5, pos=Position(64, 88))),
 
     # Mausoleum: 2 bookshelves next to portal
     (8, 3, 13): Book('A treatise on\nDruidic linguistics.\nThe first chapter teaches\nthe names of numbers.',
@@ -52,7 +52,7 @@ def examine_bookshelf(gs, bookshelf_pos, actions, _GameView):
             actions['EXAMINE'] = _GameView(gs._replace(message='You found\nan ancient scroll\n\n',
                                                        treasure_id=23, items=gs.items + ('SCROLL',)))
         else:
-            ritual_words, fixed_id = 'Mido Sesame', 51065
+            ritual_words, fixed_id = 'Mido Sesame', 51064
             if 'ABYSS_BOTTOM' in gs.secrets_found:
                 ritual_words, fixed_id = 'Klaatu Barada Nikto', 18297
             actions['EXAMINE'] = _GameView(gs._replace(book=Book(f'Ancient portals\nused to be activated\nwith an incantation:\n"{ritual_words}"')))
