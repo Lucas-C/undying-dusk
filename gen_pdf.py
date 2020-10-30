@@ -23,9 +23,8 @@ from pdf_game.mod.pages import render_credit_pages, render_intro_pages, render_v
 def main():
     args = parse_args()
     if args.list_checkpoints:
-        from pdf_game.mod.campaign import CHECKPOINTS
-        for i, cp in enumerate(CHECKPOINTS):
-            print(f'{i + 1}: {cp.description}')
+        for i, checkpoint in enumerate(campaign.CHECKPOINTS):
+            print(f'{i + 1}: {checkpoint.description}')
         return
     logging.basicConfig(format="%(asctime)s %(filename)s [%(levelname)s] %(message)s",
                         datefmt="%H:%M:%S", level=logging.DEBUG)  # displays fpdf internal logs

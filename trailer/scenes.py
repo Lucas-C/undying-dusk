@@ -45,7 +45,7 @@ def combat(fpdf, text1, text2, frame_copies=10):  # facing zombie blocking Cedar
     with _mazemap(fpdf, map_id=5, x=9, y=10, hp=42, max_hp=50) as mz:
         combat_logic(mz.gv, mz.gv.actions, GameView)
     gv, img, pdf_img = mz.gv, mz.img, mz.pdf_img
-    while True: 
+    while True:
         bitfont_set_color_red(False)
         bitfont_render(pdf_img, text1, 158, 50, Justify.RIGHT)
         bitfont_render(pdf_img, text2, 158, 80, Justify.RIGHT)

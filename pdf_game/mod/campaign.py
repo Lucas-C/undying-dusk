@@ -223,6 +223,8 @@ def script_it():
     # We limit the #states by cutting unneeded access to the village:
     mapscript_add_message((6, 4, 3), 'Trust your instinct:\nno need to go back for now', facing='north',
                                       condition=is_instinct_preventing_to_enter_village)
+    mapscript_add_message((6, 8, 14), 'Trust your instinct:\nno need to go back no more', facing='south',
+                                      condition=is_instinct_preventing_to_enter_templar_academy )
 
     # Entrance to Canal Boneyard is blocked by a skeleton; required to win: full HP + 3 MP (1 BURN & 2 HEAL) + great sword (13 dmg)
     mapscript_add_enemy((6, 12, 7), 'skeleton',

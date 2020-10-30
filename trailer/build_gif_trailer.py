@@ -4,7 +4,7 @@
 # USAGE: PYTHONPATH=. trailer/build_gif_trailer.py --watch-and-rebuild
 
 import os, sys, webbrowser
-from subprocess import check_output, STDOUT
+from subprocess import check_output
 
 from pdf_game.bitfont import bitfont_render, Justify
 from pdf_game.js import config, REL_RELEASE_DIR
