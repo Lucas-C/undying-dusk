@@ -3,7 +3,7 @@ An optimizer to reduce the GameViews by identifying the ones that will end up
 being rendered exactly the same, including the links.
 In practice, this only applies to Game Over death pages, and pages pointing to them.
 '''
-import os
+import os, resource
 from contextlib import contextmanager
 
 import fpdf
@@ -23,7 +23,8 @@ def reduce_views(game_views, multipass=True):
     in_game_views = game_views
     while True:
         if multipass:
-            print(f'Pass {pass_number} - #views removed so far: {total_views_removed}')
+            memory_peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+            print(f'Pass {pass_number} - #views removed so far: {total_views_removed} - memory peak: {memory_peak}kb')
         fake_pdf = FakePdfRecorder(pdf)  # resetting recorder between passes in order to reset links
         gv_per_page_fingerprint, out_game_views = {}, []
         # We need to assign page IDs in order to detect pages with identical links:

@@ -25,4 +25,4 @@ jobs:
       - name: Build PDF
         run: |
           git clone https://github.com/clintbellanger/heroine-dusk
-          NO_TQDM=1 ./gen_pdf.py
+          NO_TQDM=1 PYTHONUNBUFFERED=1 ./gen_pdf.py

@@ -1,5 +1,8 @@
 <!-- NEXT STEPS:
-- broken CD/CI pipeline: solve "FATAL 56: uncaught error PANIC"
+- broken CD/CI pipeline:
+    FATAL 56: uncaught error
+    PANIC 56: uncaught error (calling abort)
+    -> pyduktape ? -> https://github.com/stefano/pyduktape/issues/10
 - add SFX for spells
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"
