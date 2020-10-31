@@ -17,7 +17,7 @@ from .perfs import print_memory_stats
 from .render import render_page
 
 
-def reduce_views(game_views, multipass=True, track_mem_usage=True):
+def reduce_views(game_views, multipass=True):
     print('Starting views reducer')
     pdf = fpdf.FPDF()  # a real instance is needed due to the calls to ._parsepng
     pass_number, total_views_removed = 1, 0
@@ -27,8 +27,7 @@ def reduce_views(game_views, multipass=True, track_mem_usage=True):
             print(f'Pass {pass_number} - #views removed so far: {total_views_removed}')
         fake_pdf = FakePdfRecorder(pdf)  # resetting recorder between passes in order to reset links
         gv_per_page_fingerprint, out_game_views = {}, []
-        if track_mem_usage:
-            print_memory_stats()
+        print_memory_stats(detailed=True)
         # We need to assign page IDs in order to detect pages with identical links:
         in_game_views = assign_page_ids(in_game_views, assign_reverse_id=False)
         for game_view in tqdm(in_game_views, disable='NO_TQDM' in os.environ):
