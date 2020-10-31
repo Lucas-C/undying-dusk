@@ -2,5 +2,7 @@ humanfriendly  # purely optional
 git+git://github.com/Lucas-C/pyfpdf.git@master
 pikepdf
 pillow
+psutil  # purely optional
 git+git://github.com/Lucas-C/pyduktape.git@patch-1
+pympler  # purely optional
 tqdm  # purely optional
