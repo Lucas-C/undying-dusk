@@ -3,6 +3,11 @@
     FATAL 56: uncaught error
     PANIC 56: uncaught error (calling abort)
     -> pyduktape ? -> https://github.com/stefano/pyduktape/issues/10
+    Now:
+    FATAL 56: uncaught error
+    PANIC 56: uncaught error (segfaulting on purpose)
+    Segmentation fault      (core dumped)
+    -> memory issue due to perfs.EXEC_TIMES_MS ?
 - add SFX for spells
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"

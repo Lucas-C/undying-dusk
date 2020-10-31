@@ -13,7 +13,7 @@ except ImportError:
     tqdm = lambda _: _
 
 from .assigner import assign_page_ids
-from .memory import print_memory_stats
+from .perfs import print_memory_stats
 from .render import render_page
 
 
@@ -57,8 +57,7 @@ class FakePdfRecorder:
     def __init__(self, pdf):
         self.pdf = pdf
         self.images = pdf.images
-        self._links = {}
-        self._calls = []
+        self.reset()
 
     def add_font(self, family, style='', fname='', uni=False):
         pass
@@ -104,6 +103,7 @@ class FakePdfRecorder:
 
     def reset(self):
         self._calls = []
+        self._links = {}
 
     def get_fingerprint(self):
         return hash(tuple(self._calls))

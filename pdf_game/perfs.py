@@ -1,7 +1,17 @@
+import resource, tracemalloc
 from collections import defaultdict
 from contextlib import contextmanager
 from time import perf_counter
 from types import SimpleNamespace
+
+try:
+    import psutil
+except ImportError:
+    psutil = False
+try:
+    from pympler import muppy, summary
+except ImportError:
+    muppy = False
 
 
 EXEC_TIMES_MS = defaultdict(list)
@@ -44,3 +54,26 @@ class PerfsMonitorWrapper:
     def print_perf_stats(self):
         print(f'Perf stats of all calls made to {self.class_name} methods:')
         print_perf_stats('Method name', self.timings_in_ms_per_method)
+
+
+def print_memory_stats(detailed=False):
+    'This function has an impact on performances'
+    memory_peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    print(f'resource.ru_maxrss memory peak: {memory_peak // 1000}MB')
+
+    if psutil:
+        memory_rss = psutil.Process().memory_info().rss
+        print(f'psutil.memory_rss: {memory_rss // (1000*1000)}MB')
+
+    if not detailed: return
+
+    if muppy:
+        print('# muppy summary:')
+        summary.print_(summary.summarize(muppy.get_objects()))
+
+    if tracemalloc.is_tracing():
+        print('# tracemalloc top 10:')
+        for stat in tracemalloc.take_snapshot().statistics('lineno')[:10]:
+            print(stat)
+    else:
+        tracemalloc.start()
