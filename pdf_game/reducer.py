@@ -3,6 +3,7 @@ An optimizer to reduce the GameViews by identifying the ones that will end up
 being rendered exactly the same, including the links.
 In practice, this only applies to Game Over death pages, and pages pointing to them.
 '''
+import os
 from contextlib import contextmanager
 
 import fpdf
@@ -27,7 +28,7 @@ def reduce_views(game_views, multipass=True):
         gv_per_page_fingerprint, out_game_views = {}, []
         # We need to assign page IDs in order to detect pages with identical links:
         in_game_views = assign_page_ids(in_game_views, assign_reverse_id=False)
-        for game_view in tqdm(in_game_views):
+        for game_view in tqdm(in_game_views, disable='NO_TQDM' in os.environ):
             fake_pdf.reset()
             render_page(fake_pdf, game_view, render_victory=lambda *args: None)
             page_fingerprint = fake_pdf.get_fingerprint()

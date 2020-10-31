@@ -1,4 +1,5 @@
 <!-- NEXT STEPS:
+- broken CD/CI pipeline: solve "FATAL 56: uncaught error PANIC"
 - add SFX for spells
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"
@@ -16,6 +17,7 @@
   * glitch boulder rendering with tree (GIF from Maxime ?)
   * secret de l'arbre pas comptabilisé ??
 - redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
+- https://github.com/sumatrapdfreader/sumatrapdf/issues/1777
 - create itch.io page
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem

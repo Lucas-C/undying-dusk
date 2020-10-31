@@ -1,6 +1,7 @@
 '''
 A "dead-end" state is a GameState that cannot lead to either a GAMEOVER or a VICTORY.
 '''
+import os
 from queue import LifoQueue
 
 try:  # Optional dependency:
@@ -16,7 +17,7 @@ def detect_deadends(game_views):
     print('#end-game GVs:', len(endgame_gvs))
     print('- marking all states leading to an end-game leaf')
     non_deadend_gs_hashes = set()
-    for gv in tqdm(endgame_gvs):
+    for gv in tqdm(endgame_gvs, disable='NO_TQDM' in os.environ):
         while gv:
             gs_hash = hash(gv.state)
             if gs_hash in non_deadend_gs_hashes:

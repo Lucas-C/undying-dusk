@@ -49,7 +49,7 @@ def main():
     print('Starting PDF pages rendering')
     pdf, links_to_credits = init_pdf(start_view.page_id)
     with trace_time() as trace:
-        for game_view in tqdm(game_views):
+        for game_view in tqdm(game_views, disable='NO_TQDM' in os.environ):
             render_page(pdf, game_view, lambda pdf, gs: render_victory(pdf, gs, links_to_credits))
     render_credit_pages(pdf, links_to_credits)
     print(f'Rendering of {len(pdf.pages)} pages took: {trace.time:.2f}s')
