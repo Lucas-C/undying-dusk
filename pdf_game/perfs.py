@@ -72,8 +72,14 @@ def print_memory_stats(detailed=False):
         summary.print_(summary.summarize(muppy.get_objects()))
 
     if tracemalloc.is_tracing():
+        snapshot = tracemalloc.take_snapshot()
         print('# tracemalloc top 10:')
-        for stat in tracemalloc.take_snapshot().statistics('lineno')[:10]:
+        for stat in snapshot.statistics('lineno')[:10]:
             print(stat)
+        print('Biggest memory block traceback:')
+        stat = snapshot.statistics('traceback')[0]
+        print("%s memory blocks: %.1f MiB" % (stat.count, stat.size / 1024 / 1024))
+        for line in stat.traceback.format():
+            print(line)
     else:
         tracemalloc.start()
