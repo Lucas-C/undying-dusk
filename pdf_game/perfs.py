@@ -71,10 +71,12 @@ def print_memory_stats(detailed=False):
         print('# tracemalloc top 10:')
         for stat in snapshot.statistics('lineno')[:10]:
             print(stat)
-        print('Biggest memory block traceback:')
-        stat = snapshot.statistics('traceback')[0]
-        print("%s memory blocks: %.1f MiB" % (stat.count, stat.size / 1024 / 1024))
-        for line in stat.traceback.format():
-            print(line)
+        print('# Top 3 biggest memory blocks traceback:')
+        stats = snapshot.statistics('traceback')
+        for i in range(3):
+            stat = stats[i]
+            print("%s memory blocks: %.1f MiB" % (stat.count, stat.size / 1024 / 1024))
+            for line in stat.traceback.format():
+                print(line)
     else:
         tracemalloc.start()

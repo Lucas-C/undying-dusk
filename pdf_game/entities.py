@@ -317,7 +317,7 @@ class GameView:
     def __hash__(self):
         return hash(self.state)
     def __repr__(self):
-        return f'GameView({self.state})'
+        return f'GameView({self.state}, freeze_state={self.freeze_state}, renderer={bool(self.renderer)}, page_id={self.page_id}, _page_id_from={bool(self._page_id_from)}, actions={self.actions.keys()})'
     @property
     def state(self):
         return self._state
