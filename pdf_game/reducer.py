@@ -17,6 +17,9 @@ from .perfs import print_memory_stats
 from .render import render_page
 
 
+MIN_REMOVED_VIEWS_TO_GO_ON = 25
+
+
 def reduce_views(game_views, multipass=True):
     print('Starting views reducer')
     pdf = fpdf.FPDF()  # a real instance is needed due to the calls to ._parsepng
@@ -27,7 +30,7 @@ def reduce_views(game_views, multipass=True):
             print(f'Pass {pass_number} - #views removed so far: {total_views_removed}')
         fake_pdf = FakePdfRecorder(pdf)  # resetting recorder between passes in order to reset links
         gv_per_page_fingerprint, out_game_views = {}, []
-        print_memory_stats(detailed=True)
+        print_memory_stats()
         # We need to assign page IDs in order to detect pages with identical links:
         in_game_views = assign_page_ids(in_game_views, assign_reverse_id=False)
         for game_view in tqdm(in_game_views, disable='NO_TQDM' in os.environ):
@@ -45,7 +48,7 @@ def reduce_views(game_views, multipass=True):
         total_views_removed += views_removed
         pass_number += 1
         in_game_views = out_game_views
-        if not views_removed or not multipass or views_removed < 25:  # Last condition avoid > 20 passes...
+        if not views_removed or not multipass or views_removed < MIN_REMOVED_VIEWS_TO_GO_ON:  # Last condition avoid > 20 passes...
             break
     print(f'-{100*(total_views_removed)/len(game_views):0f}% of views were removed by the reducer')
     return out_game_views
