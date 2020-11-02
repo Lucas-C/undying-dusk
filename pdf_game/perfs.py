@@ -4,27 +4,30 @@ from contextlib import contextmanager
 from time import perf_counter
 from types import SimpleNamespace
 
-try:
-    import psutil
-except ImportError:
-    psutil = False
-try:
-    from pympler import muppy, summary
-except ImportError:
-    muppy = False
+
+_EXEC_TIMES_MS = defaultdict(list)
+_DISABLE_TRACING = False
 
 
-EXEC_TIMES_MS = defaultdict(list)
+@contextmanager
+def disable_tracing():
+    global _DISABLE_TRACING
+    _DISABLE_TRACING = True
+    yield
+    _DISABLE_TRACING = False
 
 
 @contextmanager
 def trace_time(global_key=None, timings_in_ms=None):
+    if _DISABLE_TRACING:
+        yield
+        return
     trace = SimpleNamespace() if (timings_in_ms is None and not global_key) else None  # do not create object if not needed
     start = perf_counter()
     yield trace
     duration = perf_counter() - start
     if global_key:
-        EXEC_TIMES_MS[global_key].append(duration * 1000)
+        _EXEC_TIMES_MS[global_key].append(duration * 1000)
     elif timings_in_ms is None:
         trace.time = duration
     else:
@@ -32,7 +35,7 @@ def trace_time(global_key=None, timings_in_ms=None):
 
 
 # pylint: disable=dangerous-default-value
-def print_perf_stats(header='Stage', timings_in_ms_per_stage=EXEC_TIMES_MS):
+def print_perf_stats(header='Stage', timings_in_ms_per_stage=_EXEC_TIMES_MS):
     print(f'{header:<25} | Total exec time (ms) | #execs')
     print('--------------------------|----------------------|-------')
     for stage, timings_in_ms in sorted(timings_in_ms_per_stage.items()):
@@ -57,19 +60,11 @@ class PerfsMonitorWrapper:
 
 
 def print_memory_stats(detailed=False):
-    'This function has an impact on performances'
+    'If detailed=True, this function has an impact on performances'
     memory_peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     print(f'resource.ru_maxrss memory peak: {memory_peak // 1000}MB')
 
-    if psutil:
-        memory_rss = psutil.Process().memory_info().rss
-        print(f'psutil.memory_rss: {memory_rss // (1000*1000)}MB')
-
     if not detailed: return
-
-    if muppy:
-        print('# muppy summary:')
-        summary.print_(summary.summarize(muppy.get_objects()))
 
     if tracemalloc.is_tracing():
         snapshot = tracemalloc.take_snapshot()

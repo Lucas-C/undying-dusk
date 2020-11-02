@@ -13,7 +13,7 @@ except ImportError:
     tqdm = lambda _: _
 
 from .assigner import assign_page_ids
-from .perfs import print_memory_stats
+from .perfs import disable_tracing, print_memory_stats
 from .render import render_page
 
 
@@ -29,13 +29,14 @@ def reduce_views(game_views, multipass=True):
         if multipass:
             print(f'Pass {pass_number} - #views removed so far: {total_views_removed}')
         fake_pdf = FakePdfRecorder(pdf)  # resetting recorder between passes in order to reset links
+        print_memory_stats(detailed=True)
         gv_per_page_fingerprint, out_game_views = {}, []
-        print_memory_stats()
         # We need to assign page IDs in order to detect pages with identical links:
         in_game_views = assign_page_ids(in_game_views, assign_reverse_id=False)
         for game_view in tqdm(in_game_views, disable='NO_TQDM' in os.environ):
             fake_pdf.reset()
-            render_page(fake_pdf, game_view, render_victory=lambda *args: None)
+            with disable_tracing():
+                render_page(fake_pdf, game_view, render_victory=lambda *args: None)
             page_fingerprint = fake_pdf.get_fingerprint()
             existing_matching_gv = gv_per_page_fingerprint.get(page_fingerprint)
             if existing_matching_gv:

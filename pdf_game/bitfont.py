@@ -4,6 +4,7 @@ from contextlib import contextmanager
 
 from .entities import Justify
 from .js import bitfont, config, REL_RELEASE_DIR
+from .perfs import trace_time
 from .render_utils import add_link
 
 
@@ -31,15 +32,16 @@ def bitfont_color_red():
 
 
 def bitfont_render(pdf, text, x, y, justify=Justify.LEFT, size=8, page_id=None, url=None, link=None):
-    min_x, max_x = config().VIEW_WIDTH, 0
-    lines = text.split('\n')
-    for i, line in enumerate(lines):
-        start_x, text_width = _bitfont_render(pdf, line, x, y + 10*i, justify, size)
-        min_x = min(min_x, start_x)
-        max_x = max(max_x, start_x + text_width)
-    if url or page_id or link:
-        return add_link(pdf, x=min_x, y=y, width=max_x - min_x, height=10*len(lines) - 4,
-                        page_id=page_id, url=url, link=link)  # TODO: pass link_alt=
+    with trace_time('render:bitfont'):
+        min_x, max_x = config().VIEW_WIDTH, 0
+        lines = text.split('\n')
+        for i, line in enumerate(lines):
+            start_x, text_width = _bitfont_render(pdf, line, x, y + 10*i, justify, size)
+            min_x = min(min_x, start_x)
+            max_x = max(max_x, start_x + text_width)
+        if url or page_id or link:
+            return add_link(pdf, x=min_x, y=y, width=max_x - min_x, height=10*len(lines) - 4,
+                            page_id=page_id, url=url, link=link)  # TODO: pass link_alt=
     return None
 
 
@@ -86,9 +88,8 @@ def bitfont_renderglyph(pdf, char, x, y, scale=1):
         return _SPACE
     height = _HEIGHT * scale
     width = _GLYPH_W[char] * scale
-    font_img_filepath = REL_RELEASE_DIR + (bitfont().imgred.src if _ACTIVE_COLOR == RED_RGB else bitfont().img.src)
     with pdf.rect_clip(x=x, y=y, w=width, h=height - scale):
-        pdf.image(font_img_filepath,
+        pdf.image(_RED_IMG_FILEPATH if _ACTIVE_COLOR == RED_RGB else _WHITE_IMG_FILEPATH,
                   x=x - _GLYPH_X[char]*scale, y=y,
                   w=_BITFONT_IMG_WIDTH*scale, h=height)
     return scale * (_GLYPH_W[char] + _KERNING)
@@ -105,4 +106,6 @@ _GLYPH_X = {char: bitfont().glyph_x[char] for char in _GLYPHS}
 _KERNING = bitfont().kerning
 _HEIGHT = bitfont().height
 _SPACE = bitfont().space
+_RED_IMG_FILEPATH = REL_RELEASE_DIR + bitfont().imgred.src
+_WHITE_IMG_FILEPATH = REL_RELEASE_DIR + bitfont().img.src
 _BITFONT_IMG_WIDTH = 516

@@ -1,8 +1,6 @@
 humanfriendly  # purely optional
 git+git://github.com/Lucas-C/pyfpdf.git@master
-pikepdf
+pikepdf  # optional, allows to set PDF metadata
 pillow
-psutil  # purely optional
 pyduktape
-pympler  # purely optional
 tqdm  # purely optional

@@ -2,7 +2,7 @@
 
 import argparse, json, logging, os
 
-import fpdf, pikepdf
+import fpdf
 try:  # Optional dependency:
     from tqdm import tqdm
 except ImportError:
@@ -104,6 +104,12 @@ def json_export(game_views):
 
 
 def set_metadata(filepath, metadata):
+    try:
+        # pylint: disable=import-outside-toplevel
+        import pikepdf
+    except ImportError as error:
+        print(f'Cannot set metadata: {error}')
+        return
     start_size = os.stat(filepath).st_size
     with pikepdf.open(filepath, allow_overwriting_input=True) as pdf:
         with pdf.open_metadata(set_pikepdf_as_editor=False) as meta:
