@@ -19,9 +19,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+          git clone https://github.com/clintbellanger/heroine-dusk
       - name: Build PDF
         run: |
-          git clone https://github.com/clintbellanger/heroine-dusk
           echo "__version__ = '$GITHUB_REF'" > pdf_game/__init__.py
           NO_TQDM=1 PYTHONUNBUFFERED=1 ./gen_pdf.py
           zip/gen_zip.sh

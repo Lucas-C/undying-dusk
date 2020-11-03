@@ -40,7 +40,8 @@ def build_initial_state():
                      bonus_atk=avatar().bonus_atk,
                      bonus_def=avatar().bonus_def,
                      spellbook=avatar().spellbook,
-                     mode=GameMode.DIALOG, shop_id=8)  # "hardcoded" at heroine-dusk/release/js/title.js:153
+                     mode=GameMode.DIALOG,
+                     shop_id=8)  # "hardcoded" at heroine-dusk/release/js/title.js:153
 
 
 def visit_game_views(inbetween_checkpoints=None, print_only_map_id=None, no_script=False, enable_reducer=True, enable_deadend_detection=True):

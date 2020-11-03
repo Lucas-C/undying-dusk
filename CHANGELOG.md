@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [0.9.4] - 2020-11-02
+## [0.9.4] - 2020-11-03
 Special thanks to Maxime Lemanach for the detailed feedbacks that helped me
 to improve the game in this new release!
 

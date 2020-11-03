@@ -1,13 +1,4 @@
 <!-- NEXT STEPS:
-- broken CD/CI pipeline:
-    FATAL 56: uncaught error
-    PANIC 56: uncaught error (calling abort)
-    -> pyduktape ? -> https://github.com/stefano/pyduktape/issues/10
-    Now:
-    FATAL 56: uncaught error
-    PANIC 56: uncaught error (segfaulting on purpose)
-    Segmentation fault      (core dumped)
-    -> memory issue due to perfs.EXEC_TIMES_MS ?
 - add SFX for spells
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"
@@ -29,7 +20,6 @@
 - create itch.io page
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
-- reducer: TOO SLOW! -> dump GVs removed in last step to help identify logical improvements & stop when #views_removed <= prev_views_removed
 - post-release: publish assets & create a music collection on OGA
 - release pyfpdf2 & make a quine (a program generating a PDF displaying its own source code)
 - VF?

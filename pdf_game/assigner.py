@@ -11,22 +11,22 @@ from .mod.easteregg import insert_eegggv
 START_PAGE_ID = 7  # skipping title, disclaimer & 4 pages of tutorial
 
 
-def assign_page_ids(game_views, assign_reverse_id=True):
+def assign_page_ids(game_views, assign_special_pages=True):
     gv_per_fixed_id = {gv.state.fixed_id: gv for gv in game_views if gv.state and gv.state.fixed_id}
     assert not any(fixed_id > len(game_views) for fixed_id in gv_per_fixed_id.keys()), f'Not enough GameViews ({len(game_views)}) to assign some of them with fixed IDs: {list(gv_per_fixed_id.keys())}'
     attempt = 0
     while True:
         attempt += 1
-        if assign_reverse_id:
+        if assign_special_pages:
             print(f'Attempt at assigning reversed page ID: {attempt}')
         shuffle(game_views)  # needed to render pages in a random order
-        assigner = Assigner(assign_reverse_id, gv_per_fixed_id)
+        assigner = Assigner(assign_special_pages, gv_per_fixed_id)
         if assigner.attempt(game_views):
             return assigner.out_game_views  # reverse ID assignation is valid ! => exiting "while" loop
 
 class Assigner:
-    def __init__(self, assign_reverse_id, gv_per_fixed_id):
-        self.assign_reverse_id = assign_reverse_id
+    def __init__(self, assign_special_pages, gv_per_fixed_id):
+        self.assign_special_pages = assign_special_pages
         self.gv_per_fixed_id = dict(gv_per_fixed_id)  # copy so that we can safely reassign values to None
         self.next_page_id, self.out_game_views, self.reversed_id_gv = START_PAGE_ID, [], None
 
@@ -58,7 +58,7 @@ class Assigner:
                         filler_game_view.set_page_id(self.next_page_id)
                         self.out_game_views.append(filler_game_view)
                         self._increment_next_page_id()
-                if game_view.state and game_view.state.reverse_id and self.assign_reverse_id:
+                if game_view.state and game_view.state.reverse_id and self.assign_special_pages:
                     assert not self.reversed_id_gv, 'Current algorithm cannot handle several GameView asking for a .reverse_id'
                     src_page_id = game_view.src_view.page_id
                     if not src_page_id or src_page_id >= self.next_page_id or src_page_id < 100:
@@ -112,11 +112,12 @@ class Assigner:
             self.out_game_views.append(gv)
             self.gv_per_fixed_id[self.next_page_id] = None
             self._increment_next_page_id()
-        easteregg_game_view = insert_eegggv(self.next_page_id)
-        if easteregg_game_view:
-            easteregg_game_view.set_page_id(self.next_page_id)
-            self.out_game_views.append(easteregg_game_view)
-            self._increment_next_page_id()
+        if self.assign_special_pages:
+            easteregg_game_view = insert_eegggv(self.next_page_id)
+            if easteregg_game_view:
+                easteregg_game_view.set_page_id(self.next_page_id)
+                self.out_game_views.append(easteregg_game_view)
+                self._increment_next_page_id()
 
 
 def _render_trick(trick_game_view):

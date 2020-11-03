@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Lint & build PDF
+    name: Lint, test & build PDF
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,11 +18,14 @@ jobs:
           python-version: 3.7
       - name: Install dependencies
         run: |
-          pip install flask livereload pylint -r requirements.txt
+          pip install flask livereload pylint pytest -r requirements.txt
+          git clone https://github.com/clintbellanger/heroine-dusk
       - name: Linter
         run: |
           pylint pdf_game/ gen_pdf.py hall_of_fame/hof_app.py trailer/*.py
+      - name: Tests
+        run: |
+          pytest pdf_game/
       - name: Build PDF
         run: |
-          git clone https://github.com/clintbellanger/heroine-dusk
           NO_TQDM=1 PYTHONUNBUFFERED=1 ./gen_pdf.py
