@@ -1,7 +1,5 @@
-import fpdf
-
 from .entities import GameMilestone, GameMode, GameView
-from .reducer import compute_fingerprint, reduce_views
+from .reducer import compute_fingerprint, reduce_views, FakePdfRecorder
 from .visit import build_initial_state
 
 
@@ -51,9 +49,9 @@ def test_no_over_reduce():
 
 
 def test_fingerprint_differ():
-    pdf = fpdf.FPDF()
-    fp1 = compute_fingerprint(pdf, GameView(A_FINAL_STATE))
-    fp2 = compute_fingerprint(pdf, GameView(A_FINAL_STATE._replace(x=2)))
+    fake_pdf = FakePdfRecorder()
+    fp1 = compute_fingerprint(fake_pdf, GameView(A_FINAL_STATE))
+    fp2 = compute_fingerprint(fake_pdf, GameView(A_FINAL_STATE._replace(x=2)))
     assert fp1 != fp2
 
 
