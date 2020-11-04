@@ -79,13 +79,13 @@ def visit_game_views(args):
         if not new_gv:
             new_gv = GameView(state, src_view)
             if new_gv.state.mode == GameMode.EXPLORE:
+                # We must 1st insert it in game_view_per_state to avoid an infinite recursion:
+                game_view_per_state[state] = new_gv
                 # Executing it now/there ensures it is only performed once per GV:
                 mapscript_exec(new_gv, lambda state: _GameView(state, new_gv))
                 if new_gv.state != state:  # the GameState can be changed by the mapscript
-                    existing_gv = game_view_per_state.get(new_gv.state)
-                    if existing_gv:
-                        assert new_gv.state == existing_gv.state
-                        new_gv = existing_gv
+                    del game_view_per_state[state]
+                    new_gv = game_view_per_state.get(new_gv.state) or new_gv
             game_view_per_state[new_gv.state] = new_gv
         return new_gv
 
@@ -131,9 +131,9 @@ def visit_game_views(args):
 
     for game_view in game_views:
         if game_view.state and game_view.state.milestone in (GameMilestone.CHECKPOINT, GameMilestone.VICTORY):
-            matching_checkpoints = [cp for cp in CHECKPOINTS if cp.matches(game_view.state)]
-            assert matching_checkpoints and len(matching_checkpoints) == 1, matching_checkpoints
-            print(f'Page ID for checkpoint {game_view.state.last_checkpoint}: {game_view.page_id} ({game_view.state.facing}/{"+".join(game_view.state.secrets_found)}): {matching_checkpoints[0].description}')
+            checkpoint = next(cp for i, cp in enumerate(CHECKPOINTS, start=1)
+                              if i == game_view.state.last_checkpoint)
+            print(f'Page ID for checkpoint {game_view.state.last_checkpoint}: {game_view.page_id} ({game_view.state.facing}/{"+".join(game_view.state.secrets_found)}): {checkpoint.description}')
 
     return start_view, game_views
 
