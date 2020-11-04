@@ -44,23 +44,23 @@ def build_initial_state():
                      shop_id=8)  # "hardcoded" at heroine-dusk/release/js/title.js:153
 
 
-def visit_game_views(inbetween_checkpoints=None, print_only_map_id=None, no_script=False, enable_reducer=True, enable_deadend_detection=True):
+def visit_game_views(args):
     global CHECKPOINTS, VICTORY_POS
     initial_state = build_initial_state()
 
-    if print_only_map_id is not None:
-        print(map_as_string(GameView(initial_state._replace(map_id=print_only_map_id, x=0, y=0), src_view=None)))
+    if args.only_print_map is not None:
+        print(map_as_string(GameView(initial_state._replace(map_id=args.only_print_map, x=0, y=0), src_view=None)))
         sys.exit(0)
 
     start_at_checkpoint = 0
-    if inbetween_checkpoints:
-        start_cp, end_cp = inbetween_checkpoints.split('-')
+    if args.inbetween_checkpoints:
+        start_cp, end_cp = args.inbetween_checkpoints.split('-')
         start_at_checkpoint = int(start_cp) if start_cp else 0
         end_cp = int(end_cp) if end_cp else len(CHECKPOINTS)
         CHECKPOINTS = CHECKPOINTS[:end_cp]
         VICTORY_POS = CHECKPOINTS[-1]
 
-    if no_script:  # "spectator" / "empty world" mode
+    if args.no_script:  # "spectator" / "empty world" mode
         CHECKPOINTS = (CHECKPOINTS[-1],)
         # We need to be able to open all doors with the UNLOCK spell:
         initial_state = initial_state._replace(spellbook=3, max_mp=100, mp=100)
@@ -75,16 +75,19 @@ def visit_game_views(inbetween_checkpoints=None, print_only_map_id=None, no_scri
     secret_ending_view = GameView(GameState(fixed_id=SECRET_ENDING_ID), renderer=render_secret_ending)
     game_view_per_state = {initial_state: initial_view}
     def _GameView(state, src_view):  # get existing view for given state or build one
-        if state not in game_view_per_state:
+        new_gv = game_view_per_state.get(state)
+        if not new_gv:
             new_gv = GameView(state, src_view)
-            game_view_per_state[state] = new_gv
             if new_gv.state.mode == GameMode.EXPLORE:
                 # Executing it now/there ensures it is only performed once per GV:
                 mapscript_exec(new_gv, lambda state: _GameView(state, new_gv))
-                state = new_gv.state  # the GameState can be changed by the mapscript
-                if state not in game_view_per_state:
-                    game_view_per_state[state] = new_gv
-        return game_view_per_state[state]
+                if new_gv.state != state:  # the GameState can be changed by the mapscript
+                    existing_gv = game_view_per_state.get(new_gv.state)
+                    if existing_gv:
+                        assert new_gv.state == existing_gv.state
+                        new_gv = existing_gv
+            game_view_per_state[new_gv.state] = new_gv
+        return new_gv
 
     with trace_time('visit:iterate_game_views'):
         start_view, initial_views, game_views = None, [initial_view], [initial_view, secret_ending_view]
@@ -111,33 +114,35 @@ def visit_game_views(inbetween_checkpoints=None, print_only_map_id=None, no_scri
         assert start_view, f'No start view found: maybe due to an invalid --start-at-checkpoint ({start_at_checkpoint}) ? #checkpoints=({len(CHECKPOINTS)})'
         print(f'{len(game_views)} views have been iterated')
 
-    # duplicate_gvs_str = '\n'.join(str(gv) for gv in game_views if game_views.count(gv) > 1)
-    # assert not duplicate_gvs_str, f'There are duplicate game views!\n{duplicate_gvs_str}'  # costly but useful sanity check
+    check_no_duplicate(game_views)
 
-    if enable_deadend_detection:
+    if args.detect_deadends:
         with trace_time('visit:detect_deadends'):
             detect_deadends(game_views)
             sys.exit(0)
 
-    if enable_reducer:
+    if not args.no_reducer:
         with trace_time('visit:reduce_views'):
-            game_views = reduce_views(game_views)
+            game_views = reduce_views(game_views, args.print_reduced_views)
 
     with trace_time('visit:assign_page_ids'):
         game_views = assign_page_ids(game_views)
     assert start_view.page_id
 
     for game_view in game_views:
-        if game_view.state and game_view.state.milestone in (GameMilestone.CHECKPOINT, GameMilestone.VICTORY) and any(cp.matches(game_view.state) for cp in CHECKPOINTS):
-            print(f'Page ID for checkpoint {game_view.state.last_checkpoint}: {game_view.page_id} ({game_view.state.facing}/{"+".join(game_view.state.secrets_found)})')
+        if game_view.state and game_view.state.milestone in (GameMilestone.CHECKPOINT, GameMilestone.VICTORY):
+            matching_checkpoints = [cp for cp in CHECKPOINTS if cp.matches(game_view.state)]
+            assert matching_checkpoints and len(matching_checkpoints) == 1, matching_checkpoints
+            print(f'Page ID for checkpoint {game_view.state.last_checkpoint}: {game_view.page_id} ({game_view.state.facing}/{"+".join(game_view.state.secrets_found)}): {matching_checkpoints[0].description}')
 
     return start_view, game_views
 
 
 def iterate_game_views(checkpoint, checkpoint_id, start_views, _GameView):
-    game_views, processing = set(), LifoQueue()
+    game_views, processed, processing = set(), set(), LifoQueue()
     for start_view in start_views:
         processing.put(start_view)
+        processed.add(hash(start_view))
     checkpoint_game_views = []
     while not processing.empty():
         game_view = processing.get()
@@ -166,8 +171,9 @@ def iterate_game_views(checkpoint, checkpoint_id, start_views, _GameView):
                             checkpoint_game_views.append(new_game_view)
                     else:
                         checkpoint_game_views = [new_game_view]
-            if new_game_view not in game_views and new_game_view not in start_views:
+            if hash(new_game_view) not in processed:
                 game_views.add(new_game_view)
+                processed.add(hash(new_game_view))  # we need a separate set of GS hashes, as "new_game_view not in game_views" would uses "id(new_game_view)"
                 milestone = new_game_view.state.milestone
                 if milestone == GameMilestone.GAME_OVER:
                     log_msg = (f'defeated - hp: {new_game_view.state.hp}/{new_game_view.state.max_hp}'
@@ -179,6 +185,7 @@ def iterate_game_views(checkpoint, checkpoint_id, start_views, _GameView):
                         if post_defeat and not hasattr(post_defeat, 'game_view'):
                             post_defeat.game_view = GameView(src_view=game_view, renderer=post_defeat)
                             game_views.add(post_defeat.game_view)
+                            processed.add(hash(post_defeat.game_view))
                     if new_game_view.state.rolling_boulder:
                         log_msg += f' - crushed-by-boulder@{new_game_view.state.coords}/{new_game_view.state.facing}'
                     log(new_game_view.state, log_msg)
@@ -186,8 +193,17 @@ def iterate_game_views(checkpoint, checkpoint_id, start_views, _GameView):
                     processing.put(new_game_view)
             if not action_name:  # means it is a "secret" action witout any link on the page
                 del actions[action_name]  # no link will be rendered
-    _ensure_no_duplicates(checkpoint_game_views)
     return game_views, checkpoint_game_views
+
+
+def check_no_duplicate(game_views):
+    print('Ensuring no duplicate GameViews exist...')
+    gvs_per_hash = defaultdict(list)
+    for gv in game_views:
+        gvs_per_hash[hash(gv)].append(gv)
+    duplicate_gvs_str = '\n'.join('\n'.join(map(str, gvs)) for gvs in gvs_per_hash.values() if len(gvs) > 1)
+    assert not duplicate_gvs_str, f'Duplicate game views found:\n{duplicate_gvs_str}'
+    print('Check passed ✔️')
 
 
 def _normalized_state(gv, min_checkpoint_to_ignore_gold=9):
@@ -199,16 +215,3 @@ def _normalized_state(gv, min_checkpoint_to_ignore_gold=9):
                                           hidden_triggers=(), secrets_found=(),
                                           vanquished_enemies=(),  # (e.g. shadow soul secret)
                                           tile_overrides=(), triggers_activated=())  # (e.g. shadow soul secret)
-
-
-def _ensure_no_duplicates(checkpoint_game_views):
-    if len(checkpoint_game_views) != len(set(gv.state for gv in checkpoint_game_views)):
-        cp_gvs_per_state = defaultdict(list)
-        for cp_gv in checkpoint_game_views:
-            cp_gvs_per_state[cp_gv.state].append(cp_gv)
-        print('Checkpoint GameViews sharing a same state:')
-        for cp_gvs in cp_gvs_per_state.values():
-            if len(cp_gvs) > 1:
-                print('\n'.join(str(cp_gv) for cp_gv in cp_gvs))
-                print('---')
-        assert False, 'Nooooo! Several GameViews exist for identical GameStates!'

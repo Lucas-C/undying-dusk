@@ -210,6 +210,13 @@ class GameState(NamedTuple):
     def coords(self):
         'Hero avatar coordinates'
         return self.map_id, self.x, self.y
+    def differing(self, other):
+        out = ''
+        for field in self._fields:
+            self_val, other_val = getattr(self, field), getattr(other, field)
+            if self_val != other_val:
+                out += f'{field}: {self_val} != {other_val}\n'
+        return out
 
 
 class DialogButtonType(IntEnum):
@@ -362,6 +369,14 @@ class GameView:
         return coords in self.state.vanquished_enemies
     def add_hidden_trigger(self, hidden_trigger):
         self.state = self.state.with_hidden_trigger(hidden_trigger)
+    def as_dict(self):  # JSON-export-friendly
+        view_dict = self.state._asdict()
+        combat = self.state.combat
+        if combat:  # removing non-serializable field:
+            view_dict['combat'] = combat._replace(enemy=combat.enemy._replace(post_defeat=None, post_victory=None))
+        view_dict['actions'] = {action: next_gv.page_id if next_gv else None
+                                for action, next_gv in self.actions.items()}
+        return view_dict
 
 
 class Checkpoint(NamedTuple):

@@ -13,22 +13,23 @@ except ImportError:
 def detect_deadends(game_views):
     print('Starting dead-end detecter')
     print('- listing all end-game leaf states')
-    endgame_gvs = set(gv for gv in game_views if gv.state.milestone >= 2)
+    endgame_gvs = set(gv for gv in game_views if gv.state and gv.state.milestone >= 2)
     print('#end-game GVs:', len(endgame_gvs))
     print('- marking all states leading to an end-game leaf')
     non_deadend_gs_hashes = set()
     for gv in tqdm(endgame_gvs, disable='NO_TQDM' in os.environ):
         while gv:
-            gs_hash = hash(gv.state)
-            if gs_hash in non_deadend_gs_hashes:
-                break
-            non_deadend_gs_hashes.add(gs_hash)
+            if gv.state:
+                gs_hash = hash(gv.state)
+                if gs_hash in non_deadend_gs_hashes:
+                    break
+                non_deadend_gs_hashes.add(gs_hash)
             gv = gv.src_view
     print('Initial #non-deadend GVs:', len(non_deadend_gs_hashes))
     print('- deducing all dead-end states')
     loops = []
     for gv in tqdm(game_views):
-        if hash(gv.state) in non_deadend_gs_hashes:
+        if not gv.state or gv.state.map_id < 0 or hash(gv.state) in non_deadend_gs_hashes:
             continue
         children = {gv.state}  # GameStates reachable by following actions from "gv"
         queue = LifoQueue() # GameViews to be processed, a subset of all children of "gv"
@@ -74,7 +75,8 @@ def detect_deadends(game_views):
     for loop in loops:
         for gs in loop:
             map_ids.add(gs.map_id)
-    print('Maps with dead-ends:', map_ids)
+    if map_ids:
+        print('Maps with dead-ends:', map_ids)
     for loop in sorted(loops, key=len):
         print(f'\nDead-ends loop of size {len(loop)} includes:')
         print(list(loop)[0])

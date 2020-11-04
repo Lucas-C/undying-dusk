@@ -1,5 +1,6 @@
 <!-- NEXT STEPS:
 - add SFX for spells
+- Henri & Matt bloqué dans les plaines -> sait pas quoi faire, indice du canal pas suffisant
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"
   -> face 2 enemies => 2 health bars & 2 attacks

@@ -56,7 +56,7 @@ def dialog_render(pdf, game_view):
             button_id = getattr(dialog(), f'DIALOG_BUTTON_{option.btn_type.name}')
             assert button_id is not None, f'DIALOG_BUTTON_{option.btn_type.name}'
             if option.btn_type == DialogButtonType.EXIT:
-                assert page_id is not None
+                assert page_id is not None, f'EXIT button pointing to GV without page ID: {game_view.state} -> {game_view.actions[action_name]}'
                 if i < 2:
                     # The EXIT option must always be rendered at a fixed "y" pos, at the bottom:
                     pos = BUTTON_POS[2]

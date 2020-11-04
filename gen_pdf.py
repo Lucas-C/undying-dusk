@@ -36,13 +36,12 @@ def main():
     else:
         campaign.script_it()
     with trace_time() as trace:
-        start_view, game_views = visit_game_views(args.inbetween_checkpoints, args.only_print_map,
-                                                  no_script=args.no_script, enable_reducer=not args.no_reducer,
-                                                  enable_deadend_detection=args.detect_deadends)
+        start_view, game_views = visit_game_views(args)
     print(f'States exploration took: {trace.time:.2f}s')
     if args.json:
-        with trace_time() as trace:
-            json_export(game_views)
+        with trace_time() as trace, open('game_states.json', 'w') as json_file:
+            json.dump({gv.page_id: gv.as_dict() for gv in game_views},
+                      json_file, indent=4, sort_keys=True)
         print(f'JSON export took: {trace.time:.2f}s')
     if args.no_pdf:
         return
@@ -67,16 +66,17 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--only-print-map", type=int, metavar="MAP_ID", help="Print a given map as ASCII and exit")
     parser.add_argument("--list-checkpoints", action="store_true", help="List checkpoints and exit")
     parser.add_argument("--inbetween-checkpoints", type=str, help="Only render the game inbetween the specified range of checkpoints. Example of valid values: 1-2 or 17-")
-    parser.add_argument("--json", action="store_true", help=" ")
+    parser.add_argument("--json", action="store_true", help="Dump all generated game states in a JSON file")
     parser.add_argument("--iter-logs", action="store_true", help=" ")
     parser.add_argument("--no-script", action="store_true", help=" ")
     parser.add_argument("--no-reducer", action="store_true", help=" ")
     parser.add_argument("--no-metadata", action="store_true", help=" ")
     parser.add_argument("--no-pdf", action="store_true", help=" ")
-    parser.add_argument("--detect-deadends", action="store_true", help=" ")
-    parser.add_argument("--only-print-map", type=int, metavar="MAP_ID", help=" ")
+    parser.add_argument("--detect-deadends", action="store_true", help="Sanity check")
+    parser.add_argument("--print-reduced-views", action="store_true", help=" ")
     return parser.parse_args()
 
 
@@ -87,20 +87,6 @@ def init_pdf(start_page_id):
     pdf = PerfsMonitorWrapper(pdf, class_name='FPDF')
     links_to_credits = render_intro_pages(pdf, start_page_id)
     return pdf, links_to_credits
-
-
-def json_export(game_views):
-    export = {}
-    for gv in game_views:
-        view = gv.state._asdict()
-        combat = view.get('combat')
-        if combat:  # removing non-serializable field:
-            view['combat'] = combat._replace(enemy=combat.enemy._replace(post_fight=None))
-        view['actions'] = {action: next_gv.page_id if next_gv else None
-                           for action, next_gv in gv.actions.items()}
-        export[gv.page_id] = view
-    with open('game_states.json', 'w') as json_file:
-        json.dump(export, json_file, indent=4, sort_keys=True)
 
 
 def set_metadata(filepath, metadata):
