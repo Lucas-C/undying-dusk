@@ -33,7 +33,11 @@ def reduce_views(game_views, print_reduced_views=False):
             existing_matching_gv = gv_per_page_fingerprint.get(fp_page.fingerprint)
             if existing_matching_gv:
                 assert fp_page.game_view.page_id != existing_matching_gv.page_id, f'Infinite loop detected in reducer!\n{fp_page.game_view}\n{existing_matching_gv}'
-                assert fp_page.game_view.state.milestone != GameMilestone.CHECKPOINT, f'Error in reducer: no checkpoint GameView should ever be removed!\n{fp_page.game_view}\nreplaced by:\n{existing_matching_gv}'
+                if fp_page.game_view.state and fp_page.game_view.state.milestone == GameMilestone.CHECKPOINT and not existing_matching_gv.state.milestone:
+                    # Switching GVs to preserve the Milestone:
+                    gv_per_page_fingerprint[fp_page.fingerprint] = fp_page.game_view
+                    fp_page.game_view = existing_matching_gv
+                    existing_matching_gv = gv_per_page_fingerprint[fp_page.fingerprint]
                 if print_reduced_views:
                     gs = fp_page.game_view.state
                     print('- reducer.removes:', f'{gs.coords}/{gs.facing} HP={gs.hp} round={gs.combat and gs.combat.round} secrets_found={gs.secrets_found}')

@@ -448,12 +448,12 @@ def script_it():
         hp=10, rounds=(CR('Dagger cut', atk=4),))
 
     def _open_locked_door_with_key(game_view, _GameView):
-        gs = game_view.state
-        new_game_view = _GameView(gs._replace(items=tuple(i for i in gs.items if i != 'BLUE_KEY')))
-        game_view.actions['BLUE_KEY'] = new_game_view
-        if not new_game_view.tile_override((8, 4, 12)):  # avoid re-adding override if GameView already exists
+        if not game_view.tile_override((8, 4, 12)):  # avoid re-adding override if GameView already exists
+            gs = game_view.state
             log(gs, 'opening-door-to-portal')
-            new_game_view.add_tile_override(5, coords=(8, 4, 12))
+            new_gs = gs.with_tile_override(5, coords=(8, 4, 12))\
+                       ._replace(items=tuple(i for i in gs.items if i != 'BLUE_KEY'))
+            game_view.actions['BLUE_KEY'] = _GameView(new_gs)
     mapscript_add_trigger((8, 5, 12), _open_locked_door_with_key, facing='west', permanent=True,
                                       condition=lambda gs: 'BLUE_KEY' in gs.items)
 

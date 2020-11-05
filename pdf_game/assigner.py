@@ -1,4 +1,7 @@
-'This module role is to iterate all the game states reachable by the player.'
+'''
+This module role is to assign page IDs to GameViews,
+including reversed & fixed page IDs, and to insert easter-egg pages.
+'''
 from random import shuffle
 
 from .entities import GameMode, GameView
@@ -12,6 +15,7 @@ START_PAGE_ID = 7  # skipping title, disclaimer & 4 pages of tutorial
 
 
 def assign_page_ids(game_views, assign_special_pages=True):
+    is_first_assignment = not any(gv.page_id for gv in game_views)
     gv_per_fixed_id = {gv.state.fixed_id: gv for gv in game_views if gv.state and gv.state.fixed_id}
     assert not any(fixed_id > len(game_views) for fixed_id in gv_per_fixed_id.keys()), f'Not enough GameViews ({len(game_views)}) to assign some of them with fixed IDs: {list(gv_per_fixed_id.keys())}'
     attempt = 0
@@ -22,7 +26,10 @@ def assign_page_ids(game_views, assign_special_pages=True):
         shuffle(game_views)  # needed to render pages in a random order
         assigner = Assigner(assign_special_pages, gv_per_fixed_id)
         if assigner.attempt(game_views):
-            return assigner.out_game_views  # reverse ID assignation is valid ! => exiting "while" loop
+            # reverse ID assignation is valid ! => exiting "while" loop
+            if is_first_assignment:
+                check_all_reachable_views_have_a_page_id(assigner.out_game_views)
+            return assigner.out_game_views
 
 class Assigner:
     def __init__(self, assign_special_pages, gv_per_fixed_id):
@@ -118,6 +125,16 @@ class Assigner:
                 easteregg_game_view.set_page_id(self.next_page_id)
                 self.out_game_views.append(easteregg_game_view)
                 self._increment_next_page_id()
+
+
+def check_all_reachable_views_have_a_page_id(game_views):
+    # Sanity check that revealed to be useful, e.g. when a mapscript trigger
+    # sets tile overrides on new actions GameViews *AFTER* creating them
+    # (instead of adding them on the GameState beforehand).
+    for gv in game_views:
+        for action, new_gv in gv.actions.items():
+            if new_gv:
+                assert new_gv.page_id, f'{action} point to a GV with no page ID: {new_gv}'
 
 
 def _render_trick(trick_game_view):
