@@ -69,13 +69,13 @@ class Assigner:
                     assert not self.reversed_id_gv, 'Current algorithm cannot handle several GameView asking for a .reverse_id'
                     src_page_id = game_view.src_view.page_id
                     if not src_page_id or src_page_id >= self.next_page_id or src_page_id < 100:
-                        print(f'reverse ID assignation ABORT - src_page_id={src_page_id} next_page_id={self.next_page_id}')
+                        print(f'Reverse ID assignation ABORT - src_page_id={src_page_id} next_page_id={self.next_page_id}')
                         raise StopIteration  # attempting another reverse ID assignation
                     if game_view.src_view.next_page_trick_game_view:
                         src_page_id += 1 + game_view.src_view.next_page_trick_game_view.state.trick.filler_pages
                     reversed_id = _reverse_number(src_page_id)
                     if reversed_id == src_page_id or reversed_id >= len(game_views) or src_page_id % 10 == 0 or reversed_id < self.next_page_id:
-                        print(f'reverse ID assignation ABORT - reversed_id={reversed_id}')
+                        print(f'Reverse ID assignation ABORT - reversed_id={reversed_id}')
                         raise StopIteration  # attempting another reverse ID assignation
                     print(f'ID reversal: {src_page_id} -> {reversed_id}')
                     assert game_view.set_page_id(reversed_id)
@@ -86,7 +86,7 @@ class Assigner:
                         self._increment_next_page_id()
                     else:  # can happen with the reducer, when trying to assign a page ID,
                            # to a view that already takes its ID from another one
-                        assert not self.reversed_id_gv, 'Not implemented'
+                        assert not self.reversed_id_gv, game_view
                         self.out_game_views.append(game_view)
                 if game_view.next_page_trick_game_view:
                     trick = game_view.next_page_trick_game_view.state.trick
@@ -111,6 +111,7 @@ class Assigner:
         if self.reversed_id_gv and self.next_page_id == self.reversed_id_gv.page_id:
             assert self.next_page_id not in self.gv_per_fixed_id, 'Conflicting need to use this page ID :('
             self.out_game_views.append(self.reversed_id_gv)
+            self.reversed_id_gv = None
             self._increment_next_page_id()
         gv = self.gv_per_fixed_id.get(self.next_page_id)
         if gv:

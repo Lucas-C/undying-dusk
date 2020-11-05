@@ -31,18 +31,15 @@ def reduce_views(game_views, print_reduced_views=False):
         print_memory_stats()  # Per safety, this function used to eat up memory
         for fp_page in tqdm(fingerprinted_pages, disable='NO_TQDM' in os.environ):
             existing_matching_gv = gv_per_page_fingerprint.get(fp_page.fingerprint)
-            if existing_matching_gv:
+            # The 2nd condition ensures checkpoints are preserved:
+            # removing it would break nothing though.
+            if existing_matching_gv and (not fp_page.game_view.state or fp_page.game_view.state.milestone != GameMilestone.CHECKPOINT):
                 assert fp_page.game_view.page_id != existing_matching_gv.page_id, f'Infinite loop detected in reducer!\n{fp_page.game_view}\n{existing_matching_gv}'
-                if fp_page.game_view.state and fp_page.game_view.state.milestone == GameMilestone.CHECKPOINT and not existing_matching_gv.state.milestone:
-                    # Switching GVs to preserve the Milestone:
-                    gv_per_page_fingerprint[fp_page.fingerprint] = fp_page.game_view
-                    fp_page.game_view = existing_matching_gv
-                    existing_matching_gv = gv_per_page_fingerprint[fp_page.fingerprint]
                 if print_reduced_views:
                     gs = fp_page.game_view.state
-                    print('- reducer.removes:', f'{gs.coords}/{gs.facing} HP={gs.hp} round={gs.combat and gs.combat.round} secrets_found={gs.secrets_found}')
+                    print('- reducer.removes:', f'{gs.coords}/{gs.facing} HP={gs.hp} round={gs.combat and gs.combat.round}')
                     gs = existing_matching_gv.state
-                    print('  identical to:   ', f'{gs.coords}/{gs.facing} HP={gs.hp} round={gs.combat and gs.combat.round} secrets_found={gs.secrets_found}')
+                    print('  identical to:   ', f'{gs.coords}/{gs.facing} HP={gs.hp} round={gs.combat and gs.combat.round}')
                     print('  page ID:   ', fp_page.game_view.page_id, '->', existing_matching_gv.page_id)
                 total_views_removed += 1
                 fp_page.game_view.page_id_from(existing_matching_gv)
