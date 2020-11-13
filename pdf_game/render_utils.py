@@ -3,7 +3,7 @@ from .js import action, REL_RELEASE_DIR
 
 
 BACKGROUNDS = 'black,nightsky,tempest,interior'.split(',')
-ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE,FISH_ON_A_STICK,COMBINE_WITH_TWIG,SMOKED_FISH_ON_A_STICK'.split(',')  # order matches position in .png
+ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE,FISH_ON_A_STICK,COMBINE_WITH_TWIG,SMOKED_FISH_ON_A_STICK,ATK_BOOST'.split(',')  # order matches position in .png
 ITEMS_SPELLS_BUTTON_POS = {
     # Unaltered:
     'INFO': Position(x=140, y=0),
@@ -37,6 +37,8 @@ ITEMS_SPELLS_BUTTON_POS = {
     'BLUE_KEY': Position(x=100, y=88),         # same (can never be carried together)
     # Combining on info page:
     'COMBINE_WITH_TWIG': Position(x=141, y=100),  # aligned below FISH item
+    # Extra display:
+    'ATK_BOOST': Position(x=-4, y=82),
 }
 WHITE_ARROW_NAMES = 'BACK,NEXT'.split(',')  # order matches position in .png
 WHITE_ARROW_SIZE = 16

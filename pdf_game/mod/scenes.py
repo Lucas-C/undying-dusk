@@ -498,7 +498,7 @@ class SimmonsSellableArmor:
 class SageTherelAdvice:
     @staticmethod
     def dialog_option(game_state):
-        if game_state.spellbook <= 3 and 'SCROLL' not in game_state.items:
+        if game_state.spellbook <= 2 and 'SCROLL' not in game_state.items:
             return DialogOption.only_msg('Fire magic is effective\nagainst undead and bone.')
         return DialogOption.only_msg("You opened a magic\nportal, I'm impressed!")
 
@@ -509,7 +509,10 @@ class SageTherelSellableSpell:
         if 'SCROLL' in game_state.items:
             if game_state.spellbook < 2:
                 return DialogOption(btn_type=DialogButtonType.BUY, can_buy=True, msg="I will teach it to you\nif you give me the scroll.",
-                                    buy=lambda gs: gs._replace(items=tuple(i for i in gs.items if i != 'SCROLL'),
+                                    # no more Seamus in Zuruth plains (branching paths optimization)
+                                    buy=lambda gs: gs.with_tile_override(6, (6, 1, 9), exist_ok=True)
+                                                     .with_trigger_activated((6, 1, 9))
+                                                     ._replace(items=tuple(i for i in gs.items if i != 'SCROLL'),
                                                                spellbook=2, message='New spell learned: BURN'))
             if game_state.spellbook < 3:
                 return DialogOption(btn_type=DialogButtonType.BUY, can_buy=True, msg="For another scroll, I can\nteach you a thief spell.",

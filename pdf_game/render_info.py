@@ -46,8 +46,6 @@ def info_render_equipment(pdf, game_state):
     bitfont_render(pdf, item_string, 2, 65)
     # WEAPON:
     item_string = info().weapons[game_state.weapon].name
-    if game_state.bonus_atk > 0:
-        item_string += f" +{game_state.bonus_atk}"
     bitfont_render(pdf, item_string, 2, 75)
 
 

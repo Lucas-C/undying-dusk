@@ -1,3 +1,4 @@
+# pylint: disable=inconsistent-return-statements
 from ..ascii import map_as_string
 from ..bitfont import bitfont_render, bitfont_set_color_red, Justify
 from ..entities import Bribe, Checkpoint, CombatRound as CR, MessagePlacement, Position, RewardItem, RewardTreasure, SFX, Trick

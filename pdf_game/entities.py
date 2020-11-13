@@ -191,20 +191,28 @@ class GameState(NamedTuple):
         except StopIteration:
             return None
     def with_hidden_trigger(self, hidden_trigger):
+        assert hidden_trigger not in self.hidden_triggers
         return self._replace(hidden_triggers=tuple(sorted(self.hidden_triggers + (hidden_trigger,))))
     def without_hidden_trigger(self, hidden_trigger):
         return self._replace(hidden_triggers=tuple(ht for ht in self.hidden_triggers if ht != hidden_trigger))
     def with_secret(self, secret):
+        assert secret not in self.secrets_found
         return self._replace(secrets_found=tuple(sorted(self.secrets_found + (secret,))))
-    def with_tile_override(self, tile_id, coords):
-        assert not self.tile_override_at(coords)
+    def with_tile_override(self, tile_id, coords, exist_ok=False):
+        existing_override = self.tile_override_at(coords)
+        if exist_ok and existing_override == tile_id:
+            return self
+        assert not existing_override, f'Existing tile override @{coords}: {existing_override}'
         return self._replace(tile_overrides=tuple(sorted(self.tile_overrides + ((coords, tile_id),))))
     def without_tile_override(self, coords):
         assert self.tile_override_at(coords) is not None
         return self._replace(tile_overrides=tuple((pos, tile_id) for (pos, tile_id) in self.tile_overrides if pos != coords))
     def with_trigger_activated(self, trigger_coords):
+        if trigger_coords in self.triggers_activated:
+            return self
         return self._replace(triggers_activated=tuple(sorted(self.triggers_activated + (trigger_coords,))))
     def with_vanquished_enemy(self, enemy_coords):
+        assert enemy_coords not in self.vanquished_enemies
         return self._replace(vanquished_enemies=tuple(sorted(self.vanquished_enemies + (enemy_coords,))))
     @property
     def coords(self):
@@ -215,7 +223,15 @@ class GameState(NamedTuple):
         for field in self._fields:
             self_val, other_val = getattr(self, field), getattr(other, field)
             if self_val != other_val:
-                out += f'{field}: {self_val} != {other_val}\n'
+                out += f'{field}: '
+                if isinstance(self_val, tuple):
+                    self_val_set, other_val_set = set(self_val), set(other_val)
+                    left_diff, right_diff = self_val_set - other_val_set, other_val_set - self_val_set
+                    left_diff = f'+{left_diff}' if left_diff else ''
+                    right_diff = f'+{right_diff}' if right_diff else ''
+                    out += f'{left_diff} | {right_diff}\n'
+                else:
+                    out += f'{self_val} != {other_val}\n'
         return out
 
 

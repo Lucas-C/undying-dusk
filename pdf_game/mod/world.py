@@ -61,6 +61,8 @@ def is_instinct_preventing_to_pass_mausoleum_portal(game_state):
 
 
 def is_instinct_preventing_to_pass_village_portal(game_state):
+    if not game_state.tile_override_at(VILLAGE_PORTAL_COORDS):
+        return False  # No need to display a message when the portal is not open yet
     # We forbid to get back to Mausoleum if the heroine hasn't picked the UNLOCK spell yet,
     # or hasn't taken a night of rest at the inn:
     return game_state.spellbook < 3 or game_state.gold >= 10

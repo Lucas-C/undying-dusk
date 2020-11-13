@@ -6,8 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [0.9.5] - not released yet
+### Added
+- Cauldron fire boost is displayed more explicitly
+
 ### Changed
 - Improved hints in Zuruth plain, for bottle & hidden chest
+
+### Fixed
+- Removed useless message in village when portal is not open yet: _"Trust your instinct: no need to go back for now"_
 
 ## [0.9.4] - 2020-11-03
 Special thanks to Maxime Lemanach for the detailed feedbacks that helped me

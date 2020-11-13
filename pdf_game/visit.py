@@ -7,7 +7,7 @@ from .ascii import map_as_string
 from .assigner import assign_page_ids
 from .deadends import detect_deadends
 from .explore import disable_burn_and_push
-from .entities import GameMilestone, GameMode, GameState, GameView
+from .entities import CutScene, GameMilestone, GameMode, GameState, GameView
 from .js import avatar
 from .logs import log, log_paths_diff, diff_game_states
 from .mapscript import mapscript_exec
@@ -130,10 +130,17 @@ def visit_game_views(args):
     assert start_view.page_id
 
     for game_view in game_views:
-        if game_view.state and game_view.state.milestone in (GameMilestone.CHECKPOINT, GameMilestone.VICTORY):
+        game_state = game_view.state
+        if game_state and game_state.milestone in (GameMilestone.CHECKPOINT, GameMilestone.VICTORY):
             checkpoint = next(cp for i, cp in enumerate(CHECKPOINTS, start=1)
-                              if i == game_view.state.last_checkpoint)
-            print(f'Page ID for checkpoint {game_view.state.last_checkpoint}: {game_view.page_id} ({game_view.state.facing}/{"+".join(game_view.state.secrets_found)}): {checkpoint.description}')
+                              if i == game_state.last_checkpoint)
+            print(f'Page ID for checkpoint {game_state.last_checkpoint}: {game_view.page_id} ({game_state.facing}/{"+".join(game_state.secrets_found)}): {checkpoint.description}')
+
+    for game_view in game_views:
+        game_state = game_view.state
+        if game_state and game_state.shop_id > 4 and game_view.src_view.state.shop_id == -1:
+            scene = CutScene.from_id(game_state.shop_id)
+            print(f'ID for scene {game_state.shop_id} first page: {game_view.page_id} ({game_state.facing}/{"+".join(game_state.secrets_found)}) {scene.name}')
 
     return start_view, game_views
 

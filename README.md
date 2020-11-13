@@ -1,6 +1,8 @@
 <!-- NEXT STEPS:
+- revoir énigme fish-on-a-stick (too hard)
+- make storm dragon battle longer: add animated intro with stairs ? add pary logic ?
+- improve mimics battles / how to find them
 - add SFX for spells
-- Henri: pas compris le boost initial du feu
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"
   -> face 2 enemies => 2 health bars & 2 attacks -> undead-fossil / flying demon with daggers / upscaled-dragon-skeleton ?
