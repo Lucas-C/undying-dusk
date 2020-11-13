@@ -235,16 +235,22 @@ def script_it():
             CR('Sword thrust', atk=14),                  # HEAL           -> hero HP=10 | skeleton HP=32
             CR('Sword slash', atk=12),                   # HEAL           -> hero HP=18 | skeleton HP=32
             CR('Sword thrust', atk=14, hero_crit=True),  # CRITICAL BURN! -> hero HP=4  | skeleton HP=0
-        ), music=BASE_MUSIC_URL + 'MatthewPablo-DarkDescent.mp3',
-        post_victory=clear_hidden_triggers)  # removes RUMOR_HEARD
+        ), music=BASE_MUSIC_URL + 'MatthewPablo-DarkDescent.mp3')
 
     # An invisible chest is hidden behind a wall, behind a pillar:
     def _grant_scroll(game_view, _):
+        if 'SCROLL' in game_view.state.items or game_view.state.spellbook >= 2:
+            return False
         game_view.state = game_view.state._replace(message='You found\nan ancient scroll',
                                                    items=game_view.state.items + ('SCROLL',))
     mapscript_add_chest((6, 3, 15), 23, _grant_scroll)
 
+    def _amulet_trail(game_view, _):
+        game_view.state = game_view.state._replace(extra_render=render_amulet_trail)
+    mapscript_add_trigger((6, 12, 4), _amulet_trail, facing='east', permanent=True,
+                                      condition=lambda gs: 'AMULET' not in gs.items and gs.max_mp == 1)
     def _amulet_sight(game_view, _GameView):
+        game_view.state = game_view.state._replace(extra_render=render_amulet_sight)
         game_view.actions['GLIMPSE'] = _GameView(game_view.state._replace(
                 message='You found a bright amulet\ndrifting in the canal water',
                 msg_place=MessagePlacement.UP,
@@ -423,6 +429,8 @@ def script_it():
     mapscript_add_enemy((8, 7, 4), 'mimic', **mimic_stats, reward=RewardItem('ARMOR_PART', 38))
 
     def _grant_blue_key(game_view, _):
+        if 'BLUE_KEY' in game_view.state.items or game_view.tile_override((8, 4, 12)):
+            return False
         game_view.state = game_view.state._replace(message="A blue key", items=game_view.state.items + ('BLUE_KEY',))
     mapscript_add_chest((8, 11, 9), 27, _grant_blue_key)    # hidden in hay pile
 
@@ -568,6 +576,12 @@ def script_it():
             # Bone shield                                    # player ATTACK -> hero HP=2  | empress HP=0
         ), post_victory=lambda gs: gs._replace(mode=GameMode.DIALOG, shop_id=the_end().id))
 
+
+def render_amulet_trail(pdf):
+    pdf.image('assets/water-trail.png', x=0, y=86)
+
+def render_amulet_sight(pdf):
+    pdf.image('assets/water-trail.png', x=97, y=86)
 
 def render_abyss_filler_page(pdf, i):
     pdf.add_page()

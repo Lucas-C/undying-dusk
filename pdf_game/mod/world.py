@@ -20,8 +20,6 @@ def custom_can_move_to(_map, x, y, game_state):
         if (x, y) == VILLAGE_PORTAL_COORDS[1:]:
             return game_state.tile_override_at(VILLAGE_PORTAL_COORDS) and not is_instinct_preventing_to_pass_village_portal(game_state)
     if _map.name == 'Zuruth Plains':
-        if (x, y) == (3, 15) and 'RUMOR_HEARD' in game_state.hidden_triggers:
-            return True  # give access to the hidden chest, if avatar heard the rumor about it
         if (x, y) == (13, 14) and 'BOOTS' in game_state.items:
             return True  # can enter shallow waters to access the chest
         if (x, y) == (4, 2):
@@ -98,6 +96,7 @@ def patch_tileset(tileset):
         True,   # 44 = seamus_on_grass
         True,   # 45 = seamus_on_floor
         True,   # 46 = cauldron
+        True,   # 47 = dungeon_wall_with_ivy
     ])
 
 
@@ -159,6 +158,7 @@ def _patch_tiles(_map):
         x, y = 7, 15;  tiles[y][x] = 32  # torch on left side of door to Templar Academy
         x, y = 9, 15;  tiles[y][x] = 32  # torch on right side of door to Templar Academy
         x, y = 14, 15; tiles[y][x] = 3   # locked door aside chest on south-east
+        x, y = 3, 15;  tiles[y][x] = 47  # dungeon_wall_with_ivy
         # Adding an extra line of dungeon_wall at the bottom of the map, for hidden scroll:
         tiles.append([2]*len(tiles[0]))
     if _map.name == 'Trade Tunnel':

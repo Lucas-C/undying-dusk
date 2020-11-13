@@ -1,9 +1,9 @@
 <!-- NEXT STEPS:
 - add SFX for spells
-- Henri & Matt bloqué dans les plaines -> savent pas quoi faire, indice du canal pas suffisant
+- Henri: pas compris le boost initial du feu
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"
-  -> face 2 enemies => 2 health bars & 2 attacks
+  -> face 2 enemies => 2 health bars & 2 attacks -> undead-fossil / flying demon with daggers / upscaled-dragon-skeleton ?
   -> one is sometimes looting, which is key to victory
   + empress-defeated: "Noooo!" -> "Come back to help me Dominik!"
   -> face undead Dominik, with impress in foreground
@@ -16,6 +16,7 @@
   * SCENARIO: aurait aimé avoir plus de réponses
   * glitch boulder rendering with tree (GIF from Maxime ?)
   * secret de l'arbre pas comptabilisé ??
+- make some objects on screen clickables: door, portal, ivy
 - redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
 - https://github.com/sumatrapdfreader/sumatrapdf/issues/1777
 - create itch.io page

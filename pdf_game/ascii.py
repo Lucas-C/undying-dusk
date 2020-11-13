@@ -94,4 +94,5 @@ _TILE_AS_EMOJI = [
     ansi_wrap('SE', color='magenta'), # 44: seamus_on_grass
     ansi_wrap('SE', color='magenta'), # 45: seamus_on_floor
     ansi_wrap('CF', color='yellow'),  # 46: cauldron
+    ansi_wrap('XX', bold=True),       # 47: dungeon_wall_with_ivy
 ]

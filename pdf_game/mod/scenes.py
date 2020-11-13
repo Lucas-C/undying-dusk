@@ -267,8 +267,7 @@ def seamus_in_zuruth_plains():
         background='forest_trees_with_seamus',
         extra_render=seamus_speaks2('And secrets may be hiding\nin its pillars shadow...\n\nThe Empress castle stands\nfurther behind the canal.\n\nGo look if you can see it\ndespite the darkness.'),
         # Using a custom DialogOption to be able to alter GameState:
-        dialog_options=(DialogOption.exit('Leave', lambda gs: gs.with_hidden_trigger('RUMOR_HEARD')
-                                                                .with_tile_override(6, (6, 1, 9))),),
+        dialog_options=(DialogOption.exit('Leave', lambda gs: gs.with_tile_override(6, (6, 1, 9))),),
     )
     dialog_2 = CutScene.new(
         background='forest_trees_with_seamus',

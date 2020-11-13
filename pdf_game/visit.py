@@ -26,9 +26,9 @@ from .mod.world import make_bones_and_boxes_walkables
 
 
 def build_initial_state():
-    return GameState(x=avatar().x,
+    return GameState(map_id=avatar().map_id,
+                     x=avatar().x,
                      y=avatar().y,
-                     map_id=avatar().map_id,
                      facing=avatar().facing,
                      weapon=avatar().weapon,
                      armor=avatar().armor,

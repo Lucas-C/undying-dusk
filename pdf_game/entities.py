@@ -370,9 +370,12 @@ class GameView:
     def add_hidden_trigger(self, hidden_trigger):
         self.state = self.state.with_hidden_trigger(hidden_trigger)
     def as_dict(self):  # JSON-export-friendly
+        if not self.state: return self.state
         view_dict = self.state._asdict()
         combat = self.state.combat
-        if combat:  # removing non-serializable field:
+        # removing non-serializable fields:
+        view_dict['extra_render'] = bool(view_dict['extra_render'])
+        if combat:
             view_dict['combat'] = combat._replace(enemy=combat.enemy._replace(post_defeat=None, post_victory=None))
         view_dict['actions'] = {action: next_gv.page_id if next_gv else None
                                 for action, next_gv in self.actions.items()}

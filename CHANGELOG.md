@@ -5,9 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.9.5] - not released yet
+### Changed
+- Improved hints in Zuruth plain, for bottle & hidden chest
+
 ## [0.9.4] - 2020-11-03
 Special thanks to Maxime Lemanach for the detailed feedbacks that helped me
-to improve the game in this new release!
+to improve the game a lot in this new release!
 
 ### Added
 - hint in templar library on treasure hidden behind boulder trap

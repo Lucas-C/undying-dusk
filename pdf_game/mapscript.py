@@ -39,14 +39,12 @@ def mapscript_tile_script_type(*coords):
     return None
 
 
-def mapscript_add_message(coords, message, facing=None, condition=None, msg_place=MessagePlacement.DOWN, secret=None):
+def mapscript_add_message(coords, message, facing=None, condition=None, msg_place=MessagePlacement.DOWN):
     assert coords not in SCRIPTS_PER_TILE, f'Tile @ {coords} already scripted, cannot add message'
     def _mapscript_display_message(game_view, _):
         if (facing and game_view.state.facing != facing) or (condition and not condition(game_view.state)):
             return
         game_view.state = game_view.state._replace(message=message, msg_place=msg_place)
-        if secret and secret not in game_view.state.secrets_found:
-            game_view.state = game_view.state._replace(secrets_found=game_view.state.secrets_found + (secret,))
     SCRIPTS_PER_TILE[coords] = ('message', _mapscript_display_message)
 
 
@@ -85,9 +83,9 @@ def mapscript_get_enemy_at(coords, game_state):
     return None
 
 
-def mapscript_add_chest(coords, treasure_id, grant_func=None, replace=False, secret=None):
+def mapscript_add_chest(coords, treasure_id, grant_func=None, replace=False):
     assert not (replace ^ (coords in SCRIPTS_PER_TILE)), 'Tile already scripted, cannot add chest'
-    SCRIPTS_PER_TILE[coords] = ('chest', lambda gv, _GameView: _mapscript_open_chest(gv, _GameView, treasure_id, grant_func, secret))
+    SCRIPTS_PER_TILE[coords] = ('chest', lambda gv, _GameView: _mapscript_open_chest(gv, _GameView, treasure_id, grant_func))
 
 
 def mapscript_remove_chest(coords):
@@ -99,12 +97,13 @@ CHEST_OVERRIDES = {
     2: 5,    # wall -> dungeon_ceiling (for 1st hidden scroll)
     8: 5,    # chest_interior -> dungeon_ceiling
     9: 1,    # chest_exterior -> dungeon_floor
-    17: 17,  # hay pile -> hay pile
-    40: 40,  # fire -> fire
+    17: 17,  # hay pile -> hay pile | BEWARE: same tile => "already open" detection system won't work
+    40: 40,  # fire -> fire | BEWARE: same tile => "already open" detection system won't work
     43: 42,  # stump_with_bottle -> stump
     46: 40,  # cauldron -> fire
+    47: 47,  # dungeon_wall_with_ivy -> dungeon_wall_with_ivy | BEWARE: same tile => "already open" detection system won't work
 }
-def _mapscript_open_chest(game_view, _GameView, treasure_id, grant_func=None, secret=None):
+def _mapscript_open_chest(game_view, _GameView, treasure_id, grant_func=None):
     if game_view.tile_override(game_view.state.coords):
         return  # chest already opened
     map_id, x, y = game_view.state.coords
@@ -116,8 +115,6 @@ def _mapscript_open_chest(game_view, _GameView, treasure_id, grant_func=None, se
     initial_tile_id = _map.tiles[y][x]
     assert initial_tile_id in CHEST_OVERRIDES, f'Unexpected initial tile id {initial_tile_id} @ {game_view.state.coords}'
     game_view.add_tile_override(CHEST_OVERRIDES[_map.tiles[y][x]])
-    if secret and secret not in game_view.state.secrets_found:
-        game_view.state = game_view.state._replace(secrets_found=game_view.state.secrets_found + (secret,))
     if isinstance(treasure_id, str):
         gold_str, gold_found = game_view.state.treasure_id.split('_')
         assert gold_str == 'gold'
@@ -125,9 +122,9 @@ def _mapscript_open_chest(game_view, _GameView, treasure_id, grant_func=None, se
         log(game_view.state, '+' + game_view.state.message + f' ({gold_found})')
     else:
         grant_func = grant_func or getattr(sys.modules[__name__], f'_mapscript_grant_chest_{treasure_id}')
-        grant_func(game_view, _GameView)
-        assert game_view.state.message, f'grant_func for chest @ {game_view.state.coords} must set a .message'
-        log(game_view.state, '+' + game_view.state.message.replace('\n', ' '))
+        if grant_func(game_view, _GameView) is not False:
+            assert game_view.state.message, f'grant_func for chest @ {game_view.state.coords} must set a .message'
+            log(game_view.state, '+' + game_view.state.message.replace('\n', ' '))
 
 
 def mapscript_add_boulder(trigger_pos, start_at, _dir):

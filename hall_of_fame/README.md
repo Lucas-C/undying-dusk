@@ -1,4 +1,4 @@
-This [Flask](https://flask.palletsprojects.com) powers <    >.
+This [Flask](https://flask.palletsprojects.com) powers <https://chezsoi.org/lucas/undying-dusk/hall-of-fame>.
 
 
 # Installation

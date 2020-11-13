@@ -5,6 +5,7 @@ In practice, this only applies to Game Over death pages, and pages pointing to t
 '''
 import os
 from contextlib import contextmanager
+from textwrap import indent
 
 import fpdf
 try:  # Optional dependency:
@@ -40,7 +41,7 @@ def reduce_views(game_views, print_reduced_views=False):
                     print('- reducer.removes:', f'{gs.coords}/{gs.facing} HP={gs.hp} round={gs.combat and gs.combat.round}')
                     gs = existing_matching_gv.state
                     print('  identical to:   ', f'{gs.coords}/{gs.facing} HP={gs.hp} round={gs.combat and gs.combat.round}')
-                    print('  page ID:   ', fp_page.game_view.page_id, '->', existing_matching_gv.page_id)
+                    print('  differing:   \n' + indent(fp_page.game_view.state.differing(existing_matching_gv.state), '    '), end='')
                 total_views_removed += 1
                 fp_page.game_view.page_id_from(existing_matching_gv)
                 for incoming_fp_page in fp_page.incoming_pages:
