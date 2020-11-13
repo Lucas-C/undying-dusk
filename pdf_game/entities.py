@@ -227,8 +227,8 @@ class GameState(NamedTuple):
                 if isinstance(self_val, tuple):
                     self_val_set, other_val_set = set(self_val), set(other_val)
                     left_diff, right_diff = self_val_set - other_val_set, other_val_set - self_val_set
-                    left_diff = f'+{left_diff}' if left_diff else ''
-                    right_diff = f'+{right_diff}' if right_diff else ''
+                    left_diff = ('+' + ','.join(map(str, left_diff))) if left_diff else ''
+                    right_diff = ('+' + ','.join(map(str, right_diff))) if right_diff else ''
                     out += f'{left_diff} | {right_diff}\n'
                 else:
                     out += f'{self_val} != {other_val}\n'

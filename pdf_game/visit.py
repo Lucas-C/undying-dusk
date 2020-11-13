@@ -2,6 +2,7 @@
 import sys
 from collections import defaultdict
 from queue import LifoQueue
+from textwrap import indent
 
 from .ascii import map_as_string
 from .assigner import assign_page_ids
@@ -136,11 +137,18 @@ def visit_game_views(args):
                               if i == game_state.last_checkpoint)
             print(f'Page ID for checkpoint {game_state.last_checkpoint}: {game_view.page_id} ({game_state.facing}/{"+".join(game_state.secrets_found)}): {checkpoint.description}')
 
+    scene_game_states = {}
     for game_view in game_views:
         game_state = game_view.state
-        if game_state and game_state.shop_id > 4 and game_view.src_view.state.shop_id == -1:
+        # Excluding actual shops (ID <= 4):
+        if game_state and game_state.shop_id > 4 and game_view.src_view and game_view.src_view.state.shop_id == -1:
             scene = CutScene.from_id(game_state.shop_id)
             print(f'ID for scene {game_state.shop_id} first page: {game_view.page_id} ({game_state.facing}/{"+".join(game_state.secrets_found)}) {scene.name}')
+            existing_gs = scene_game_states.get((game_state.facing, game_state.secrets_found))
+            if existing_gs:
+                # print('Diff with other GameState leading to this scene:')
+                print(indent(existing_gs.differing(game_state), '  '), end='')
+            scene_game_states[(game_state.facing, game_state.secrets_found)] = game_state
 
     return start_view, game_views
 

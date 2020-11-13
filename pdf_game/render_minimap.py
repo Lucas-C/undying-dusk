@@ -3,7 +3,7 @@ from os.path import dirname, join, realpath
 
 from PIL import Image
 
-from .js import atlas, minimap, tileset, REL_RELEASE_DIR
+from .js import atlas, minimap, tileset
 
 from .mod.minimap import minimap_is_unknown
 
@@ -41,23 +41,27 @@ def _get_prerendered_img(map_id, game_state):
     img_filepath = _get_img_filepath(map_id, walkablity_changes)
     if img_filepath not in ALREADY_GENERATED:
         makedirs(DIR_REL_PATH, exist_ok=True)
-        btn_size = minimap().MINIMAP_ICON_SIZE
+        icon_size = minimap().MINIMAP_ICON_SIZE
         icon_imgs = _get_icon_images()
         map_height, map_width = len(_map.tiles), len(_map.tiles[0])
-        with Image.new('RGB', (map_width * btn_size, map_height * btn_size)) as img:
+        with Image.new('RGB', (map_width * icon_size, map_height * icon_size)) as img:
             # render map
             for i in range(map_width):
                 for j in range(map_height):
                     if not minimap_is_unknown(map_id, i, j):
-                        walkable = walkablity_changes.get((i, j), tileset().walkable[_map.tiles[j][i]])
-                        icon_type = 'WALKABLE' if walkable else 'NONWALKABLE'
-                        img.paste(icon_imgs[icon_type], (i * btn_size, j * btn_size))
+                        tile_id = _map.tiles[j][i]
+                        if tile_id == 15:
+                            icon_type = 'WATER'
+                        else:
+                            walkable = walkablity_changes.get((i, j), tileset().walkable[tile_id])
+                            icon_type = 'WALKABLE' if walkable else 'NONWALKABLE'
+                        img.paste(icon_imgs[icon_type], (i * icon_size, j * icon_size))
             # render exits
             for _exit in _map.exits:
-                img.paste(icon_imgs['EXIT'], (_exit.exit_x * btn_size, _exit.exit_y * btn_size))
+                img.paste(icon_imgs['EXIT'], (_exit.exit_x * icon_size, _exit.exit_y * icon_size))
             # render shops
             for shop in _map.shops:
-                img.paste(icon_imgs['EXIT'], (shop.exit_x * btn_size, shop.exit_y * btn_size))
+                img.paste(icon_imgs['EXIT'], (shop.exit_x * icon_size, shop.exit_y * icon_size))
             img.save(img_filepath)
         ALREADY_GENERATED.add(img_filepath)
     return img_filepath
@@ -83,13 +87,19 @@ def _get_img_filepath(map_id, walkablity_changes):
 
 
 def _get_icon_images():
-    btn_size = minimap().MINIMAP_ICON_SIZE
-    with Image.open(REL_RELEASE_DIR + 'images/interface/minimap.png') as icons_img:
-        icon_imgs = {}
-        for icon in ('WALKABLE', 'NONWALKABLE', 'EXIT'):
-            start_x = getattr(minimap(), f'MINIMAP_ICON_{icon}') * btn_size
-            icon_imgs[icon] = icons_img.crop((start_x * btn_size, 0, (start_x + 1) * btn_size, btn_size))
-    return icon_imgs
+    return {
+        'WALKABLE': plain_icon((222, 238, 214)),
+        'NONWALKABLE': plain_icon((20, 12, 28)),
+        'EXIT': plain_icon((210, 125, 44)),
+        'WATER': plain_icon((89, 125, 206)),
+    }
+
+
+def plain_icon(color):
+    icon_size = minimap().MINIMAP_ICON_SIZE
+    img = Image.new('RGB', (icon_size, icon_size))
+    img.paste(color, (0, 0, *img.size))
+    return img
 
 
 def _minimap_render_cursor(pdf, screen_x, screen_y, icon_type):

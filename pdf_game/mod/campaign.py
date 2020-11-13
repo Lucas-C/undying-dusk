@@ -430,7 +430,8 @@ def script_it():
     mapscript_add_enemy((8, 7, 4), 'mimic', **mimic_stats, reward=RewardItem('ARMOR_PART', 38))
 
     def _grant_blue_key(game_view, _):
-        if 'BLUE_KEY' in game_view.state.items or game_view.tile_override((8, 4, 12)):
+        is_door_open = bool(game_view.tile_override((8, 4, 12)))
+        if is_door_open or 'BLUE_KEY' in game_view.state.items:
             return False
         game_view.state = game_view.state._replace(message="A blue key", items=game_view.state.items + ('BLUE_KEY',))
     mapscript_add_chest((8, 11, 9), 27, _grant_blue_key)    # hidden in hay pile

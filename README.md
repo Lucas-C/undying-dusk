@@ -42,14 +42,16 @@
   * for a sequel, start off with Empress chasing player! (not doable due to #states explosion with secrets)
     -> must go back through whole level without slowing down, with Empress following
     -> pickup itemX * 3 (with buckler?) on the way, in order to face Empress again with 3 throwable weapons
-  * dialogs choices inspired by Monkey Island Insult Sword Fighting,    where there's a unique set of answers that leads to victory
+  * dialogs choices inspired by Monkey Island Insult Sword Fighting,
+    where there's a unique set of answers that leads to victory
   * drunk/potion -> mess with direction arrows (reversed / all over the page)
+  * moving enemy
   * cloak to bypass enemy (avoid an encounter)
   * light up torch and go to some place previously very dark
   * place bomb on stone door doorstep (require a "broken wall" tile)
   * item to jump/teleport over a fixed distance
-  * offer choices that matters on the ending
-  * perso conscient d'être dans PDF
+  * offer choices that matter on the ending
+  * perso conscient d'être dans un PDF
   * ACTIONS from dawnlike-level-16x16.png: bed, skull, rope, glove, diamond, snake, crown
                  dawnlike-npcs-16x16.png: interrogation mark, shadow form
   * try other PDF features: PrevPage ? sub-page navigation ?

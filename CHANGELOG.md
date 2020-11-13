@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.9.5] - not released yet
 ### Added
 - Cauldron fire boost is displayed more explicitly
+- Displaying water on minimap
 
 ### Changed
 - Improved hints in Zuruth plain, for bottle & hidden chest
