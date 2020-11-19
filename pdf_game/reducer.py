@@ -32,9 +32,9 @@ def reduce_views(game_views, print_reduced_views=False):
         print_memory_stats()  # Per safety, this function used to eat up memory
         for fp_page in tqdm(fingerprinted_pages, disable='NO_TQDM' in os.environ):
             existing_matching_gv = gv_per_page_fingerprint.get(fp_page.fingerprint)
-            # The 2nd condition ensures checkpoints are preserved:
-            # removing it would break nothing though.
-            if existing_matching_gv and (not fp_page.game_view.state or fp_page.game_view.state.milestone != GameMilestone.CHECKPOINT):
+            # 2nd condition ensures checkpoints are preserved: removing it would break nothing though.
+            # 3rd condition ensures we don't alter secrets_cound in the process.
+            if existing_matching_gv and (not fp_page.game_view.state or fp_page.game_view.state.milestone != GameMilestone.CHECKPOINT) and (not fp_page.game_view.state or fp_page.game_view.state.secrets_found == existing_matching_gv.state.secrets_found):
                 assert fp_page.game_view.page_id != existing_matching_gv.page_id, f'Infinite loop detected in reducer!\n{fp_page.game_view}\n{existing_matching_gv}'
                 if print_reduced_views:
                     gs = fp_page.game_view.state
@@ -136,7 +136,7 @@ class FakePdfRecorder:
         self._calls.append(('link', x, y, w, h, page_or_url, alt_text))
 
     def _parsepng(self, filename):
-        # pylint: disable=protected-access
+        # pylint: disable=no-member,protected-access
         return self.pdf._parsepng(filename)
 
     def reset(self):  # Note that ._links MUST be preserved, otherwise a 1st over-reduce glitch can be seen after talking to Seamus in the Sanitarium

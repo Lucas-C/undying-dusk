@@ -1,6 +1,11 @@
 from .entities import Position
 from .js import action, REL_RELEASE_DIR
 
+try:
+    from fpdf.image_parsing import get_img_info
+except ImportError:
+    get_img_info = False
+
 
 BACKGROUNDS = 'black,nightsky,tempest,interior'.split(',')
 ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE,FISH_ON_A_STICK,COMBINE_WITH_TWIG,SMOKED_FISH_ON_A_STICK,ATK_BOOST'.split(',')  # order matches position in .png
@@ -113,7 +118,10 @@ def get_image_info(pdf, img_filepath):
     info = pdf.images.get(img_filepath)
     if not info:
         # pylint: disable=protected-access
-        info = pdf._parsepng(img_filepath)  # all of this game images are PNGs
+        if get_img_info:  # alexanderankin/pyfpdf
+            info = get_img_info(img_filepath)
+        else:  # reingart/pyfpdf
+            info = pdf._parsepng(img_filepath)  # all of this game images are PNGs
         pdf.images[img_filepath] = info
         info['i'] = len(pdf.images)
     return info

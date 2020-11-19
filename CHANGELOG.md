@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Improved hints in Zuruth plain, for bottle & hidden chest
 
 ### Fixed
+- secrets were incorrectly reported to the Hall of Fame, due to a pages count over-optimization
 - Removed useless message in village when portal is not open yet: _"Trust your instinct: no need to go back for now"_
 
 ## [0.9.4] - 2020-11-03

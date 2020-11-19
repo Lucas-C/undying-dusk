@@ -1,4 +1,6 @@
 <!-- NEXT STEPS:
+- abyss bottom minor text/img rendering glitch
+- répondre à Henri & lui demander ce qu'il a pensé de l'énigme fish-on-a-stick
 - revoir énigme fish-on-a-stick (too hard)
 - make storm dragon battle longer: add animated intro with stairs ? add pary logic ?
 - improve mimics battles / how to find them
@@ -19,8 +21,9 @@
   * glitch boulder rendering with tree (GIF from Maxime ?)
   * secret de l'arbre pas comptabilisé ??
 - make some objects on screen clickables: door, portal, ivy
+- feedback Henri:
+  * ajouter un journal rappelant tous les indices trouvés, à apparition unique
 - redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
-- https://github.com/sumatrapdfreader/sumatrapdf/issues/1777
 - create itch.io page
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
@@ -130,7 +133,7 @@ fast nav / ok page render time | ✔️ | ✔️ | 🤔 | ✔️ | ☹️ | ☹�
 ALT+🡄 "back" key binding       | ✔️<br><em>backspace</em> also works | `t` must be used instead | ✔️ | ❌ | ✔️ | ❌ | ✔️ | ?  | ?  | ?  |
 "back" history size            | 50 | 256 | 49 | ❌ | 31 | ❌ | 49 | ?  | ?  | ?  |
 
-\* Please use Sumatra PDF version 3.1.2, that can be download on [this page](https://www.sumatrapdfreader.org/download-prev.html). The latest 3.2 version [has difficulties opening Undying Dusk](https://github.com/Lucas-C/undying-dusk/issues/3).
+\* Please use Sumatra PDF version 3.1.2, that can be download on [this page](https://www.sumatrapdfreader.org/download-prev.html). The latest 3.2 version [has difficulties opening Undying Dusk](https://github.com/Lucas-C/undying-dusk/issues/3). This should be solved in the next release of Sumatra PDF.
 
 We only recommend PDF readers that meet all of the above criteria.
 
