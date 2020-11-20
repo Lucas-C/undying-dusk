@@ -1,3 +1,4 @@
+from .bitfont import bitfont_render
 from .entities import GameMilestone, GameMode, GameView
 from .reducer import compute_fingerprint, reduce_views, FakePdfRecorder
 from .visit import build_initial_state
@@ -10,14 +11,46 @@ A_FINAL_STATE = AN_EXPLORE_STATE._replace(milestone=GameMilestone.GAME_OVER)
 def test_reduce_2_identical_views():
     game_views = [
         GameView(A_FINAL_STATE),
-        GameView(A_FINAL_STATE._replace(secrets_found='X'))
+        GameView(A_FINAL_STATE._replace(hidden_triggers=('X',)))
     ]
     assert len(reduce_views(game_views)) == 1
 
 
+def test_reduce_2_identical_views_except_for_secret():
+    game_views = [
+        GameView(A_FINAL_STATE),
+        GameView(A_FINAL_STATE._replace(secrets_found=('X',)))
+    ]
+    assert len(reduce_views(game_views)) == 2
+
+
+def test_reduce_2_identical_views_except_for_page_id_link():
+    def render1(pdf):
+        bitfont_render(pdf, 'Back to start', 80, 90, page_id=1)
+    def render2(pdf):
+        bitfont_render(pdf, 'Back to start', 80, 90, page_id=2)
+    game_views = [
+        GameView(renderer=render1),
+        GameView(renderer=render2),
+    ]
+    assert len(reduce_views(game_views)) == 2
+
+
+def test_reduce_2_identical_views_except_for_url_link():
+    def render1(pdf):
+        bitfont_render(pdf, 'Online hall of fame', 80, 90, url='chezsoi.org/lucas/blog/')
+    def render2(pdf):
+        bitfont_render(pdf, 'Online hall of fame', 80, 90, url='chezsoi.org/lucas/blog')
+    game_views = [
+        GameView(renderer=render1),
+        GameView(renderer=render2),
+    ]
+    assert len(reduce_views(game_views)) == 2
+
+
 def test_reduce_5_views_to_3():
     leaf_view1 = GameView(A_FINAL_STATE)
-    leaf_view2 = GameView(A_FINAL_STATE._replace(secrets_found='X'))
+    leaf_view2 = GameView(A_FINAL_STATE._replace(hidden_triggers=('X',)))
     middle_view1 = GameView(AN_EXPLORE_STATE._replace(y=2))
     middle_view1.actions['MOVE-BACKWARD'] = leaf_view1
     middle_view2 = GameView(AN_EXPLORE_STATE._replace(y=2))
