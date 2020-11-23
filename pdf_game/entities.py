@@ -200,8 +200,8 @@ class GameState(NamedTuple):
         return self._replace(secrets_found=tuple(sorted(self.secrets_found + (secret,))))
     def with_tile_override(self, tile_id, coords, exist_ok=False):
         existing_override = self.tile_override_at(coords)
-        if exist_ok and existing_override == tile_id:
-            return self
+        if existing_override and exist_ok:
+            return self if existing_override == tile_id else self.without_tile_override(coords).with_tile_override(tile_id, coords)
         assert not existing_override, f'Existing tile override @{coords}: {existing_override}'
         return self._replace(tile_overrides=tuple(sorted(self.tile_overrides + ((coords, tile_id),))))
     def without_tile_override(self, coords):

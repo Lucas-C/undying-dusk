@@ -99,6 +99,10 @@ def patch_tileset(tileset):
         True,   # 45 = seamus_on_floor
         True,   # 46 = cauldron
         True,   # 47 = dungeon_wall_with_ivy
+        False,  # 48 = dungeon_wall_lever_slot
+        False,  # 49 = dungeon_wall_lever_down
+        False,  # 50 = dungeon_wall_lever_up
+        False,  # 51 = dungeon_wall_lever_up_wth_fish
     ])
 
 
@@ -213,13 +217,17 @@ def _patch_tiles(_map):
         x, y = 13, 7;  tiles[y][x] = 5   # removing bone pile
         x, y = 11, 5;  tiles[y][x] = 5   # removing bone pile
         x, y = 6, 9;   tiles[y][x] = 5   # moving up chest (mimic) in central room...
-        x, y = 7, 4;   tiles[y][x] = 8   # ... to block the path north
+        x, y = 7, 3;   tiles[y][x] = 8   # ... to block the path north
+        x, y = 7, 4;   tiles[y][x] = 26  # portcullis
+        x, y = 10, 10; tiles[y][x] = 26  # portcullis
         x, y = 9, 3;   tiles[y][x] = 8   # adding a chest (mimic) in the northern corridor, behind water
         x, y = 2, 2;   tiles[y][x] = 34  # bookshelf
         x, y = 3, 3;   tiles[y][x] = 30  # dungeon_wall_tagged with FOUNTAIN_HINT
         x, y = 7, 11;  tiles[y][x] = 2   # wall after warp south-west in central room
         x, y = 10, 3;  tiles[y][x] = 2   # wall after warp north-east in central room
-        x, y = 12, 7;  tiles[y][x] = 32  # replacing straight path to exit by torch on wall
+        x, y = 12, 7;  tiles[y][x] = 48  # replacing straight path to exit by lever down
+        x, y = 12, 6;  tiles[y][x] = 32  # surrounded by torchs on wall
+        x, y = 12, 8;  tiles[y][x] = 32  # surrounded by torchs on wall
     if _map.name == 'Dead Walkways':
         x, y = 1, 5;   tiles[y][x] = 0   # no going back
         x, y = 4, 8;   tiles[y][x] = 4   # pillar, for symetry

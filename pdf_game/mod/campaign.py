@@ -183,9 +183,10 @@ def script_it():
         music = BASE_MUSIC_URL + 'TomaszKucza-10MysteriesOfTheMechanicalPrince.mp3'
         btn_pos = Position(x=40, y=12)
         game_view.actions['LIGHT'] = _GameView(game_view.state.with_secret('DEAD_TREE')
+                                                        # opening locked door to Cedar Village:
+                                                        .without_tile_override((4, 10, 15))
                                                         ._replace(message=msg, hp=12,  # restoring HP
                                                                   music=music, music_btn_pos=btn_pos))
-        game_view.actions['LIGHT'].remove_tile_override(coords=(4, 10, 15))  # opening locked door to Cedar Village
     mapscript_add_trigger((4, 10, 12), _facing_dead_tree, facing='north', permanent=True,
                                        condition=lambda gs: 'BEEN_TO_VILLAGE' in gs.hidden_triggers and 'DEAD_TREE' not in gs.secrets_found)
 
@@ -427,14 +428,45 @@ def script_it():
                                           # Knowing he can HEAL on 1st round, a quick way to ensure this is to one-shot him on 2nd round.
         ), post_victory=_remove_chest
     )
-    mapscript_add_enemy((8, 7, 4), 'mimic', **mimic_stats, reward=RewardItem('ARMOR_PART', 38))
+    mapscript_add_enemy((8, 7, 3), 'mimic', **mimic_stats, reward=RewardItem('ARMOR_PART', 38))
 
-    def _grant_blue_key(game_view, _):
+    def _hidden_in_hay_pile(game_view, _):
         is_door_open = bool(game_view.tile_override((8, 4, 12)))
         if is_door_open or 'BLUE_KEY' in game_view.state.items:
             return False
         game_view.state = game_view.state._replace(message="A blue key", items=game_view.state.items + ('BLUE_KEY',))
-    mapscript_add_chest((8, 11, 9), 27, _grant_blue_key)    # hidden in hay pile
+    mapscript_add_chest((8, 11, 9), 27, _hidden_in_hay_pile)
+
+    def _lever(game_view, _GameView):
+        lever_tile_id = game_view.tile_override((8, 12, 7)) or 48
+        if lever_tile_id == 48:  # slot waiting for stick or puzzle over
+            if game_view.tile_override((8, 7, 4)): return
+            log(game_view.state, 'put-stick-in-lever')
+            game_view.actions['PUT_STICK_IN_LEVER'] = _GameView(game_view.state
+                    .with_tile_override(49, coords=(8, 12, 7))
+                    ._replace(message='You put your stick\nin the mechanism'))
+        elif lever_tile_id == 49:  # lever waiting to be raised
+            log(game_view.state, 'raise-lever')
+            assert 'RAISE_LEVER' not in game_view.actions
+            game_view.actions['RAISE_LEVER'] = _GameView(game_view.state
+                    .with_tile_override(50, coords=(8, 12, 7), exist_ok=True)
+                    .with_tile_override(5, coords=(8, 7, 4))
+                    .with_tile_override(5, coords=(8, 10, 10))
+                    ._replace(message='You raise the lever\nand hear a metalic noise', x=10))
+        elif lever_tile_id == 50:  # lever waiting to be raised
+            log(game_view.state, 'put-fish-on-lever-stick')
+            game_view.actions['FISH'] = _GameView(game_view.state
+                    .with_tile_override(51, coords=(8, 12, 7), exist_ok=True)
+                    ._replace(message='You put the fish\non the stick',
+                              items=tuple(i for i in game_view.state.items if i != 'FISH')))
+        elif lever_tile_id == 51:  # fish-on-a-stick ready to be picked up!
+            log(game_view.state, 'pick-up-fish-on-a-stick')
+            game_view.actions['PICK_FISH_ON_A_STICK'] = _GameView(game_view.state
+                    .without_tile_override((8, 12, 7))
+                    ._replace(message='You pick up the\nfish-on-a-stick',
+                              treasure_id=31, msg_place=MessagePlacement.UP,
+                              items=game_view.state.items + ('FISH_ON_A_STICK',)))
+    mapscript_add_trigger((8, 11, 7), _lever, facing='east', permanent=True)
 
     def _smoke_fish_on_a_stick(game_view, _GameView):
         log(game_view.state, 'smoking fish-on-a-stick on torch flame')
@@ -445,7 +477,9 @@ def script_it():
                 treasure_id=32,
                 message=message,
                 msg_place=MessagePlacement.UP))
-    mapscript_add_trigger((8, 11, 7), _smoke_fish_on_a_stick, facing='east', permanent=True,
+    mapscript_add_trigger((8, 11, 6), _smoke_fish_on_a_stick, facing='east', permanent=True,
+                                      condition=lambda gs: 'FISH_ON_A_STICK' in gs.items)
+    mapscript_add_trigger((8, 11, 8), _smoke_fish_on_a_stick, facing='east', permanent=True,
                                       condition=lambda gs: 'FISH_ON_A_STICK' in gs.items)
 
     goblin_bribes = (

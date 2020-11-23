@@ -15,6 +15,14 @@ def test_reduce_2_identical_views():
     ]
     assert len(reduce_views(game_views)) == 1
 
+    def render(pdf):
+        bitfont_render(pdf, 'Online hall of fame', 80, 90, url='https://chezsoi.org/lucas/blog/')
+    game_views = [
+        GameView(renderer=render),
+        GameView(renderer=render),
+    ]
+    assert len(reduce_views(game_views)) == 1
+
 
 def test_reduce_2_identical_views_except_for_secret():
     game_views = [
@@ -38,9 +46,9 @@ def test_reduce_2_identical_views_except_for_page_id_link():
 
 def test_reduce_2_identical_views_except_for_url_link():
     def render1(pdf):
-        bitfont_render(pdf, 'Online hall of fame', 80, 90, url='chezsoi.org/lucas/blog/')
+        bitfont_render(pdf, 'Online hall of fame', 80, 90, url='https://chezsoi.org/lucas/blog/')
     def render2(pdf):
-        bitfont_render(pdf, 'Online hall of fame', 80, 90, url='chezsoi.org/lucas/blog')
+        bitfont_render(pdf, 'Online hall of fame', 80, 90, url='https://chezsoi.org/lucas/blog')
     game_views = [
         GameView(renderer=render1),
         GameView(renderer=render2),

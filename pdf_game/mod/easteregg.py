@@ -2,7 +2,7 @@ from ..bitfont import bitfont_render, Justify
 from ..entities import GameView
 
 
-EXTRA_BACKGROUNDS = ('blue_trees', 'boat', 'mountains', 'ruins', 'temple')
+EXTRA_BACKGROUNDS = ('boat', 'mountains', 'ruins', 'snow_house1', 'snow_house2', 'temple')
 
 
 def insert_eegggv(page_id):

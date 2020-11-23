@@ -1,11 +1,18 @@
 from os import makedirs
 from os.path import dirname, join, realpath
+from typing import Dict, NamedTuple, Tuple
 
 from PIL import Image
 
 from .js import atlas, minimap, tileset
 
 from .mod.minimap import minimap_is_unknown
+
+
+class Palette(NamedTuple):
+    name: str
+    columns: int
+    colors: Dict[str, Tuple[int]]
 
 
 DIR_REL_PATH = join(dirname(realpath(__file__)), '..', 'minimaps')
@@ -87,12 +94,27 @@ def _get_img_filepath(map_id, walkablity_changes):
 
 
 def _get_icon_images():
+    palette = parse_gpl_file('DawnBringer.gpl')
     return {
-        'WALKABLE': plain_icon((222, 238, 214)),
-        'NONWALKABLE': plain_icon((20, 12, 28)),
-        'EXIT': plain_icon((210, 125, 44)),
-        'WATER': plain_icon((89, 125, 206)),
+        'WALKABLE': plain_icon(palette.colors['Light8']),
+        'NONWALKABLE': plain_icon(palette.colors['Dark1']),
+        'EXIT': plain_icon(palette.colors['Light2']),
+        'WATER': plain_icon(palette.colors['Light1']),
     }
+
+
+def parse_gpl_file(gpl_filepath):
+    with open(gpl_filepath) as gpl_file:
+        lines = [line.strip() for line in gpl_file.readlines()]
+    assert lines[0] == 'GIMP Palette'
+    name = lines[1][len('Name: '):]
+    columns = int(lines[2][len('Columns: '):])
+    colors = {}
+    for line in lines[3:]:
+        if not line.startswith('#'):
+            rgba, color = line.split('    ')
+            colors[color] = tuple(map(int, [c.strip() for c in rgba.split()]))
+    return Palette(name=name, columns=columns, colors=colors)
 
 
 def plain_icon(color):

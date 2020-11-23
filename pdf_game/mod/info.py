@@ -1,4 +1,4 @@
-from ..entities import GameMode, MessagePlacement, Position
+from ..entities import GameMode, Position
 from ..mazemap import mazemap_next_pos_facing, mazemap_get_tile
 
 from .scenes import BASE_MUSIC_URL
@@ -17,11 +17,3 @@ def custom_info_logic(game_view, actions, _GameView):
                                      music=BASE_MUSIC_URL + 'AlexandrZhelanov-Insight.mp3',
                                      music_btn_pos=Position(x=72, y=15))
             actions['THROW-COIN'] = _GameView(next_state)
-    if game_view.state.coords == (8, 11, 9) and 'FISH' in game_view.state.items:
-        items = tuple(i for i in game_view.state.items if i != 'FISH') + ('FISH_ON_A_STICK',)
-        message = 'You pick a twig and\nput it in the fish'
-        actions['COMBINE_WITH_TWIG'] = _GameView(game_view.state._replace(items=items,
-                                                                          treasure_id=31,
-                                                                          mode=GameMode.EXPLORE,
-                                                                          message=message,
-                                                                          msg_place=MessagePlacement.UP))

@@ -18,7 +18,7 @@ from .render_utils import add_link, action_button_render, get_image_info, link_f
 from .mod.world import patch_enemy_name
 
 
-TILES = ',dungeon_floor,dungeon_wall,dungeon_door,pillar_exterior,dungeon_ceiling,grass,pillar_interior,chest_interior,chest_exterior,medieval_house,medieval_door,tree_evergreen,grave_cross,grave_stone,water,skull_pile,hay_pile,locked_door,death_speaker,boulder_floor,boulder_ceiling,boulder_grass,sign_grass,fountain,portcullis_exterior,portcullis_interior,portal_interior,portal_interior_closed,dead_tree,dungeon_wall_tagged,well,dungeon_torch,box_interior,dungeon_bookshelf,dungeon_bookshelf_torch,box_exterior,hay_pile_exterior,statue,statue_with_amulet,fire,dungeon_wall_small_window,stump,stump_with_bottle,seamus_on_grass,seamus_on_floor,cauldron,dungeon_wall_with_ivy'.split(',')
+TILES = ',dungeon_floor,dungeon_wall,dungeon_door,pillar_exterior,dungeon_ceiling,grass,pillar_interior,chest_interior,chest_exterior,medieval_house,medieval_door,tree_evergreen,grave_cross,grave_stone,water,skull_pile,hay_pile,locked_door,death_speaker,boulder_floor,boulder_ceiling,boulder_grass,sign_grass,fountain,portcullis_exterior,portcullis_interior,portal_interior,portal_interior_closed,dead_tree,dungeon_wall_tagged,well,dungeon_torch,box_interior,dungeon_bookshelf,dungeon_bookshelf_torch,box_exterior,hay_pile_exterior,statue,statue_with_amulet,fire,dungeon_wall_small_window,stump,stump_with_bottle,seamus_on_grass,seamus_on_floor,cauldron,dungeon_wall_with_ivy,dungeon_wall_lever_slot,dungeon_wall_lever_down,dungeon_wall_lever_up,dungeon_wall_lever_up_with_fish'.split(',')
 ARROW_BUTTONS_POS = {
     'TURN-LEFT': Position(x=98, y=8, angle=180),
     'TURN-RIGHT': Position(x=114, y=8, angle=0),
@@ -33,6 +33,10 @@ ARROW_LINKS_POS = {
 }
 ARROW_LINK_WIDTH = 12
 ARROW_LINK_HEIGHT = 9
+CLICK_ZONES = {
+    'RAISE_LEVER':          {'x': 67, 'y': 43, 'width': 21, 'height': 49},
+    'PICK_FISH_ON_A_STICK': {'x': 50, 'y': 32, 'width': 38, 'height': 47},
+}
 MINIATURES_DIR_PATH = join(dirname(realpath(__file__)), '..', 'small_enemies')
 MINIATURES_ALREADY_GENERATED = set()
 
@@ -98,6 +102,9 @@ def render_page(pdf, game_view, render_victory):
             elif action_name == 'CLOSING-BOOK':
                 assert game_state.book
                 render_book(pdf, game_state.book, next_game_view.page_id, game_state.treasure_id)
+            elif action_name in CLICK_ZONES:
+                click_zone = CLICK_ZONES[action_name]
+                add_link(pdf, **click_zone, page_id=next_game_view.page_id, link_alt=action_name.replace('_', ' '))
             elif action_name in ACTION_BUTTONS:
                 action_button_render(pdf, action_name,
                                      page_id=next_game_view.page_id if next_game_view else None)

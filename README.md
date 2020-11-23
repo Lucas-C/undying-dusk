@@ -1,7 +1,7 @@
 <!-- NEXT STEPS:
 - abyss bottom minor text/img rendering glitch
+- trigger scene after beating skeleton + checkpoint before
 - répondre à Henri & lui demander ce qu'il a pensé de l'énigme fish-on-a-stick
-- revoir énigme fish-on-a-stick (too hard)
 - make storm dragon battle longer: add animated intro with stairs ? add pary logic ?
 - improve mimics battles / how to find them
 - add SFX for spells
@@ -197,6 +197,7 @@ DawnLike 16x16 Universal Rogue-like tileset
 - fish-on-a-stick from [496 pixel art icons for medieval/fantasy RPG by Henrique Lazarini (7Soul1)](https://opengameart.org/content/496-pixel-art-icons-for-medievalfantasy-rpg) - CC0
 - knight & skeleton portrait from [32x32 Fantasy portrait set by CobraLad](https://opengameart.org/content/32x32-fantasy-portrait-set) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - explosion from [Lots of free 2d tiles and sprites by Hyptosis](https://opengameart.org/content/lots-of-free-2d-tiles-and-sprites-by-hyptosis) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [SNES JRPG Background: Snowy Village by Inkerrio](https://www.deviantart.com/inkerrio/art/SNES-JRPG-Background-Snowy-Village-794916075)
 - attacks SFXs from [Dungeon Crawl Stone Soup](http://crawl.develz.org/wordpress/) - CC0
 <!--
 * knight from [2d Lost Garden Zelda style tiles resized to 32x32 with additions](https://opengameart.org/node/11758) by Daniel Cook, Jetrel, Saphy (TMW), Zabin, Bertram - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)

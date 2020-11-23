@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Improved hints in Zuruth plain, for bottle & hidden chest
+- Tried to make fish-on-a-stick puzzle funnier & simpler, in Mausoleum
 
 ### Fixed
 - secrets were incorrectly reported to the Hall of Fame, due to a pages count over-optimization
