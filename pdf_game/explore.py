@@ -7,6 +7,7 @@ from .power import power_burn, power_unlock
 
 from .mod.books import examine_bookshelf
 from .mod.konami import custom_explore_logic
+from .mod.world import custom_can_burn, custom_can_push
 
 
 ROTATIONS_PER_FACING = {
@@ -27,9 +28,12 @@ def explore_logic(game_view, actions, _GameView):
     # First, handling bookshelves examination / book closing.
     # It must be done first as it can trigger an early return.
     if next_tile_facing in (34, 35):
-        if game_view.state.book:
-            if game_view.state.book.next:
-                game_state = game_state._replace(book=game_view.state.book.next)
+        book = game_view.state.book
+        if book:
+            if book.hidden_trigger and book.hidden_trigger not in game_view.state.hidden_triggers:
+                game_state = game_state.with_hidden_trigger(book.hidden_trigger)
+            if book.next:
+                game_state = game_state._replace(book=book.next)
             elif game_view.state.shop_id >= 0:  # Means a CutScene follows this book opening
                 game_state = game_state._replace(mode=GameMode.DIALOG, shop_id=game_view.state.shop_id)
             actions['CLOSING-BOOK'] = _GameView(game_state)
@@ -73,17 +77,29 @@ def explore_logic(game_view, actions, _GameView):
                 actions[action_name] = _GameView(game_state._replace(message=message))
             continue
         actions[action_name] = _GameView(custom_explore_logic(action_name, game_state, game_state._replace(x=x, y=y)))
-    if BURN_AND_PUSH_ALLOWED and next_tile_facing in (33, 36):
-        next_next_pos_facing = mazemap_next_pos_facing(*next_pos_facing, game_state.facing)
-        next_next_tile_facing = mazemap_get_tile(game_view, game_state.map_id, *next_next_pos_facing)
-        if next_next_tile_facing in (5, 1, 0, None):  # empty tile behind
-            actions['PUSH'] = _GameView(_push_box(game_state, next_pos_facing, next_next_pos_facing, next_tile_facing, next_next_tile_facing))
+    if BURN_AND_PUSH_ALLOWED and next_tile_facing in (33, 36):  # facing a box
+        custom = custom_can_push(game_state, actions)
+        if custom:
+            action_name, next_gv = custom
+            actions[action_name] = next_gv
         else:
-            actions['NO_PUSH'] = None
-    if BURN_AND_PUSH_ALLOWED and game_state.spellbook >= 2 and next_tile_facing in (16, 33, 36):  # facing a bone_pile or box with BURN spell
+            next_next_pos_facing = mazemap_next_pos_facing(*next_pos_facing, game_state.facing)
+            next_next_tile_facing = mazemap_get_tile(game_view, game_state.map_id, *next_next_pos_facing)
+            if next_next_tile_facing in (5, 1, 0, None):  # empty tile behind
+                actions['PUSH'] = _GameView(_push_box(game_state, next_pos_facing, next_next_pos_facing, next_tile_facing, next_next_tile_facing))
+            else:
+                actions['NO_PUSH'] = None
+    if BURN_AND_PUSH_ALLOWED and game_state.spellbook >= 2 and next_tile_facing in (16, 33, 36) and custom_can_burn(game_state):  # facing a bone_pile or box with BURN spell
         actions['BURN'] = _GameView(power_burn(game_state, next_pos_facing, next_tile_facing)) if game_state.mp else None
     if game_state.spellbook >= 3 and next_tile_facing == 18:  # facing a locked_door with UNLOCK spell available
         actions['UNLOCK'] = _GameView(power_unlock(game_state, next_pos_facing)) if game_state.mp else None
+    if 'MOVE-FORWARD' in actions:  # adding user-friendly click zones in the middle of the screen:
+        if next_tile_facing in (3, 11):  # dungeon or village door
+            actions['OPEN_DOOR'] = actions['MOVE-FORWARD']
+        if next_tile_facing == 27:  # open portal
+            actions['PASS_PORTAL'] = actions['MOVE-FORWARD']
+        if next_tile_facing == 47:  # ivy - does it make puzzle too easy?
+            actions['PASS_BEHIND_IVY'] = actions['MOVE-FORWARD']
 
 
 def _push_box(game_state, next_pos_facing, next_next_pos_facing, next_tile_facing, next_next_tile_facing):

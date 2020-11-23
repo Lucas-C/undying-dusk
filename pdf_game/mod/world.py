@@ -7,6 +7,18 @@ VILLAGE_PORTAL_COORDS = (5, 9, 3)
 WALKABLE_BONES_AND_BOXES = False  # for --no-script mode
 
 
+def custom_can_burn(game_state):
+    # We forbid box burning in Mausoleum, where there is a box mimic:
+    return game_state.map_id != 8
+
+
+def custom_can_push(game_state, actions):
+    if (game_state.coords, game_state.facing) == ((8, 9, 2), 'south'):
+        # Facing box mimic in Mausoleum: if the player tries to push it, it triggers a fight!
+        return 'PUSH', actions['MOVE-FORWARD']
+    return None
+
+
 def custom_can_move_to(_map, x, y, game_state):
     'Allow to override the default tile walkability on specific coordinates'
     if WALKABLE_BONES_AND_BOXES and _map.tiles[y][x] in (16, 33, 36):  # skull pile or interior/exterior box
@@ -38,6 +50,10 @@ def custom_can_move_to(_map, x, y, game_state):
             return True  # can walk on shallow waters
         if (x, y) == MAUSOLEUM_PORTAL_COORDS[1:]:
             return game_state.tile_override_at(MAUSOLEUM_PORTAL_COORDS) and not is_instinct_preventing_to_pass_mausoleum_portal(game_state)
+        if (x, y) == (9, 3):  # allow to move on box mimic tile:
+            return True
+        if (x, y) == (15, 7):  # exit to Dead Walkways, require door mimic to be beaten:
+            return (8, 14, 7) in game_state.vanquished_enemies
     return None
 
 
@@ -103,6 +119,7 @@ def patch_tileset(tileset):
         False,  # 49 = dungeon_wall_lever_down
         False,  # 50 = dungeon_wall_lever_up
         False,  # 51 = dungeon_wall_lever_up_wth_fish
+        True,   # 52 = dungeon_black_passage
     ])
 
 
@@ -220,7 +237,8 @@ def _patch_tiles(_map):
         x, y = 7, 3;   tiles[y][x] = 8   # ... to block the path north
         x, y = 7, 4;   tiles[y][x] = 26  # portcullis
         x, y = 10, 10; tiles[y][x] = 26  # portcullis
-        x, y = 9, 3;   tiles[y][x] = 8   # adding a chest (mimic) in the northern corridor, behind water
+        x, y = 3, 2;   tiles[y][x] = 5   # removing north-west chest
+        x, y = 9, 3;   tiles[y][x] = 33  # adding a box (mimic) in the northern corridor, behind water
         x, y = 2, 2;   tiles[y][x] = 34  # bookshelf
         x, y = 3, 3;   tiles[y][x] = 30  # dungeon_wall_tagged with FOUNTAIN_HINT
         x, y = 7, 11;  tiles[y][x] = 2   # wall after warp south-west in central room

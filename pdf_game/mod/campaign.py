@@ -418,17 +418,21 @@ def script_it():
     mapscript_remove_chest((8, 3, 12))  # used to be: Magic Sapphire (MP Up)
 
     # 3 mimics possess the St Knight armor parts; required to win: UNLOCK spell + 1 MP each + enough HP (= 1 night of rest @ Inn)
-    def _remove_chest(gs):
+    def _remove_mimic_camouflage(gs):
         assert gs.spellbook >= 3, f'Mimic @{gs.coords} beaten without UNLOCK spell!'
-        return gs.with_tile_override(5, coords=gs.coords)
-    mimic_stats = dict(
+        return gs.with_tile_override(5, coords=gs.coords)  # useless for door mimic, but who cares?
+    _mimic_stats = lambda first_atk_name: dict(
+        category=enemy().ENEMY_CATEGORY_AUTOMATON, show_on_map=False,  # rendered by the chest tile
         hp=30, rounds=(
-            CR('Lid clasp', atk=6),       # Hero must be able to stand this x3
+            CR(first_atk_name, atk=6),    # Hero must be able to stand this x3
             CR('Critical bite', atk=30),  # The hero must not be able to beat a mimic without the UNLOCK spell.
                                           # Knowing he can HEAL on 1st round, a quick way to ensure this is to one-shot him on 2nd round.
-        ), post_victory=_remove_chest
-    )
-    mapscript_add_enemy((8, 7, 3), 'mimic', **mimic_stats, reward=RewardItem('ARMOR_PART', 38))
+        ), post_victory=_remove_mimic_camouflage)
+    mapscript_add_enemy((8, 7, 3), 'chest_mimic', **_mimic_stats('Lid clasp'), reward=RewardItem('ARMOR_PART', 38))
+    def _chest_mimic_tongue(game_view, _):
+        game_view.state = game_view.state._replace(extra_render=render_chest_mimic_tongue)
+    mapscript_add_trigger((8, 7, 4), _chest_mimic_tongue, facing='north', permanent=True,
+                                      condition=lambda gs: (8, 7, 3) not in gs.vanquished_enemies)
 
     def _hidden_in_hay_pile(game_view, _):
         is_door_open = bool(game_view.tile_override((8, 4, 12)))
@@ -452,6 +456,7 @@ def script_it():
                     .with_tile_override(50, coords=(8, 12, 7), exist_ok=True)
                     .with_tile_override(5, coords=(8, 7, 4))
                     .with_tile_override(5, coords=(8, 10, 10))
+                    # (cheap) Moving player 1 step back so that it does not immediately sees the FISH action
                     ._replace(message='You raise the lever\nand hear a metalic noise', x=10))
         elif lever_tile_id == 50:  # lever waiting to be raised
             log(game_view.state, 'put-fish-on-lever-stick')
@@ -508,9 +513,18 @@ def script_it():
     mapscript_add_message((5, 9, 4), 'Trust your instinct:\nno need to go back for now', facing='north',
                                       condition=is_instinct_preventing_to_pass_village_portal)
 
-    mapscript_add_enemy((8, 3, 2), 'mimic', **mimic_stats, reward=RewardItem('ARMOR_PART', 39),
-                                            hidden_trigger='FOUNTAIN_HINT')
-    mapscript_add_enemy((8, 9, 3), 'mimic', **mimic_stats, reward=RewardItem('ARMOR_PART', 40))
+    def _facing_door_mimic(game_view, _GameView):
+        if 'MOVE-FORWARD' in game_view.actions:
+            assert game_view.actions['MOVE-FORWARD'].state.mode == GameMode.COMBAT
+            return
+        mimic_stats = _mimic_stats('Flying handle')
+        _enemy = Enemy(name='door_mimic', **mimic_stats, max_hp=mimic_stats['hp'], reward=RewardItem('ARMOR_PART', 39))
+        game_view.actions['MOVE-FORWARD'] = _GameView(game_view.state
+            .with_tile_override(52, coords=(8, 15, 7))  # dungeon_black_passage
+            ._replace(mode=GameMode.COMBAT, combat=CombatState(enemy=_enemy)))
+    mapscript_add_trigger((8, 14, 7), _facing_door_mimic, facing='east', permanent=True,
+                                      condition=lambda gs: (8, 14, 7) not in gs.vanquished_enemies)
+    mapscript_add_enemy((8, 9, 3), 'box_mimic', **_mimic_stats('Wood slivers'), reward=RewardItem('ARMOR_PART', 40))
 
     # CHECKPOINT: about to enter the Dead Walkways and fight the storm dragon, with the St Knight armor
 
@@ -597,6 +611,7 @@ def script_it():
 
     # The heroine has 16/30HP, 3/3 MP, the HEAL, BURN & UNLOCK spells, a BUCKLER, St Knight armor (def 12) and does 13 dmg with their sword.
     mapscript_add_enemy((9, 11, 5), 'death_speaker',  # Empress
+        show_on_map=False,  # rendered by the tile
         music=BASE_MUSIC_URL + 'MatthewPablo-HeroicDemise.mp3',
         # STRATEGY to beat her: parry lightning attacks, use 2 BURN to put shield down, 1 HEAL, else attack
         # Note that the Empress is of DEMON type, so BURN does her only 4 dmg (it ignores the shield)
@@ -618,6 +633,9 @@ def render_amulet_trail(pdf):
 
 def render_amulet_sight(pdf):
     pdf.image('assets/water-trail.png', x=97, y=86)
+
+def render_chest_mimic_tongue(pdf):
+    pdf.image('assets/tongue.png', x=84, y=77)
 
 def render_abyss_filler_page(pdf, i):
     pdf.add_page()

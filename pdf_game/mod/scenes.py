@@ -348,7 +348,7 @@ def the_final_leap():
     scene_2 = CutScene.new(
         background=1,
         name='The final leap',
-        text="You reach the Empress's\nquarters: there is only\ndarnkess and ruins.\n\nAs you climb your way\namong floating debris,\na huge creature falls\nfrom the sky onto you!",
+        text='\n' * 8 + "You reach the Empress's\nquarters: there is only\ndarnkess and ruins.\n\nAs you climb your way\namong floating debris,\na huge creature falls\nfrom the sky onto you!",
         exit_msg="Engage the fight",
     )
     return CutScene.new(

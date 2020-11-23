@@ -33,9 +33,14 @@ def _tile_as_char(game_view, _map, x, y, content):
     if script_type == 'warp':
         return ansi_wrap('WW', color='magenta')
     tile_override = game_view.tile_override((game_state.map_id, x, y))
-    out_chars = _TILE_AS_EMOJI[tile_override or content]
+    tile_id = tile_override or content
+    out_chars = _TILE_AS_EMOJI[tile_id]
     if script_type == 'enemy' and not game_view.enemy_vanquished((game_state.map_id, x, y)):
-        return ansi_wrap('CE' if out_chars == 'CC' else 'EE', color='red')
+        chars = 'EE'
+        if tile_id in (8, 9): chars = 'CE'
+        if tile_id in (33, 36): chars = 'BE'
+        if tile_id == 3: chars = 'DE'
+        return ansi_wrap(chars, color='red')
     if script_type == 'chest' and not tile_override:
         return ansi_wrap(out_chars if out_chars != '  ' else '$$', color='yellow')
     if script_type and 'trigger' in script_type:
@@ -99,4 +104,5 @@ _TILE_AS_EMOJI = [
     ansi_wrap('WL', bold=True),       # 49: dungeon_wall_lever_down
     ansi_wrap('WL', bold=True),       # 50: dungeon_wall_lever_up
     ansi_wrap('WL', bold=True),       # 51: dungeon_wall_lever_up_with_fish
+    ansi_wrap('DD', bold=True),       # 52: dungeon_black_passage
 ]

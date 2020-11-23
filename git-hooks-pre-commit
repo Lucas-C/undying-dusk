@@ -1,0 +1,3 @@
+#!/bin/sh
+./check_dawnbringer.py $(git diff --cached --name-only --diff-filter=ACM | grep .png | grep -v yellow-star.png)
+pylint $(git diff --cached --name-only --diff-filter=ACM | grep -F .py)

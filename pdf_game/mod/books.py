@@ -40,7 +40,7 @@ BOOKS = {
     (8, 3, 13): Book('A treatise on\nDruidic linguistics.\nThe first chapter teaches\nthe names of numbers.',
                      next=Book('1 : Klaatu  2 : Da\n3 : Fer  4 : Me\n5 : Mi  6 : Sesa\n7 : To  8 : Bara\n9 : Nik  10 : Do')),
     # Mausoleum: bookshelf behind a mimic, north-west
-    (8, 2, 2): False,
+    (8, 2, 2): Book('TODO', hidden_trigger='FOUNTAIN_HINT'),
 }
 
 

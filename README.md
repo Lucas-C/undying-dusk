@@ -1,9 +1,8 @@
 <!-- NEXT STEPS:
 - abyss bottom minor text/img rendering glitch
 - trigger scene after beating skeleton + checkpoint before
-- répondre à Henri & lui demander ce qu'il a pensé de l'énigme fish-on-a-stick
-- make storm dragon battle longer: add animated intro with stairs ? add pary logic ?
-- improve mimics battles / how to find them
+- "you get a armor part"
+- make storm dragon battle longer
 - add SFX for spells
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"
@@ -19,8 +18,6 @@
   * skeleton fight : too hard ? hint at critical ?
   * SCENARIO: aurait aimé avoir plus de réponses
   * glitch boulder rendering with tree (GIF from Maxime ?)
-  * secret de l'arbre pas comptabilisé ??
-- make some objects on screen clickables: door, portal, ivy
 - feedback Henri:
   * ajouter un journal rappelant tous les indices trouvés, à apparition unique
 - redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
@@ -29,7 +26,7 @@
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
   * maze rendering glitch
 - post-release: publish assets & create a music collection on OGA
-- release pyfpdf2 & make a quine (a program generating a PDF displaying its own source code)
+- make a PDF quine (a program generating a PDF displaying its own source code)
 - VF?
 - a11y:
   * add alt desc on action links -> https://www.w3.org/TR/WCAG20-TECHS/pdf#PDF13
@@ -48,7 +45,7 @@
   * dialogs choices inspired by Monkey Island Insult Sword Fighting,
     where there's a unique set of answers that leads to victory
   * drunk/potion -> mess with direction arrows (reversed / all over the page)
-  * moving enemy
+  * moving enemy: either with a looping pattern, or that must be caught when running away, thanks to a shortcut
   * cloak to bypass enemy (avoid an encounter)
   * light up torch and go to some place previously very dark
   * place bomb on stone door doorstep (require a "broken wall" tile)

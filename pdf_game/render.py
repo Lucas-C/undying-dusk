@@ -18,7 +18,7 @@ from .render_utils import add_link, action_button_render, get_image_info, link_f
 from .mod.world import patch_enemy_name
 
 
-TILES = ',dungeon_floor,dungeon_wall,dungeon_door,pillar_exterior,dungeon_ceiling,grass,pillar_interior,chest_interior,chest_exterior,medieval_house,medieval_door,tree_evergreen,grave_cross,grave_stone,water,skull_pile,hay_pile,locked_door,death_speaker,boulder_floor,boulder_ceiling,boulder_grass,sign_grass,fountain,portcullis_exterior,portcullis_interior,portal_interior,portal_interior_closed,dead_tree,dungeon_wall_tagged,well,dungeon_torch,box_interior,dungeon_bookshelf,dungeon_bookshelf_torch,box_exterior,hay_pile_exterior,statue,statue_with_amulet,fire,dungeon_wall_small_window,stump,stump_with_bottle,seamus_on_grass,seamus_on_floor,cauldron,dungeon_wall_with_ivy,dungeon_wall_lever_slot,dungeon_wall_lever_down,dungeon_wall_lever_up,dungeon_wall_lever_up_with_fish'.split(',')
+TILES = ',dungeon_floor,dungeon_wall,dungeon_door,pillar_exterior,dungeon_ceiling,grass,pillar_interior,chest_interior,chest_exterior,medieval_house,medieval_door,tree_evergreen,grave_cross,grave_stone,water,skull_pile,hay_pile,locked_door,death_speaker,boulder_floor,boulder_ceiling,boulder_grass,sign_grass,fountain,portcullis_exterior,portcullis_interior,portal_interior,portal_interior_closed,dead_tree,dungeon_wall_tagged,well,dungeon_torch,box_interior,dungeon_bookshelf,dungeon_bookshelf_torch,box_exterior,hay_pile_exterior,statue,statue_with_amulet,fire,dungeon_wall_small_window,stump,stump_with_bottle,seamus_on_grass,seamus_on_floor,cauldron,dungeon_wall_with_ivy,dungeon_wall_lever_slot,dungeon_wall_lever_down,dungeon_wall_lever_up,dungeon_wall_lever_up_with_fish,dungeon_black_passage'.split(',')
 ARROW_BUTTONS_POS = {
     'TURN-LEFT': Position(x=98, y=8, angle=180),
     'TURN-RIGHT': Position(x=114, y=8, angle=0),
@@ -34,6 +34,9 @@ ARROW_LINKS_POS = {
 ARROW_LINK_WIDTH = 12
 ARROW_LINK_HEIGHT = 9
 CLICK_ZONES = {
+    'OPEN_DOOR':            {'x': 62, 'y': 43, 'width': 35, 'height': 54},
+    'PASS_BEHIND_IVY':      {'x': 54, 'y': 36, 'width': 49, 'height': 58},
+    'PASS_PORTAL':          {'x': 50, 'y': 26, 'width': 60, 'height': 61},
     'RAISE_LEVER':          {'x': 67, 'y': 43, 'width': 21, 'height': 49},
     'PICK_FISH_ON_A_STICK': {'x': 50, 'y': 32, 'width': 38, 'height': 47},
 }
@@ -226,7 +229,7 @@ def mazemap_render_tile(pdf, game_view, x, y, render_pos):
             pdf.image('assets/boulder_small.png', x=68, y=48)
     if render_pos == 9:  # center of midle row
         _enemy = mapscript_get_enemy_at((map_id, x, y), game_view.state)
-        if _enemy and _enemy.name not in ('death_speaker', 'mimic') and not game_view.enemy_vanquished((map_id, x, y)):
+        if _enemy and _enemy.show_on_map and not game_view.enemy_vanquished((map_id, x, y)):
             enemy_render_small(pdf, _enemy)
 
 

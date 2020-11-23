@@ -76,11 +76,12 @@ class Bribe(NamedTuple):
 
 class Enemy(NamedTuple):
     name : str
-    type : Optional[int]
     category : int
     hp : int
     max_hp : int
     rounds : Tuple[CombatRound]
+    type : Optional[int] = None
+    show_on_map : bool = True
     intro_msg : str = ''
     bribes : Tuple[Bribe] = ()
     allows_running_away : bool = False
@@ -130,6 +131,7 @@ class Book(NamedTuple):
     bird_index: Optional[int] = None
     next: Optional['Book'] = None  # using a Forward Reference type hint
     portrait : Optional[int] = None
+    hidden_trigger : Optional[str] = None
     sfx : SFX = None
 
 
