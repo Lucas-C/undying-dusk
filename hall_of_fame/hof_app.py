@@ -56,6 +56,7 @@ def upsert_score(player_name, pdf_reader, secrets_found, version):
 # The following code recipe was taken from: https://flask.palletsprojects.com/en/1.1.x/patterns/sqlite3/
 
 def get_db():
+    # "g" is a per-request generic context. It is needed to retrieve the connection in "close_connection" below
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DB_FILEPATH, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)

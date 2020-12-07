@@ -1,9 +1,11 @@
 <!-- NEXT STEPS:
+- lever puzzle -> draw lever slot side: staff-in-slot pos: x=76, y=31
 - abyss bottom minor text/img rendering glitch
+- access to FOUNTAIN_HINT must be blocked until all 3 mimics are dead
 - trigger scene after beating skeleton + checkpoint before
 - "you get a armor part"
 - make storm dragon battle longer
-- add SFX for spells
+- add SFX for spells: cf. https://www.patreon.com/posts/dark-magic-8600078 & https://www.patreon.com/posts/light-magic-8781428
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"
   -> face 2 enemies => 2 health bars & 2 attacks -> undead-fossil / flying demon with daggers / upscaled-dragon-skeleton ?
@@ -25,7 +27,7 @@
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
   * maze rendering glitch
-- post-release: publish assets & create a music collection on OGA
+- post-release: publish small assets & create a music collection
 - make a PDF quine (a program generating a PDF displaying its own source code)
 - VF?
 - a11y:
@@ -57,7 +59,7 @@
   * try other PDF features: PrevPage ? sub-page navigation ?
   * implement monster arrival animations & attacks & delayed log msgs using PDF `Transitions` or as a GIF (_cf._ [Patrick Gallot article](https://www.datalogics.com/blog/corporate/the-making-of-a-pdf-presentation/))
   * use navigation node `Dur` to implement QTEs / real-time game mechanics ?
-  * enemies: griffon
+  * enemies: griffon, allacrost daemarbora, demonic_essence & skeleton_with_axe
 - secrets: ABYSS_BOTTOM, DEAD_TREE, FOUNTAIN_WISH, KONAMI_CODE
   * [x] empress soul at the bottom of the abyss
   * [x] throwing gold piece in fountain (hint hidden on a special wall sprite)
@@ -154,7 +156,7 @@ Thank you Clint!
 First of all, this game uses the great 16 color palette made by [DawnBringer at PixelJoint](http://www.pixeljoint.com/forum/forum_posts.asp?TID=12795). 
 
 This game also makes use of the following assets, some of which I ported to the DawnBringer palette:
-- all the original art was made by Clint Bellanger for the original Heroine Dusk game - [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+- all [the original art](https://opengameart.org/content/first-person-dungeon-crawl-art-pack) was made by Clint Bellanger for the original Heroine Dusk game - [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - enemies come from [Redshrike remix of Heroine Dusk original ones](https://opengameart.org/content/first-person-dungeon-crawl-enemies-remixed).
 Fossil dino come from [Fossil (Undead) RPG Enemy Sprites](https://opengameart.org/content/fossil-undead-rpg-enemy-sprites),
 flying demon with daggers from [More RPG enemies!](https://opengameart.org/content/more-rpg-enemies), Seamus wizard & demon portrait from his [6 More RPG Enemies spritesheet](https://opengameart.org/content/6-more-rpg-enemies), black bird from his [Tower Defense Prototyping Assets]( https://opengameart.org/content/tower-defense-prototyping-assets-4-monsters-some-tiles-a-background-image) and blowfish from his [3 RPG enemy remixes](https://opengameart.org/content/3-rpg-enemy-remixes) - all [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
@@ -185,22 +187,24 @@ DawnLike 16x16 Universal Rogue-like tileset
 - stump made from [Snake on an old stump by Angry Amish](https://opengameart.org/content/snake-on-an-old-stump) - CC0
 - hangman from [Fantasy Tiles by surt](https://opengameart.org/content/fantasy-tiles) - CC0
 - [Temple background by Ironthunder](https://opengameart.org/content/temple-background) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-- blue trees from [Fairy-Tale 2D Backgrounds by CraftPix.net 2D Game Assets](https://opengameart.org/content/fairy-tale-2d-backgrounds) - [OGA-BY 3.0](https://opengameart.org/content/oga-by-30-faq)
 - boat from [Mythical Ruins Tileset by voec](https://opengameart.org/content/mythical-ruins-tileset) - CC0
 - knight from [Dungeon Crawl 32x32 tiles](https://opengameart.org/content/dungeon-crawl-32x32-tiles) - CC0
 - small mimics from [Chest and Mimic by IndigoFenix](https://opengameart.org/content/chest-and-mimic) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [blood splat by PWL](https://opengameart.org/content/blood-splats) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [Rose Flower by Lovecraft](https://opengameart.org/content/rose-flower-pyxeledit-document-and-image) - CC0
-- fish-on-a-stick from [496 pixel art icons for medieval/fantasy RPG by Henrique Lazarini (7Soul1)](https://opengameart.org/content/496-pixel-art-icons-for-medievalfantasy-rpg) - CC0
+- fish-on-a-stick & hand mirror from [496 pixel art icons for medieval/fantasy RPG by Henrique Lazarini (7Soul1)](https://opengameart.org/content/496-pixel-art-icons-for-medievalfantasy-rpg) - CC0
 - knight & skeleton portrait from [32x32 Fantasy portrait set by CobraLad](https://opengameart.org/content/32x32-fantasy-portrait-set) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - explosion from [Lots of free 2d tiles and sprites by Hyptosis](https://opengameart.org/content/lots-of-free-2d-tiles-and-sprites-by-hyptosis) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [SNES JRPG Background: Snowy Village by Inkerrio](https://www.deviantart.com/inkerrio/art/SNES-JRPG-Background-Snowy-Village-794916075)
 - attacks SFXs from [Dungeon Crawl Stone Soup](http://crawl.develz.org/wordpress/) - CC0
+- gorgon's staff downscaled from [Staff by LordNeo](https://opengameart.org/content/staff-64-x64)
 <!--
 * knight from [2d Lost Garden Zelda style tiles resized to 32x32 with additions](https://opengameart.org/node/11758) by Daniel Cook, Jetrel, Saphy (TMW), Zabin, Bertram - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 * griffon: Lanea Zimmerman (AKA Sharm) https://forums.rpgmakerweb.com/index.php?threads/sharms-stuff.26278/
 * scene_cave: https://opengameart.org/content/parallax-halloween-2d-game-backgrounds
 -->
+
+All the OpenGameAssets have been gathered in [this collection](https://opengameart.org/content/art-for-undying-dusk-pdf-game).
 
 ### Fonts
 The Boxy Bold font was made [by Clint Bellanger for Heroine Dusk](https://opengameart.org/content/boxy-bold-font).

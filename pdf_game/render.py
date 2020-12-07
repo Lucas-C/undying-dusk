@@ -1,5 +1,5 @@
 from os import makedirs
-from os.path import dirname, join, realpath
+from os.path import dirname, exists, join, realpath
 
 from PIL import Image
 
@@ -18,7 +18,7 @@ from .render_utils import add_link, action_button_render, get_image_info, link_f
 from .mod.world import patch_enemy_name
 
 
-TILES = ',dungeon_floor,dungeon_wall,dungeon_door,pillar_exterior,dungeon_ceiling,grass,pillar_interior,chest_interior,chest_exterior,medieval_house,medieval_door,tree_evergreen,grave_cross,grave_stone,water,skull_pile,hay_pile,locked_door,death_speaker,boulder_floor,boulder_ceiling,boulder_grass,sign_grass,fountain,portcullis_exterior,portcullis_interior,portal_interior,portal_interior_closed,dead_tree,dungeon_wall_tagged,well,dungeon_torch,box_interior,dungeon_bookshelf,dungeon_bookshelf_torch,box_exterior,hay_pile_exterior,statue,statue_with_amulet,fire,dungeon_wall_small_window,stump,stump_with_bottle,seamus_on_grass,seamus_on_floor,cauldron,dungeon_wall_with_ivy,dungeon_wall_lever_slot,dungeon_wall_lever_down,dungeon_wall_lever_up,dungeon_wall_lever_up_with_fish,dungeon_black_passage'.split(',')
+TILES = ',dungeon_floor,dungeon_wall,dungeon_door,pillar_exterior,dungeon_ceiling,grass,pillar_interior,chest_interior,chest_exterior,medieval_house,medieval_door,tree_evergreen,grave_cross,grave_stone,water,skull_pile,hay_pile,locked_door,death_speaker,boulder_floor,boulder_ceiling,boulder_grass,sign_grass,fountain,portcullis_exterior,portcullis_interior,portal_interior,portal_interior_closed,dead_tree,dungeon_wall_tagged,well,dungeon_torch,box_interior,dungeon_bookshelf,dungeon_bookshelf_torch,box_exterior,hay_pile_exterior,statue,statue_with_amulet,fire,dungeon_wall_small_window,stump,stump_with_bottle,seamus_on_grass,seamus_on_floor,cauldron,dungeon_wall_with_ivy,dungeon_wall_lever_slot,dungeon_wall_lever_down,dungeon_wall_lever_up,dungeon_wall_lever_up_with_fish,dungeon_black_passage,petrified_gorgon_with_staff,petrified_gorgon'.split(',')
 ARROW_BUTTONS_POS = {
     'TURN-LEFT': Position(x=98, y=8, angle=180),
     'TURN-RIGHT': Position(x=114, y=8, angle=0),
@@ -39,6 +39,8 @@ CLICK_ZONES = {
     'PASS_PORTAL':          {'x': 50, 'y': 26, 'width': 60, 'height': 61},
     'RAISE_LEVER':          {'x': 67, 'y': 43, 'width': 21, 'height': 49},
     'PICK_FISH_ON_A_STICK': {'x': 50, 'y': 32, 'width': 38, 'height': 47},
+    'PICK_STAFF':           {'x': 43, 'y': 18, 'width': 15, 'height': 79},
+    'REFLECT_GORGON':       {'x': 15, 'y': 17, 'width': 46, 'height': 72},
 }
 MINIATURES_DIR_PATH = join(dirname(realpath(__file__)), '..', 'small_enemies')
 MINIATURES_ALREADY_GENERATED = set()
@@ -65,6 +67,9 @@ def render_page(pdf, game_view, render_victory):
         with trace_time('render:3:combat'):
             combat_render(pdf, game_state)
     # Combat rendering must be done mefore .message rendering, for bribes messages to display well
+    # Same with extra rendering: it must be done before displaying .message, e.g. for gorgon
+    if game_state.extra_render:
+        game_state.extra_render(pdf)
     if game_state.mode == GameMode.INFO:
         with trace_time('render:2:info_page'):
             minimap_render(pdf, game_view)
@@ -116,8 +121,6 @@ def render_page(pdf, game_view, render_victory):
     if game_view.state.bonus_atk and game_state.mode in (GameMode.EXPLORE, GameMode.INFO):
         action_button_render(pdf, 'ATK_BOOST')
         bitfont_render(pdf, f'+{game_view.state.bonus_atk}', 10, 90)
-    if game_state.extra_render:
-        game_state.extra_render(pdf)
 
 
 def mazemap_render(pdf, game_view):
@@ -238,9 +241,11 @@ def action_render(pdf, spellbook, items):
     # as it is present in the "actions" dict
     for btn_type in ACTION_BUTTONS[2:2+spellbook]:
         action_button_render(pdf, btn_type)
+    i = 0
     for btn_type in items:
         if btn_type != 'ARMOR_PART':
-            action_button_render(pdf, btn_type)
+            action_button_render(pdf, btn_type, item_index=i)
+            i += 1
     # "Hardcoded" rendering of new mod collectible item:
     armor_parts_count = items.count('ARMOR_PART')
     if armor_parts_count:
@@ -296,16 +301,18 @@ def enemy_render(pdf, _enemy, _round=0):
 
 
 def enemy_render_small(pdf, _enemy, scale=2/3):
-    small_img_filepath = f'{MINIATURES_DIR_PATH}/{_enemy.name}.png'
-    if small_img_filepath not in MINIATURES_ALREADY_GENERATED:
-        makedirs(MINIATURES_DIR_PATH, exist_ok=True)
-        width, height = config().VIEW_WIDTH, config().VIEW_HEIGHT
-        with Image.open(_enemy_img_filepath(_enemy)) as img:
-            # Cropping 1st, in case image contains multiple frames:
-            img.crop((0, 0, width, height))\
-               .resize((round(width*scale), round(height*scale)), resample=Image.NEAREST)\
-               .save(small_img_filepath)
-        MINIATURES_ALREADY_GENERATED.add(small_img_filepath)
+    small_img_filepath = f'assets/enemies/small/{_enemy.name}.png'
+    if not exists(small_img_filepath):  # fallback to auto-generated miniature:
+        small_img_filepath = f'{MINIATURES_DIR_PATH}/{_enemy.name}.png'
+        if small_img_filepath not in MINIATURES_ALREADY_GENERATED:
+            makedirs(MINIATURES_DIR_PATH, exist_ok=True)
+            width, height = config().VIEW_WIDTH, config().VIEW_HEIGHT
+            with Image.open(_enemy_img_filepath(_enemy)) as img:
+                # Cropping 1st, in case image contains multiple frames:
+                img.crop((0, 0, width, height))\
+                   .resize((round(width*scale), round(height*scale)), resample=Image.NEAREST)\
+                   .save(small_img_filepath)
+            MINIATURES_ALREADY_GENERATED.add(small_img_filepath)
     pdf.image(small_img_filepath, x=25, y=18)
 
 

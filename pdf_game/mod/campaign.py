@@ -9,8 +9,7 @@ from ..render import render_bar
 from ..render_utils import portrait_render, white_arrow_render
 
 from .scenes import abyss_bottom, seamus_through_small_window, the_end, BASE_MUSIC_URL
-from .world import is_instinct_preventing_to_enter_village, is_instinct_preventing_to_enter_templar_academy, is_instinct_preventing_to_pass_mausoleum_portal, is_instinct_preventing_to_pass_village_portal
-
+from .world import is_instinct_preventing_to_enter_village, is_instinct_preventing_to_enter_templar_academy, is_instinct_preventing_to_pass_mausoleum_portal, is_instinct_preventing_to_pass_village_portal, MAUSOLEUM_PORTAL_COORDS
 
 VICTORY_POS = Checkpoint((9, 11, 5), 'ending after beating the Empress')
 CHECKPOINTS = (  # intermediate positions that should be reachable through a unique path only
@@ -25,6 +24,7 @@ CHECKPOINTS = (  # intermediate positions that should be reachable through a uni
     Checkpoint((7, 2, 5),   'Canal Boneyard entrance'),
     Checkpoint((7, 9, 5),   'After beating zombie on Canal Boneyard exit'),
     # Checkpoint((8, 5, 7),   'Mausoleum, about to pass portcullis'),
+    Checkpoint((8, 10, 11), 'Mausoleum, after bribing goblin'),
     Checkpoint((8, 4, 12),  'Mausoleum, after opening door with blue key'),
     Checkpoint((5, 9, 4),   'back to Cedar Village'),
     Checkpoint((8, 3, 12),  'back to Mausoleum with full HP & UNLOCK spell'),
@@ -207,25 +207,41 @@ def script_it():
     # - Sage Therel             teach BURN spell in exchange for the scroll / teach UNLOCK spell later on, again in exchange for a scroll
 
     # Block exit to the plains; required to win: a night of rest
-    def _post_zombie_fight(gs):
-        assert gs.hp == 8 and not gs.mp, f'HP={gs.hp} MP={gs.mp}'
+    def _post_1st_zombie_fight(gs):
+        assert gs.hp == 8 and not gs.mp, gs
     mapscript_add_enemy((5, 9, 10), 'zombie',
         hp=5, gold=3, rounds=(                 # best moves:
             CR('Critical thump!', atk=20),     # ATTACK -> hero HP=10 | zombie HP=1
             CR('Bite', atk=7, hp_drain=True),  # HEAL   -> hero HP=23 | zombie HP=8
             CR('Blow', atk=6),                 # ATTACK -> hero HP=17 | zombie HP=4
             CR('Punch', atk=9),                # ATTACK -> hero HP=8  | zombie HP=0
-        ), post_victory=_post_zombie_fight)
+        ), post_victory=_post_1st_zombie_fight)
 
     #---------------------------
     # Entering: Zuruth Plains (map: 6 - checkpoint)
     #---------------------------
     # The heroine has 8/30 HP, 0/1 MP, 5 gold, the HEAL spells and does 4 damages with their stick.
 
-    # We limit the #states by cutting unneeded access to the village:
-    mapscript_add_message((6, 4, 3), 'Trust your instinct:\nno need to go back for now', facing='north',
-                                      condition=is_instinct_preventing_to_enter_village)
-    mapscript_add_message((6, 8, 14), 'Trust your instinct:\nno need to go back no more', facing='south',
+    # We limit the #states by cutting unneeded access to the village,
+    # and use this opportunity to provide hints:
+    def _village_door_hint(game_view, _):
+        gs = game_view.state
+        if not is_instinct_preventing_to_enter_village(gs): return
+        if not gs.tile_override_at((6, 1, 9)):
+            msg = 'The whispering wind\ntells you to look for Seamus\nbefore returning'
+        elif gs.mp >= 2:
+            msg = 'The whispering wind\nadvises you to look behind\nthe ivy before returning'
+        elif 'SCROLL' in gs.items:
+            if 'AMULET' in gs.items:
+                msg = 'The whispering wind\nrecommends you to use this\namulet before returning'
+            else:
+                msg = 'The whispering wind\ntells you to search the canal\namulet before returning'
+        else:
+            msg = "The whispering wind\ntells you to follow Seamus'\nadvice before returning"
+        assert msg, 'A hint should be given if the path is blocked'
+        game_view.state = gs._replace(message=msg)
+    mapscript_add_trigger((6, 4, 3), _village_door_hint, facing='north', permanent=True)
+    mapscript_add_message((6, 8, 14), 'No need to go back anymore', facing='south',
                                       condition=is_instinct_preventing_to_enter_templar_academy )
 
     # Entrance to Canal Boneyard is blocked by a skeleton; required to win: full HP + 3 MP (1 BURN & 2 HEAL) + great sword (13 dmg)
@@ -248,11 +264,13 @@ def script_it():
     mapscript_add_chest((6, 3, 15), 23, _grant_scroll)
 
     def _amulet_trail(game_view, _):
-        game_view.state = game_view.state._replace(extra_render=render_amulet_trail)
+        game_view.state = game_view.state._replace(
+                extra_render=lambda pdf: pdf.image('assets/water-trail.png', x=0, y=86))
     mapscript_add_trigger((6, 12, 4), _amulet_trail, facing='east', permanent=True,
                                       condition=lambda gs: 'AMULET' not in gs.items and gs.max_mp == 1)
     def _amulet_sight(game_view, _GameView):
-        game_view.state = game_view.state._replace(extra_render=render_amulet_sight)
+        game_view.state = game_view.state._replace(
+                extra_render=lambda pdf: pdf.image('assets/water-trail.png', x=97, y=86))
         game_view.actions['GLIMPSE'] = _GameView(game_view.state._replace(
                 message='You found a bright amulet\ndrifting in the canal water',
                 msg_place=MessagePlacement.UP,
@@ -336,14 +354,15 @@ def script_it():
     mapscript_add_trigger((7, 2, 5), _signal_portcullis)  # one-time event/message
 
     # Entrance to Mausoleum is blocked by a zombie; required to win: full HP & full fire boost buff (+9 dmg)
+    def _post_canal_zombie_fight(gs):
+        assert gs.hp == 4 and not gs.mp, gs
     mapscript_add_enemy((7, 9, 5), 'zombie',
         hp=27, gold=5, rounds=(                # best moves:
             CR('Punch', atk=6, dodge=True),    # player ATTACK -> hero HP=24 | zombie HP=24
             CR('Bite', atk=8, hp_drain=True),  # player ATTACK -> hero HP=16 | zombie HP=10
             CR('Critical thump', atk=12),      # player ATTACK -> hero HP=4  | zombie VANQUISHED!
             CR('Bite', atk=10, dodge=True, hp_drain=True),
-        ))
-
+        ), post_victory=_post_canal_zombie_fight)
     mapscript_add_message((7, 2, 2), 'You might want to pray\non the grave\nof the Saint Knight.\nMay he rest in peace.')  # hint on sign in the water
 
     def _examine_glimpse(game_view, _GameView):
@@ -351,19 +370,20 @@ def script_it():
     mapscript_add_trigger((7, 4, 9), _examine_glimpse, facing='west', permanent=True,
                                      condition=lambda gs: 'SHORTCUT_HINT' not in gs.hidden_triggers)
 
+    cauldron_pos = (7, 13, 5)
     def _shortcut_above_fire_and_cauldron(game_view, _GameView):
         # Creating a shortcut to the Mausoleum entrance, starting the fight against the zombie with the current Atk Buff:
-        if not game_view.tile_override((7, 13, 5)):
+        if not game_view.tile_override(cauldron_pos):
             log(game_view.state, 'drinking-cauldron')
-            game_view.add_tile_override(40, coords=(7, 13, 5))
+            game_view.add_tile_override(40, coords=cauldron_pos)
             msg = 'You drink the cauldron soup\nand feel stronger!\n\n'
             game_view.state = game_view.state._replace(message=msg, bonus_atk=10, sfx=SFX(id=4, pos=Position(64, 88)))
         trick = Trick('You climb on the roof\nand run to the\nMausoleum entrance!',
                       music=BASE_MUSIC_URL + 'JohanJansen-OrchestralLoomingBattle.ogg')
         game_view.actions[None] = _GameView(game_view.state._replace(x=9, y=5, facing='east', trick=trick, treasure_id=0))
         game_view.prev_page_trick_game_view = game_view.actions[None]
-    mapscript_remove_chest((7, 13, 5))  # used to be: Magic Diamond (Def Up)
-    mapscript_add_trigger((7, 13, 5), _shortcut_above_fire_and_cauldron, permanent=True)
+    mapscript_remove_chest(cauldron_pos)  # used to be: Magic Diamond (Def Up)
+    mapscript_add_trigger(cauldron_pos, _shortcut_above_fire_and_cauldron, permanent=True)
 
     def _tomb_healing(game_view, _GameView):
         gs = game_view.state
@@ -384,6 +404,7 @@ def script_it():
     #---------------------------
     # The heroine has 4/30 HP, 0/3 MP, 14 gold, boots, the HEAL & BURN spells and does 13 damages with their great sword
     def _edge_of_the_abyss(game_view, _GameView):
+        assert game_view.state.hp == 4, game_view
         gs = game_view.state._replace(message='The path ends abrutly.\nA bottomless abyss\nopens at your feet')
         game_view.state = gs
         if 'ABYSS_BOTTOM' in gs.secrets_found:
@@ -430,16 +451,29 @@ def script_it():
         ), post_victory=_remove_mimic_camouflage)
     mapscript_add_enemy((8, 7, 3), 'chest_mimic', **_mimic_stats('Lid clasp'), reward=RewardItem('ARMOR_PART', 38))
     def _chest_mimic_tongue(game_view, _):
-        game_view.state = game_view.state._replace(extra_render=render_chest_mimic_tongue)
+        game_view.state = game_view.state._replace(
+            extra_render=lambda pdf: pdf.image('assets/tongue.png', x=84, y=77))
     mapscript_add_trigger((8, 7, 4), _chest_mimic_tongue, facing='north', permanent=True,
                                       condition=lambda gs: (8, 7, 3) not in gs.vanquished_enemies)
 
     def _hidden_in_hay_pile(game_view, _):
         is_door_open = bool(game_view.tile_override((8, 4, 12)))
-        if is_door_open or 'BLUE_KEY' in game_view.state.items:
+        if is_door_open: return False
+        if 'HAND_MIRROR' not in game_view.state.items:
+            game_view.state = game_view.state._replace(message='You find\na hand mirror',
+                                                       msg_place=MessagePlacement.UP,
+                                                       items=game_view.state.items + ('HAND_MIRROR',),
+                                                       treasure_id=41)
+            log(game_view.state, '+HAND_MIRROR')
+        elif 'BLUE_KEY' not in game_view.state.items:
+            game_view.state = game_view.state._replace(message='You find\na blue key',
+                                                       msg_place=MessagePlacement.UP,
+                                                       items=game_view.state.items + ('BLUE_KEY',),
+                                                       treasure_id=27)
+            log(game_view.state, '+BLUE_KEY')
+        else:
             return False
-        game_view.state = game_view.state._replace(message="A blue key", items=game_view.state.items + ('BLUE_KEY',))
-    mapscript_add_chest((8, 11, 9), 27, _hidden_in_hay_pile)
+    mapscript_add_trigger((8, 8, 11), _hidden_in_hay_pile, permanent=True)
 
     def _lever(game_view, _GameView):
         lever_tile_id = game_view.tile_override((8, 12, 7)) or 48
@@ -508,10 +542,55 @@ def script_it():
 
     # CHECKPOINT: about to find scroll & pass through portal back to Cedar Village
     # Sage Therel will trade the scroll for the UNLOCK spell
-    mapscript_add_message((8, 3, 12), 'Trust your instinct:\nno need to go back for now', facing='west',
-                                      condition=is_instinct_preventing_to_pass_mausoleum_portal)
-    mapscript_add_message((5, 9, 4), 'Trust your instinct:\nno need to go back for now', facing='north',
-                                      condition=is_instinct_preventing_to_pass_village_portal)
+
+    gorgon_pos = (5, 9, 9)
+    def _unbelievable(_):
+        assert False, 'Gorgon vanquished in fair battle!'
+    mapscript_add_enemy(gorgon_pos, 'gorgon',
+        condition=lambda gs: gs.tile_override_at(MAUSOLEUM_PORTAL_COORDS),
+        category=enemy().ENEMY_CATEGORY_DEMON,
+        hp=100, rounds=(CR('Petrifying stare', atk=42),),
+        post_victory=_unbelievable)
+
+    def _reflect_gorgon_or_loot_her_staff(game_view, _GameView):
+        gs = game_view.state
+        if gs.facing == 'north' and 'HAND_MIRROR' in gs.items:
+            if not gs.extra_render:
+                game_view.actions['HAND_MIRROR'] = _GameView(gs._replace(
+                        extra_render=lambda pdf: pdf.image('assets/gorgon-in-mirror.png', x=0, y=0)))
+            else:
+                game_view.actions['REFLECT_GORGON'] = _GameView(gs
+                    .with_vanquished_enemy(gorgon_pos).with_tile_override(53, gorgon_pos)
+                    ._replace(
+                        message='The gorgon\npetrified\nherself!', msg_place=MessagePlacement.UP,
+                        extra_render=lambda pdf: pdf.image('assets/gorgon-petrified-in-mirror.png', x=0, y=0),
+                        items=tuple(i for i in gs.items if i != 'HAND_MIRROR')))
+        elif gs.facing == 'south' and gorgon_pos in gs.vanquished_enemies and 'STAFF' not in gs.items:
+            game_view.actions['PICK_STAFF'] = _GameView(gs
+                .with_tile_override(54, gorgon_pos, exist_ok=True)
+                ._replace(items=gs.items + ('STAFF',),
+                          message="You take\nthe gorgon's staff", msg_place=MessagePlacement.UP))
+    mapscript_add_trigger((5, 9, 8), _reflect_gorgon_or_loot_her_staff, permanent=True)
+
+    def _mausoleum_portal_hint(game_view, _):
+        gs = game_view.state
+        if is_instinct_preventing_to_pass_mausoleum_portal(gs):
+            game_view.state = gs._replace(message='No need to go back until\nyou have all the armor parts')
+    mapscript_add_trigger((8, 3, 12), _mausoleum_portal_hint, facing='west', permanent=True)
+    def _village_portal_hint(game_view, _):
+        gs = game_view.state
+        if not is_instinct_preventing_to_pass_village_portal(gs): return
+        if gs.spellbook < 3:
+            msg = 'The whispering wind\nadvises you to bring the scroll\nto the sage before returning'
+        elif gs.gold >= 10:
+            msg = 'The whispering wind\nadvises you to rest before\nreturning to that dungeon'
+        elif gorgon_pos not in gs.vanquished_enemies:
+            msg = 'The whispering wind\nimplores you not to abandon\nthe villagers to the gorgon'
+        elif 'STAFF' not in gs.items:
+            msg = 'The whispering wind\nadvises you to inspect the\ngorgon before returning'
+        assert msg, 'A hint should be given if the path is blocked'
+        game_view.state = gs._replace(message=msg)
+    mapscript_add_trigger((5, 9, 4), _village_portal_hint, facing='north', permanent=True)
 
     def _facing_door_mimic(game_view, _GameView):
         if 'MOVE-FORWARD' in game_view.actions:
@@ -627,15 +706,6 @@ def script_it():
             # Bone shield                                    # player ATTACK -> hero HP=2  | empress HP=0
         ), post_victory=lambda gs: gs._replace(mode=GameMode.DIALOG, shop_id=the_end().id))
 
-
-def render_amulet_trail(pdf):
-    pdf.image('assets/water-trail.png', x=0, y=86)
-
-def render_amulet_sight(pdf):
-    pdf.image('assets/water-trail.png', x=97, y=86)
-
-def render_chest_mimic_tongue(pdf):
-    pdf.image('assets/tongue.png', x=84, y=77)
 
 def render_abyss_filler_page(pdf, i):
     pdf.add_page()

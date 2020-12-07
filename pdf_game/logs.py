@@ -49,8 +49,11 @@ def log_path_to(game_view, actions_only=False, map_as_string=None, stop_at=None,
                 print(_combat_line(gv.state))
             elif gv.state.mode == GameMode.DIALOG:
                 _shop = shop()[gv.state.shop_id]
-                for i, item in enumerate(_shop.item):
-                    print(f'{i}: {item.msg1} - {item.msg2}')
+                try:
+                    for i, item in enumerate(_shop.item):
+                        print(f'{i}: {item.msg1} - {item.msg2}')
+                except AttributeError:  # CutScene or class like RoomForTheNight, SageTherel...
+                    print(_shop)
         elif actions_only and prev_gv:
             try:
                 action_name = next(name for name, next_gv in prev_gv.actions.items() if next_gv == gv)

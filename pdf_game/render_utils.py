@@ -8,45 +8,49 @@ except ImportError:
 
 
 BACKGROUNDS = 'black,nightsky,tempest,interior'.split(',')
-ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE,FISH_ON_A_STICK,COMBINE_WITH_TWIG,SMOKED_FISH_ON_A_STICK,ATK_BOOST,PUT_STICK_IN_LEVER'.split(',')  # order matches position in .png
-ITEMS_SPELLS_BUTTON_POS = {
+ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE,FISH_ON_A_STICK,COMBINE_WITH_TWIG,SMOKED_FISH_ON_A_STICK,ATK_BOOST,PUT_STICK_IN_LEVER,STAFF,HAND_MIRROR'.split(',')  # order matches position in .png
+ACTION_BUTTON_POS = {
     # Unaltered:
-    'INFO': Position(x=140, y=0),
-    'ATTACK': Position(x=120, y=20),
-    'RUN': Position(x=140, y=20),
+    'INFO':    Position(x=140, y=0),
+    'ATTACK':  Position(x=120, y=20),
+    'RUN':     Position(x=140, y=20),
     # Re-arrange spells to give space to items when rendering INFO:
-    'HEAL': Position(x=100, y=40),
-    'BURN': Position(x=120, y=40),
-    'UNLOCK': Position(x=140, y=40),
-    'LIGHT': Position(x=100, y=60),
-    'FREEZE': Position(x=120, y=60),
+    'HEAL':    Position(x=100, y=40),
+    'BURN':    Position(x=120, y=40),
+    'UNLOCK':  Position(x=140, y=40),
+    'LIGHT':   Position(x=100, y=60),
+    'FREEZE':  Position(x=120, y=60),
     'REFLECT': Position(x=140, y=60),
     # Extra actions
-    'TALK': Position(x=76, y=30),              # so far, aligned with dungeon_wall_small_window sprite
-    'PUSH': Position(x=72, y=60),              # so far, aligned with box sprite
-    'NO_PUSH': Position(x=72, y=60),           # so far, aligned with box sprite
-    'EXAMINE': Position(x=66, y=72),           # so far, aligned with bookshelf & well sprites
-    'GLIMPSE': Position(x=76, y=79),           # so far, aligned with Canal Boneyard water
+    'TALK':    Position(x=76, y=30),  # aligned with dungeon_wall_small_window sprite
+    'PUSH':    Position(x=72, y=60),  # aligned with box sprite
+    'NO_PUSH': Position(x=72, y=60),  # aligned with box sprite
+    'EXAMINE': Position(x=66, y=72),  # aligned with bookshelf & well sprites
+    'GLIMPSE': Position(x=76, y=79),  # aligned with Canal Boneyard water
     'BUCKLER': Position(x=140, y=20),
-    # Items:
-    'EMPTY_BOTTLE': Position(x=100, y=88),
-    'HOLY_WATER': Position(x=100, y=88),       # same (can never be carried together)
-    'CRUCIFIX': Position(x=120, y=88),
-    'SCROLL': Position(x=100, y=88),           # same (can never be carried together)
-    'AMULET': Position(x=120, y=88),
-    'BOOTS': Position(x=120, y=88),            # same (can never be carried together)
-    'FISH': Position(x=140, y=88),
-    'FISH_ON_A_STICK': Position(x=140, y=88),  # same (can never be carried together)
-    'SMOKED_FISH_ON_A_STICK': Position(x=140, y=88),  # same (can never be carried together)
-    'BLUE_KEY': Position(x=100, y=88),         # same (can never be carried together)
     # Explore mode contextual actions:
-    'PRAY': Position(x=100, y=88),
+    'AMULET':             Position(x=140, y=88),
+    'BLUE_KEY':           Position(x=140, y=88),
+    'CRUCIFIX':           Position(x=140, y=88),
+    'HAND_MIRROR':        Position(x=140, y=88),
+    'EMPTY_BOTTLE':       Position(x=140, y=88),
+    'FISH':               Position(x=140, y=88),
+    'FISH_ON_A_STICK':    Position(x=140, y=88),
     'PUT_STICK_IN_LEVER': Position(x=136, y=97),
-    # Combining on info page (deprecated):
-    'COMBINE_WITH_TWIG': Position(x=141, y=100),  # aligned below FISH item
+    'PRAY':               Position(x=100, y=88),
+    # Bribe items:
+    # FISH                -> already present as a contextual action
+    # FISH_ON_A_STICK     -> already present as a contextual action
+    'SMOKED_FISH_ON_A_STICK': Position(x=140, y=88),
     # Extra display:
     'ATK_BOOST': Position(x=-4, y=82),
 }
+INFO_SCREEN_ITEM_SLOT_POS = (
+    Position(x=100, y=88),
+    Position(x=120, y=88),
+    Position(x=140, y=88),
+    # Position(x=140, y=102), # bottom-right corner => it's getting messy, no need for now
+)
 WHITE_ARROW_NAMES = 'BACK,NEXT'.split(',')  # order matches position in .png
 WHITE_ARROW_SIZE = 16
 
@@ -66,9 +70,9 @@ def tileset_background_render(pdf, bg_id):
     pdf.image(img_filepath, x=0, y=0)
 
 
-def action_button_render(pdf, btn_type, page_id=None, url='', btn_pos=None):
+def action_button_render(pdf, btn_type, page_id=None, url='', btn_pos=None, item_index=None):
     if not btn_pos:
-        btn_pos = ITEMS_SPELLS_BUTTON_POS[btn_type]
+        btn_pos = ACTION_BUTTON_POS[btn_type] if item_index is None else INFO_SCREEN_ITEM_SLOT_POS[item_index]
     img_index = ACTION_BUTTONS.index(btn_type)
     if img_index < 8:  # Original button:
         img_filepath = REL_RELEASE_DIR + action().button_img.src

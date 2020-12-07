@@ -40,7 +40,7 @@ BOOKS = {
     (8, 3, 13): Book('A treatise on\nDruidic linguistics.\nThe first chapter teaches\nthe names of numbers.',
                      next=Book('1 : Klaatu  2 : Da\n3 : Fer  4 : Me\n5 : Mi  6 : Sesa\n7 : To  8 : Bara\n9 : Nik  10 : Do')),
     # Mausoleum: bookshelf behind a mimic, north-west
-    (8, 2, 2): Book('TODO', hidden_trigger='FOUNTAIN_HINT'),
+    (8, 2, 2): False  # Book('TODO', hidden_trigger='FOUNTAIN_HINT'),
 }
 
 
@@ -64,8 +64,6 @@ def examine_bookshelf(gs, bookshelf_pos, actions, _GameView):
                     log(new_gv.state, f'activating-portal: secrets_found={new_gv.state.secrets_found}')
                     new_gv.add_tile_override(27, coords=MAUSOLEUM_PORTAL_COORDS)
                     new_gv.add_tile_override(27, coords=VILLAGE_PORTAL_COORDS)
-                    # Sealing exit to Zuruth Plains with a boulder:
-                    new_gv.add_tile_override(20, coords=(5, 9, 10))
         return
     book = BOOKS.get(key)
     if book:

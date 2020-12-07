@@ -66,7 +66,7 @@ class Assigner:
                         self.out_game_views.append(filler_game_view)
                         self._increment_next_page_id()
                 if game_view.state and game_view.state.reverse_id and self.assign_special_pages:
-                    assert not self.reversed_id_gv, 'Current algorithm cannot handle several GameView asking for a .reverse_id'
+                    assert not self.reversed_id_gv, f'Current algorithm cannot handle several GameView asking for a .reverse_id:\n{self.reversed_id_gv}\n{game_view}'
                     src_page_id = game_view.src_view.page_id
                     if not src_page_id or src_page_id >= self.next_page_id or src_page_id < 100:
                         print(f'Reverse ID assignation ABORT - src_page_id={src_page_id} next_page_id={self.next_page_id}')

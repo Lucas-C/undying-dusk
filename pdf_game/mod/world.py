@@ -31,6 +31,8 @@ def custom_can_move_to(_map, x, y, game_state):
     if _map.name == 'Cedar Village':
         if (x, y) == VILLAGE_PORTAL_COORDS[1:]:
             return game_state.tile_override_at(VILLAGE_PORTAL_COORDS) and not is_instinct_preventing_to_pass_village_portal(game_state)
+        if (x, y) == (9, 11):  # south exit
+            assert not game_state.tile_override_at(VILLAGE_PORTAL_COORDS), f'No going back to Zututh Plains once portal is open!\n{game_state}'
     if _map.name == 'Zuruth Plains':
         if (x, y) == (13, 14) and 'BOOTS' in game_state.items:
             return True  # can enter shallow waters to access the chest
@@ -58,7 +60,7 @@ def custom_can_move_to(_map, x, y, game_state):
 
 
 def is_instinct_preventing_to_enter_village(game_state):
-    # The village must be accessed from Zuruth Plains 3 times:
+    # Cedar Village must be accessed from Zuruth Plains 3 times:
     # - when avatar has 2 MP and the scroll, to go see Sage Therel
     # - when avatar has 20 gold, to buy the boots
     # - when avatar has 60 gold, to repair the sword & get a nigth of rest
@@ -80,8 +82,8 @@ def is_instinct_preventing_to_pass_village_portal(game_state):
     if not game_state.tile_override_at(VILLAGE_PORTAL_COORDS):
         return False  # No need to display a message when the portal is not open yet
     # We forbid to get back to Mausoleum if the heroine hasn't picked the UNLOCK spell yet,
-    # or hasn't taken a night of rest at the inn:
-    return game_state.spellbook < 3 or game_state.gold >= 10
+    # hasn't taken a night of rest at the inn, or hasn't picked up the staff on the petrified gorgon yet:
+    return game_state.spellbook < 3 or game_state.gold >= 10 or 'STAFF' not in game_state.items
 
 
 def patch_tileset(tileset):
@@ -120,6 +122,8 @@ def patch_tileset(tileset):
         False,  # 50 = dungeon_wall_lever_up
         False,  # 51 = dungeon_wall_lever_up_wth_fish
         True,   # 52 = dungeon_black_passage
+        False,  # 53 = petrified_gorgon_with_staff
+        False,  # 54 = petrified_gorgon
     ])
 
 
@@ -238,7 +242,8 @@ def _patch_tiles(_map):
         x, y = 7, 4;   tiles[y][x] = 26  # portcullis
         x, y = 10, 10; tiles[y][x] = 26  # portcullis
         x, y = 3, 2;   tiles[y][x] = 5   # removing north-west chest
-        x, y = 9, 3;   tiles[y][x] = 33  # adding a box (mimic) in the northern corridor, behind water
+        x, y = 9, 3;   tiles[y][x] = 33  # adding a box (mimic) in northern corridor alcove, behind water
+        x, y = 8, 11;  tiles[y][x] = 37  # adding hay pile in southern corridor alcove, behind water
         x, y = 2, 2;   tiles[y][x] = 34  # bookshelf
         x, y = 3, 3;   tiles[y][x] = 30  # dungeon_wall_tagged with FOUNTAIN_HINT
         x, y = 7, 11;  tiles[y][x] = 2   # wall after warp south-west in central room

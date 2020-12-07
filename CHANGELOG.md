@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.9.5] - not released yet
 ### Added
+- new monster & puzzle : the Gorgon!
 - Cauldron fire boost is displayed more explicitly
 - Displaying water on minimap
+- More helpful hints than _"Trust your instinct: no need to go back for now"_
+- new checkpoint after bribing the goblin
 
 ### Changed
 - Improved hints in Zuruth plain, for bottle & hidden chest
@@ -18,6 +21,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - secrets were incorrectly reported to the Hall of Fame, due to a pages count over-optimization
 - Removed useless message in village when portal is not open yet: _"Trust your instinct: no need to go back for now"_
+
+### Removed
+- boulder on Cedar Village exit, no more need thanks to the gorgon
 
 ## [0.9.4] - 2020-11-03
 Special thanks to Maxime Lemanach for the detailed feedbacks that helped me
