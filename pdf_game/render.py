@@ -15,7 +15,7 @@ from .render_info import info_render, info_render_button, info_render_gold, info
 from .render_treasure import treasure_render_collectible, treasure_render_gold, treasure_render_item
 from .render_utils import add_link, action_button_render, get_image_info, link_from_page_id, portrait_render, sfx_render, tileset_background_render, white_arrow_render, ACTION_BUTTONS
 
-from .mod.world import patch_enemy_name
+from .mod.world import patch_enemy_name, CLICK_ZONES
 
 
 TILES = ',dungeon_floor,dungeon_wall,dungeon_door,pillar_exterior,dungeon_ceiling,grass,pillar_interior,chest_interior,chest_exterior,medieval_house,medieval_door,tree_evergreen,grave_cross,grave_stone,water,skull_pile,hay_pile,locked_door,death_speaker,boulder_floor,boulder_ceiling,boulder_grass,sign_grass,fountain,portcullis_exterior,portcullis_interior,portal_interior,portal_interior_closed,dead_tree,dungeon_wall_tagged,well,dungeon_torch,box_interior,dungeon_bookshelf,dungeon_bookshelf_torch,box_exterior,hay_pile_exterior,statue,statue_with_amulet,fire,dungeon_wall_small_window,stump,stump_with_bottle,seamus_on_grass,seamus_on_floor,cauldron,dungeon_wall_with_ivy,dungeon_wall_lever_slot,dungeon_wall_lever_down,dungeon_wall_lever_up,dungeon_wall_lever_up_with_fish,dungeon_black_passage,petrified_gorgon_with_staff,petrified_gorgon'.split(',')
@@ -33,15 +33,6 @@ ARROW_LINKS_POS = {
 }
 ARROW_LINK_WIDTH = 12
 ARROW_LINK_HEIGHT = 9
-CLICK_ZONES = {
-    'OPEN_DOOR':            {'x': 62, 'y': 43, 'width': 35, 'height': 54},
-    'PASS_BEHIND_IVY':      {'x': 54, 'y': 36, 'width': 49, 'height': 58},
-    'PASS_PORTAL':          {'x': 50, 'y': 26, 'width': 60, 'height': 61},
-    'RAISE_LEVER':          {'x': 67, 'y': 43, 'width': 21, 'height': 49},
-    'PICK_FISH_ON_A_STICK': {'x': 50, 'y': 32, 'width': 38, 'height': 47},
-    'PICK_STAFF':           {'x': 43, 'y': 18, 'width': 15, 'height': 79},
-    'REFLECT_GORGON':       {'x': 15, 'y': 17, 'width': 46, 'height': 72},
-}
 MINIATURES_DIR_PATH = join(dirname(realpath(__file__)), '..', 'small_enemies')
 MINIATURES_ALREADY_GENERATED = set()
 
@@ -85,7 +76,7 @@ def render_page(pdf, game_view, render_victory):
             y -= 10*newlines_count
         bitfont_render(pdf, game_state.message, 80, y, Justify.CENTER)
     if game_state.music:
-        assert game_state.music_btn_pos
+        assert game_state.music_btn_pos, f'No music_btn_pos provided:\n{game_state}'
         action_button_render(pdf, 'MUSIC', url=game_state.music, btn_pos=game_state.music_btn_pos)
     if game_state.treasure_id:  # EXPLORE | COMBAT
         if isinstance(game_state.treasure_id, str):
@@ -112,7 +103,9 @@ def render_page(pdf, game_view, render_victory):
                 render_book(pdf, game_state.book, next_game_view.page_id, game_state.treasure_id)
             elif action_name in CLICK_ZONES:
                 click_zone = CLICK_ZONES[action_name]
-                add_link(pdf, **click_zone, page_id=next_game_view.page_id, link_alt=action_name.replace('_', ' '))
+                rotation = click_zone.pop('rotation', 0)
+                link_alt = action_name.replace('_', ' ')
+                add_link(pdf, **click_zone, rotation=rotation, page_id=next_game_view.page_id, link_alt=link_alt)
             elif action_name in ACTION_BUTTONS:
                 action_button_render(pdf, action_name,
                                      page_id=next_game_view.page_id if next_game_view else None)
@@ -355,11 +348,13 @@ def render_book(pdf, book, page_id, treasure_id):
             pdf.image(book.img, x=32, y=32)
             y += 16
         if book.portrait is not None:
-            portrait_render(pdf, book.portrait)
+            portrait_render(pdf, book.portrait, x=35, y=33)
         if book.sfx:
             sfx_render(pdf, book.sfx)
         if book.treasure_id:
             treasure_render_item(pdf, book.treasure_id, Position(x=86, y=76))
+        if book.music:
+            action_button_render(pdf, 'MUSIC', url=book.music, btn_pos=Position(24, 46))
         if book.bird_index is not None:
             link = link_from_page_id(pdf, page_id)
             x, y = 80, 60

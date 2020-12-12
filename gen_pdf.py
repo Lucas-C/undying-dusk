@@ -3,15 +3,12 @@
 import argparse, json, logging, os
 
 import fpdf
-try:  # Optional dependency:
-    from tqdm import tqdm
-except ImportError:
-    tqdm = lambda _: _
 
 from pdf_game.visit import visit_game_views
 from pdf_game.js import config
 from pdf_game.logs import quiet_logging
 from pdf_game.mapscript import mapscript_remove_all
+from pdf_game.optional_deps import pikepdf, tqdm
 from pdf_game.perfs import print_perf_stats, trace_time, PerfsMonitorWrapper
 from pdf_game.render import render_page
 
@@ -90,11 +87,8 @@ def init_pdf(start_page_id):
 
 
 def set_metadata(filepath, metadata):
-    try:
-        # pylint: disable=import-outside-toplevel
-        import pikepdf
-    except ImportError as error:
-        print(f'Cannot set metadata: {error}')
+    if not pikepdf:
+        print('Cannot set metadata: pikepdf package not installed')
         return
     start_size = os.stat(filepath).st_size
     with pikepdf.open(filepath, allow_overwriting_input=True) as pdf:

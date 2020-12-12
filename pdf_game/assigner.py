@@ -5,6 +5,7 @@ including reversed & fixed page IDs, and to insert easter-egg pages.
 from random import shuffle
 
 from .entities import GameMode, GameView
+from .optional_deps import ansi_wrap
 from .render import render_filler_page, render_trick
 
 from .mod.campaign import CHECKPOINTS
@@ -17,7 +18,8 @@ START_PAGE_ID = 7  # skipping title, disclaimer & 4 pages of tutorial
 def assign_page_ids(game_views, assign_special_pages=True):
     is_first_assignment = not any(gv.page_id for gv in game_views)
     gv_per_fixed_id = {gv.state.fixed_id: gv for gv in game_views if gv.state and gv.state.fixed_id}
-    assert not any(fixed_id > len(game_views) for fixed_id in gv_per_fixed_id.keys()), f'Not enough GameViews ({len(game_views)}) to assign some of them with fixed IDs: {list(gv_per_fixed_id.keys())}'
+    if any(fixed_id > len(game_views) for fixed_id in gv_per_fixed_id.keys()):
+        print(ansi_wrap(f'Not enough GameViews ({len(game_views)}) to assign some of them with fixed IDs: {list(gv_per_fixed_id.keys())}', color='red'))
     attempt = 0
     while True:
         attempt += 1
@@ -102,8 +104,6 @@ class Assigner:
                     self._increment_next_page_id()
         except StopIteration:
             return False
-        # Ensure all GV requiring a fixed ID have been processed:
-        assert not any(self.gv_per_fixed_id.values())
         return True
 
     def _increment_next_page_id(self):

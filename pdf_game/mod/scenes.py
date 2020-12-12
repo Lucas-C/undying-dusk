@@ -127,7 +127,7 @@ def seamus_through_small_window():
 def entering_monastery_courtyard():
     minimap_tip = CutScene.new(
         name='Tip',
-        text='\n' * 5 + 'Use the minimap\non the INFO page\nto help orient yourself',
+        text='\n' * 5 + 'Use the minimap\non the INFO page\nto help orient\nyourself',
         extra_render=lambda pdf: pdf.image('minimaps/map_1_.png', x=67, y=15),
         exit_msg='Enter courtyard',
     )
@@ -289,7 +289,9 @@ def risking_it_all():
         dialog_options=(DialogOption.only_msg('May the guardian lady\nwatch over you!'),
                         # Using a custom DialogOption to be able to alter GameState:
                         DialogOption.exit('Walk towards the castle',
-                                          lambda gs: gs._replace(items=gs.items + ('ARMOR_PART',)))),
+                                          lambda gs: gs._replace(items=gs.items + ('ARMOR_PART',),
+                                                                 # Entering Canal Boneyard:
+                                                                 map_id=7, x=2, y=5))),
     )
     scene_5 = CutScene.new(
         background='distant_castle',
@@ -337,7 +339,7 @@ def abyss_bottom():  # Did the Empress made a pact with the Deep Ones?
     return CutScene.new(
         name='Abyss bottom',
         text='The empress soul\nrests in the dark\n(you found a SECRET)',
-        sfx=SFX(id=6, pos=Position(64, 88)),
+        sfx=SFX(id=6, pos=Position(64, 78)),
         exit_msg='Climb back up',
         music=BASE_MUSIC_URL + 'AlexandrZhelanov-MysticalTheme.mp3',
     )
@@ -559,7 +561,6 @@ def patch_map_shops(_map):
     if _map.name == "Zuruth Plains":
         return [
             Proxy(exit_x=1, exit_y=9, shop_id=seamus_in_zuruth_plains().id, dest_x=2, dest_y=9, ephemeral=True),
-            Proxy(exit_x=14, exit_y=7, shop_id=risking_it_all().id),  # after vanquishing skeleton
         ]
     if _map.name == "Mausoleum":
         return [Proxy(exit_x=15, exit_y=7, shop_id=the_final_leap().id)]  # entering the final level, before the dragon

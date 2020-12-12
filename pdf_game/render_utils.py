@@ -1,10 +1,7 @@
 from .entities import Position
 from .js import action, REL_RELEASE_DIR
 
-try:
-    from fpdf.image_parsing import get_img_info
-except ImportError:
-    get_img_info = False
+from fpdf.image_parsing import get_img_info
 
 
 BACKGROUNDS = 'black,nightsky,tempest,interior'.split(',')
@@ -44,6 +41,7 @@ ACTION_BUTTON_POS = {
     'FISH_ON_A_STICK':    Position(x=140, y=88),
     'PUT_STICK_IN_LEVER': Position(x=136, y=97),
     'PRAY':               Position(x=100, y=88),
+    'STAFF':              Position(x=140, y=88),
     # Bribe items:
     # FISH                -> already present as a contextual action
     # FISH_ON_A_STICK     -> already present as a contextual action
@@ -105,13 +103,17 @@ def render_button(pdf, btn_pos, img_filepath, img_index=0, page_id=None, url='',
     return None
 
 
-def add_link(pdf, x, y, width, height, page_id=None, url='', link=None, link_alt=''):
+def add_link(pdf, x, y, width, height, rotation=None, page_id=None, url='', link=None, link_alt=''):
     if page_id is not None:
         assert not (link or url)
         link = link_from_page_id(pdf, page_id)
     if url: assert isinstance(url, str)
     if link: assert isinstance(link, int)
-    pdf.link(x, y, width, height, link or url, link_alt)
+    if rotation:
+        with pdf.rotation(rotation, x=x+width/2, y=y+height/2):
+            pdf.link(x, y, width, height, link or url, link_alt)
+    else:
+        pdf.link(x, y, width, height, link or url, link_alt)
     return link
 
 
@@ -127,11 +129,7 @@ def get_image_info(pdf, img_filepath):
     # Could be exposed as a FPDF method with a minor refactor.
     info = pdf.images.get(img_filepath)
     if not info:
-        # pylint: disable=protected-access
-        if get_img_info:  # alexanderankin/pyfpdf
-            info = get_img_info(img_filepath)
-        else:  # reingart/pyfpdf
-            info = pdf._parsepng(img_filepath)  # all of this game images are PNGs
+        info = get_img_info(img_filepath)
         pdf.images[img_filepath] = info
         info['i'] = len(pdf.images)
     return info

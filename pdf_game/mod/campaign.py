@@ -1,6 +1,6 @@
 # pylint: disable=inconsistent-return-statements
 from ..ascii import map_as_string
-from ..bitfont import bitfont_render, bitfont_set_color_red, Justify
+from ..bitfont import bitfont_color_red, bitfont_render, bitfont_set_color_red, Justify
 from ..entities import Bribe, Checkpoint, CombatRound as CR, MessagePlacement, Position, RewardItem, RewardTreasure, SFX, Trick
 from ..js import REL_RELEASE_DIR
 from ..logs import log, log_combat, log_path_to
@@ -8,8 +8,8 @@ from ..mapscript import *
 from ..render import render_bar
 from ..render_utils import portrait_render, white_arrow_render
 
-from .scenes import abyss_bottom, seamus_through_small_window, the_end, BASE_MUSIC_URL
-from .world import is_instinct_preventing_to_enter_village, is_instinct_preventing_to_enter_templar_academy, is_instinct_preventing_to_pass_mausoleum_portal, is_instinct_preventing_to_pass_village_portal, MAUSOLEUM_PORTAL_COORDS
+from .scenes import abyss_bottom, risking_it_all, seamus_through_small_window, the_end, BASE_MUSIC_URL
+from .world import is_instinct_preventing_to_enter_village, is_instinct_preventing_to_enter_templar_academy, is_instinct_preventing_to_pass_mausoleum_portal, is_instinct_preventing_to_pass_village_portal, BOX_MIMIC_POS, DOOR_MIMIC_POS, MAUSOLEUM_PORTAL_COORDS, MAUSOLEUM_EXIT_COORDS
 
 VICTORY_POS = Checkpoint((9, 11, 5), 'ending after beating the Empress')
 CHECKPOINTS = (  # intermediate positions that should be reachable through a unique path only
@@ -21,6 +21,8 @@ CHECKPOINTS = (  # intermediate positions that should be reachable through a uni
                             condition=lambda gs: gs.mp >= 2 and gs.spellbook >= 2),
     Checkpoint((10, 2, 8),  'After beating the druid in the Academy'),
     Checkpoint((10, 2, 14), 'Before the chest behind boulder in the Academy'),
+    Checkpoint((6, 11, 7),  'About to face Skeleton, rested, with Great Sword',
+                            condition=lambda gs: gs.weapon >= 7 and gs.hp == gs.max_hp),
     Checkpoint((7, 2, 5),   'Canal Boneyard entrance'),
     Checkpoint((7, 9, 5),   'After beating zombie on Canal Boneyard exit'),
     # Checkpoint((8, 5, 7),   'Mausoleum, about to pass portcullis'),
@@ -32,8 +34,8 @@ CHECKPOINTS = (  # intermediate positions that should be reachable through a uni
     # Checkpoint((4, 10, 14), 'after beating the Shadow Soul -> secret',
                             # condition=lambda gs: 'BEEN_TO_VILLAGE' in gs.hidden_triggers),
     # Checkpoint((5, 3, 1),   'back to Cedar Village after finding dead tree secret'),
-    Checkpoint((8, 14, 7),  'Mausoleum exit before dragon, with strong armor',
-                            condition=lambda gs: gs.armor > 1),
+    Checkpoint((8, 14, 7),  'Mausoleum exit before dragon, with strong armor & iron gate raised',
+                            condition=lambda gs: gs.armor > 1 and gs.tile_override_at(MAUSOLEUM_EXIT_COORDS)),
     Checkpoint((9, 2, 5),   'Dead Walkways entrance, after beating dragon'),
     Checkpoint((9, 5, 5),   'after passing 1st Dead Walkways arch'),
     Checkpoint((9, 8, 2),   'after passing 2nd Dead Walkways arch',
@@ -47,7 +49,8 @@ CHECKPOINTS = (  # intermediate positions that should be reachable through a uni
 # VICTORY_POS = Checkpoint((3, 2, 3)); CHECKPOINTS = (VICTORY_POS,)  # stop after beating Shadow Tendrils
 
 ENEMY_CATEGORY_BEAST = 4  # new category, 1s unused integer among original ENEMY_CATEGORY_* constants
-PORTCULLIS_BTN_POS = Position(x=72, y=55)
+PORTCULLIS_MUSIC_BTN_POS = Position(x=72, y=55)
+ROTATING_LEVER_CORRECT_SEQUENCE = 406  # south-north-west
 
 
 def script_it():
@@ -92,7 +95,7 @@ def script_it():
             CR('Tentacle hit', atk=6),
             CR('Tentacle hit', atk=8),
         ), # at the end of the combat, hero has 13 HP
-        post_defeat=render_post_defeat_hint)
+        post_defeat=render_monastery_post_defeat_hint)
 
     # Block access to the Monastery exit; required to win: Wood Stick (4 damages) + HEAL spell
     mapscript_add_enemy((1, 4, 8), 'imp',
@@ -101,7 +104,7 @@ def script_it():
             CR('Trident thrust', atk=15),  # without HEAL spell, hero must dies on 2nd round
             CR('Horn strike', atk=7),
         ), # at the end of the combat, hero has 1 HP
-        post_defeat=render_post_defeat_hint)
+        post_defeat=render_monastery_post_defeat_hint)
 
     #---------------------------
     # Entering: Monastery Trail (map: 4 - checkpoint)
@@ -253,7 +256,8 @@ def script_it():
             CR('Sword thrust', atk=14),                  # HEAL           -> hero HP=10 | skeleton HP=32
             CR('Sword slash', atk=12),                   # HEAL           -> hero HP=18 | skeleton HP=32
             CR('Sword thrust', atk=14, hero_crit=True),  # CRITICAL BURN! -> hero HP=4  | skeleton HP=0
-        ), music=BASE_MUSIC_URL + 'MatthewPablo-DarkDescent.mp3')
+        ), music=BASE_MUSIC_URL + 'MatthewPablo-DarkDescent.mp3',
+        post_victory=lambda gs: gs._replace(mode=GameMode.DIALOG, shop_id=risking_it_all().id))
 
     # An invisible chest is hidden behind a wall, behind a pillar:
     def _grant_scroll(game_view, _):
@@ -350,7 +354,7 @@ def script_it():
     def _signal_portcullis(game_view, _):
         # Override default message indicating entered map name:
         music = BASE_MUSIC_URL + 'JanneHanhisuanto-OldCrypt.ogg'
-        game_view.state = game_view.state._replace(message='You hear the portcullis\ngoing down behind you\n\n\n\nCanal Boneyard', music=music, music_btn_pos=PORTCULLIS_BTN_POS)
+        game_view.state = game_view.state._replace(message='You hear the portcullis\ngoing down behind you\n\n\n\nCanal Boneyard', music=music, music_btn_pos=PORTCULLIS_MUSIC_BTN_POS)
     mapscript_add_trigger((7, 2, 5), _signal_portcullis)  # one-time event/message
 
     # Entrance to Mausoleum is blocked by a zombie; required to win: full HP & full fire boost buff (+9 dmg)
@@ -430,7 +434,7 @@ def script_it():
         game_view.add_tile_override(26, coords=(8, 5, 7))
         game_view.state = game_view.state._replace(message='You hear the portcullis\ngoing down behind you',
                                                    music=BASE_MUSIC_URL + 'AlexandrZhelanov-DarkHall.mp3',
-                                                   music_btn_pos=PORTCULLIS_BTN_POS)
+                                                   music_btn_pos=PORTCULLIS_MUSIC_BTN_POS)
     mapscript_add_trigger((8, 6, 7), _lower_portcullis)  # one-time event/message
 
     mapscript_add_warp((8, 7, 10), (8, 10, 4))  # so that player get lost a bit
@@ -439,16 +443,19 @@ def script_it():
     mapscript_remove_chest((8, 3, 12))  # used to be: Magic Sapphire (MP Up)
 
     # 3 mimics possess the St Knight armor parts; required to win: UNLOCK spell + 1 MP each + enough HP (= 1 night of rest @ Inn)
-    def _remove_mimic_camouflage(gs):
+    def _on_mimic_vanquished(gs):
         assert gs.spellbook >= 3, f'Mimic @{gs.coords} beaten without UNLOCK spell!'
-        return gs.with_tile_override(5, coords=gs.coords)  # useless for door mimic, but who cares?
+        if gs.coords == BOX_MIMIC_POS:  # box mimic beaten => inscription on wall can be seen
+            gs = gs.with_hidden_trigger('FOUNTAIN_HINT')
+        if gs.coords != DOOR_MIMIC_POS:  # door mimic tile override is performed BEFORE the battle:
+            return gs.with_tile_override(5, coords=gs.coords)  # remove camouflage
     _mimic_stats = lambda first_atk_name: dict(
         category=enemy().ENEMY_CATEGORY_AUTOMATON, show_on_map=False,  # rendered by the chest tile
         hp=30, rounds=(
             CR(first_atk_name, atk=6),    # Hero must be able to stand this x3
             CR('Critical bite', atk=30),  # The hero must not be able to beat a mimic without the UNLOCK spell.
                                           # Knowing he can HEAL on 1st round, a quick way to ensure this is to one-shot him on 2nd round.
-        ), post_victory=_remove_mimic_camouflage)
+        ), post_victory=_on_mimic_vanquished)
     mapscript_add_enemy((8, 7, 3), 'chest_mimic', **_mimic_stats('Lid clasp'), reward=RewardItem('ARMOR_PART', 38))
     def _chest_mimic_tongue(game_view, _):
         game_view.state = game_view.state._replace(
@@ -482,7 +489,7 @@ def script_it():
             log(game_view.state, 'put-stick-in-lever')
             game_view.actions['PUT_STICK_IN_LEVER'] = _GameView(game_view.state
                     .with_tile_override(49, coords=(8, 12, 7))
-                    ._replace(message='You put your stick\nin the mechanism'))
+                    ._replace(message='You place your stick\nin the mechanism slot'))
         elif lever_tile_id == 49:  # lever waiting to be raised
             log(game_view.state, 'raise-lever')
             assert 'RAISE_LEVER' not in game_view.actions
@@ -496,7 +503,7 @@ def script_it():
             log(game_view.state, 'put-fish-on-lever-stick')
             game_view.actions['FISH'] = _GameView(game_view.state
                     .with_tile_override(51, coords=(8, 12, 7), exist_ok=True)
-                    ._replace(message='You put the fish\non the stick',
+                    ._replace(message='You place the fish\non the stick',
                               items=tuple(i for i in game_view.state.items if i != 'FISH')))
         elif lever_tile_id == 51:  # fish-on-a-stick ready to be picked up!
             log(game_view.state, 'pick-up-fish-on-a-stick')
@@ -554,28 +561,38 @@ def script_it():
 
     def _reflect_gorgon_or_loot_her_staff(game_view, _GameView):
         gs = game_view.state
+        has_staff_been_picked_up = 'STAFF' in gs.items or gs.tile_override_at(MAUSOLEUM_EXIT_COORDS)
         if gs.facing == 'north' and 'HAND_MIRROR' in gs.items:
             if not gs.extra_render:
                 game_view.actions['HAND_MIRROR'] = _GameView(gs._replace(
                         extra_render=lambda pdf: pdf.image('assets/gorgon-in-mirror.png', x=0, y=0)))
             else:
+                log(gs, 'reflecting-gorgon')
                 game_view.actions['REFLECT_GORGON'] = _GameView(gs
                     .with_vanquished_enemy(gorgon_pos).with_tile_override(53, gorgon_pos)
                     ._replace(
                         message='The gorgon\npetrified\nherself!', msg_place=MessagePlacement.UP,
                         extra_render=lambda pdf: pdf.image('assets/gorgon-petrified-in-mirror.png', x=0, y=0),
+                        music=BASE_MUSIC_URL + 'MarcusRasseli-WalkingWithPoseidon.mp3',
+                        music_btn_pos=Position(74, 58),
                         items=tuple(i for i in gs.items if i != 'HAND_MIRROR')))
-        elif gs.facing == 'south' and gorgon_pos in gs.vanquished_enemies and 'STAFF' not in gs.items:
+        elif gs.facing == 'south' and gorgon_pos in gs.vanquished_enemies and not has_staff_been_picked_up:
+            log(gs, '+gorgon-staff')
             game_view.actions['PICK_STAFF'] = _GameView(gs
                 .with_tile_override(54, gorgon_pos, exist_ok=True)
-                ._replace(items=gs.items + ('STAFF',),
+                ._replace(items=gs.items + ('STAFF',), treasure_id=30,
                           message="You take\nthe gorgon's staff", msg_place=MessagePlacement.UP))
     mapscript_add_trigger((5, 9, 8), _reflect_gorgon_or_loot_her_staff, permanent=True)
 
     def _mausoleum_portal_hint(game_view, _):
         gs = game_view.state
-        if is_instinct_preventing_to_pass_mausoleum_portal(gs):
-            game_view.state = gs._replace(message='No need to go back until\nyou have all the armor parts')
+        if not is_instinct_preventing_to_pass_mausoleum_portal(gs): return
+        if gs.items.count('ARMOR_PART') < 4:
+            msg = 'No need to go back until\nyou have all the armor parts'
+        elif not gs.tile_override_at(MAUSOLEUM_EXIT_COORDS):
+            msg = 'The whispering wind\ntells you the key to this\ncrypt exit is in the books'
+        assert msg, 'A hint should be given if the path is blocked'
+        game_view.state = gs._replace(message=msg)
     mapscript_add_trigger((8, 3, 12), _mausoleum_portal_hint, facing='west', permanent=True)
     def _village_portal_hint(game_view, _):
         gs = game_view.state
@@ -599,11 +616,47 @@ def script_it():
         mimic_stats = _mimic_stats('Flying handle')
         _enemy = Enemy(name='door_mimic', **mimic_stats, max_hp=mimic_stats['hp'], reward=RewardItem('ARMOR_PART', 39))
         game_view.actions['MOVE-FORWARD'] = _GameView(game_view.state
-            .with_tile_override(52, coords=(8, 15, 7))  # dungeon_black_passage
+            .with_tile_override(5, coords=(8, 4, 2))
             ._replace(mode=GameMode.COMBAT, combat=CombatState(enemy=_enemy)))
-    mapscript_add_trigger((8, 14, 7), _facing_door_mimic, facing='east', permanent=True,
-                                      condition=lambda gs: (8, 14, 7) not in gs.vanquished_enemies)
-    mapscript_add_enemy((8, 9, 3), 'box_mimic', **_mimic_stats('Wood slivers'), reward=RewardItem('ARMOR_PART', 40))
+    mapscript_add_trigger(DOOR_MIMIC_POS, _facing_door_mimic, facing='west', permanent=True,
+                                          condition=lambda gs: DOOR_MIMIC_POS not in gs.vanquished_enemies)
+    mapscript_add_enemy(BOX_MIMIC_POS, 'box_mimic', **_mimic_stats('Wood slivers'), reward=RewardItem('ARMOR_PART', 40))
+
+    def _second_lever(game_view, _GameView):
+        gs = game_view.state
+        if 'STAFF' in gs.items:
+            log(gs, 'placing-staff-in-slot')
+            game_view.actions['STAFF'] = _GameView(gs._replace(
+                    items=tuple(i for i in gs.items if i != 'STAFF'),
+                    message="You place the gorgon's staff\nin the mechanism slot\nand runes appear on the wall",
+                    puzzle_step=0, extra_render=RENDER_STAFF_PUZZLE[0]))
+            return
+        if gs.puzzle_step is not None:
+            lever_angle_index = gs.puzzle_step % 10
+            if not gs.extra_render:  # happens when moving to this tile from another one
+                assert gs.puzzle_step == 0
+                game_view.state = game_view.state._replace(extra_render=RENDER_STAFF_PUZZLE[0])
+            if gs.puzzle_step == ROTATING_LEVER_CORRECT_SEQUENCE:
+                game_view.state = game_view.state.with_tile_override(5, MAUSOLEUM_EXIT_COORDS)._replace(
+                        message='You hear the iron gate\nrise behind you',
+                        puzzle_step=0, extra_render=RENDER_STAFF_PUZZLE[0])
+            gs = game_view.state
+            if gs.tile_override_at(MAUSOLEUM_EXIT_COORDS):
+                return  # Once puzzle is solved, TURN_LEVER_* actions should not be available anymore
+            log(game_view.state, f'lever-sequence-{gs.puzzle_step}')
+            # If the sequence of lever positions is correct so far, we propagate it:
+            new_puzzle_step = 0
+            is_correct = str(ROTATING_LEVER_CORRECT_SEQUENCE).startswith(str(gs.puzzle_step))
+            if is_correct and 'FOUNTAIN_HINT' in gs.hidden_triggers:
+                # This hidden trigger indicates that access was given to the last bookshelf:
+                # in order to reduce #states, we only allow to solve this puzzle when the ballad has been read.
+                new_puzzle_step = gs.puzzle_step * 10
+            for i in range(8):
+                if i != lever_angle_index:
+                    game_view.actions[f'TURN_LEVER_{i}'] = _GameView(gs._replace(message='',
+                        puzzle_step=new_puzzle_step + i,
+                        extra_render=RENDER_STAFF_PUZZLE[i]))
+    mapscript_add_trigger((8, 13, 7), _second_lever, facing='west', permanent=True)
 
     # CHECKPOINT: about to enter the Dead Walkways and fight the storm dragon, with the St Knight armor
 
@@ -621,7 +674,9 @@ def script_it():
             CR('Wing thump', atk=12, dodge=True), # player ATTACK -> hero HP=10 | dragon HP=25
             CR('Critical bite', atk=17),          # player ATTACK -> hero HP=5  | dragon HP=12
             CR('Bite', atk=14),                   # player ATTACK -> hero HP=3  | dragon HP=-1
-        ), post_victory=_ensure_beaten_with_st_knight_armor)
+        ), post_defeat_condition=lambda gs: gs.armor <= 1,
+        post_defeat=render_storm_dragon_post_defeat_hint,
+        post_victory=_ensure_beaten_with_st_knight_armor)
     # Post-dragon-fight avatar has 3 HP.
 
     goblin_bribe = Bribe(gold=3, result_msg='He runs away with your gold')
@@ -713,7 +768,7 @@ def render_abyss_filler_page(pdf, i):
     if i == 1: pdf.image('assets/blobfish.png', x=53, y=30)
 
 
-def render_post_defeat_hint(pdf):
+def render_monastery_post_defeat_hint(pdf):
     bitfont_set_color_red(False)
     pdf.add_page()
     pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
@@ -721,7 +776,38 @@ def render_post_defeat_hint(pdf):
     render_bar(pdf, 10, 20)
     white_arrow_render(pdf, 'BACK', 16, 16)
     bitfont_render(pdf, 'If you cannot bring an enemy\nlifebar to zero before\nloosing your last HP,\nmaybe an item somewhere\ncan help you.', 80, 40, Justify.CENTER, page_id=1)
-    bitfont_render(pdf, 'Start over', 80, 100, Justify.CENTER, page_id=1)
+    with bitfont_color_red():
+        bitfont_render(pdf, 'Start over', 80, 100, Justify.CENTER, page_id=1)
+
+
+def render_staff_puzzle(lever_angle_index):
+    def extra_render(pdf):
+        pdf.image('assets/runes.png', x=0, y=0)
+        x, y, _ = LEVER_STAFF_POS[lever_angle_index]
+        pdf.image(f'assets/lever-staff-{lever_angle_index}.png', x=x, y=y)
+    return extra_render
+RENDER_STAFF_PUZZLE = tuple(render_staff_puzzle(i) for i in range(8))
+
+LEVER_STAFF_POS = (  # match assets/lever-staff-$i.png files
+    Position(x=76, y=41),
+    Position(x=77, y=47),
+    Position(x=80, y=69),
+    Position(x=77, y=69),
+    Position(x=76, y=71),
+    Position(x=54, y=69),
+    Position(x=48, y=69),
+    Position(x=55, y=47),
+)
+
+
+def render_storm_dragon_post_defeat_hint(pdf):
+    bitfont_set_color_red(False)
+    pdf.add_page()
+    pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
+    bitfont_render(pdf, 'Tip', 80, 5, Justify.CENTER)
+    bitfont_render(pdf, 'You need a better armor\nto stand the dragons attacks', 80, 40, Justify.CENTER, page_id=1)
+    with bitfont_color_red():
+        bitfont_render(pdf, 'Start over', 80, 100, Justify.CENTER, page_id=1)
 
 
 def clear_hidden_triggers(gs):

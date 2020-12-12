@@ -131,9 +131,10 @@ def combat_determine_reward(game_state):
     if _enemy.reward:
         assert not _enemy.gold, 'Not implemented yet'
         if isinstance(_enemy.reward, RewardItem):
+            assert _enemy.reward.name == 'ARMOR_PART'  # if other values are possible, message must be made dynamic
             return game_state._replace(
                 items=game_state.items + (_enemy.reward.name,),
-                message=f"{msg}\nYou get a\n{_enemy.reward.name.replace('_', ' ')}",
+                message=f"{msg}\nYou get a\npiece of armor",
                 treasure_id=_enemy.reward.treasure_id)
         assert isinstance(_enemy.reward, RewardTreasure)
         return _enemy.reward.grant(game_state._replace(

@@ -15,6 +15,8 @@
 - [x] Mausoleum after portculiss: **Dark Hall by Alexandr Zhelanov**
 - [x] Dead tree secret: **10 Mysteries of The Mechanical Prince by Tomasz Kucza (Magnesus)**
 - [ ] Opening magic portal / back to village
+- [x] Petrifying the gorgon: **Walking with Poseidon by Marcus Rasseli**
+- [x] Ballad of the First King: **Journey to the East Rocks by Alexandr Zhelanov**
 - [x] fountain / protecting-god-below secret: **Insight by Alexandr Zhelanov**
 - [x] Deserted palace / Dead Walkwayas / storm dragon battle: **Dark Winds by Johan Jansen (Zefz)**
 - [x] Konami code secret: **Treasures Of Ancient Dungeon 2 by Alexandr Zhelanov**
@@ -90,6 +92,12 @@
     Keywords: epic battle, crescendo, imperial, flute, sacred, looming
     Usage: storm dragon battle
 
+- 4:47 - Journey to the East Rocks - Alexandr Zhelanov - https://opengameart.org/content/journey-to-the-east-rocks - CC-BY 3.0
+    Keywords: soft, poetic, tale-telling, calm
+
+- 0:43 - Walking with Poseidon - Marcus Rasseli - https://opengameart.org/content/walking-with-poseidon - CC BY 3.0
+    Keywords: greek, epic, triumph
+
 - 0:37 - Treasures Of Ancient Dungeon 2 - Alexandr Zhelanov - https://opengameart.org/content/treasures-of-ancient-dungeon-2 - CC-BY 3.0
     Keywords: imperial, incoming danger
     Usage: konami code
@@ -119,6 +127,3 @@
 
 - 2:07 - Castlecall - Alexandr Zhelanov - https://opengameart.org/content/castlecall - CC-BY 3.0
     Keywords: military, nostalgic
-
-- 4:47 - Journey to the East Rocks - Alexandr Zhelanov - https://opengameart.org/content/journey-to-the-east-rocks - CC-BY 3.0
-    Keywords: soft, poetic, tale-telling, calm

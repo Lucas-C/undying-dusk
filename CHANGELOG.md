@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.9.5] - not released yet
 ### Added
-- new monster & puzzle : the Gorgon!
+- new monster & puzzle to defeat it : the Gorgon!
+- new books-based rotating-lever puzzle to leave the Mausoleum
 - Cauldron fire boost is displayed more explicitly
 - Displaying water on minimap
 - More helpful hints than _"Trust your instinct: no need to go back for now"_

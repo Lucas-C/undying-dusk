@@ -7,14 +7,9 @@ import os
 from contextlib import contextmanager
 from textwrap import indent
 
-import fpdf
-try:  # Optional dependency:
-    from tqdm import tqdm
-except ImportError:
-    tqdm = lambda _: _
-
 from .assigner import assign_page_ids
 from .entities import GameMilestone
+from .optional_deps import tqdm
 from .perfs import disable_tracing, print_memory_stats
 from .render import render_page
 
@@ -92,8 +87,7 @@ def render_victory_noop(*_): pass
 class FakePdfRecorder:
     'Fake fpdf.FPDF class that must implement all the methods used during the pages rendering'
     def __init__(self):
-        self.pdf = fpdf.FPDF()  # a real instance is needed due to the calls to ._parsepng
-        self.images = self.pdf.images
+        self.images = {}  # images cache used by get_image_info
         self._calls = []
         self._links = {}
 
@@ -134,10 +128,6 @@ class FakePdfRecorder:
     def link(self, x, y, w, h, link, alt_text=''):
         page_or_url = link if isinstance(link, str) else self._links[link]
         self._calls.append(('link', x, y, w, h, page_or_url, alt_text))
-
-    def _parsepng(self, filename):
-        # pylint: disable=no-member,protected-access
-        return self.pdf._parsepng(filename)
 
     def reset(self):  # Note that ._links MUST be preserved, otherwise a 1st over-reduce glitch can be seen after talking to Seamus in the Sanitarium
         self._calls = []

@@ -1,12 +1,8 @@
 from collections import defaultdict
 
-try:
-    from humanfriendly.terminal import ansi_wrap
-except ImportError:
-    ansi_wrap = lambda msg, color=None: msg
-
 from .entities import GameMode
 from .js import shop
+from .optional_deps import ansi_wrap
 
 
 ALREADY_LOGGED = defaultdict(list)
@@ -175,8 +171,8 @@ def diff_game_states(gs1, gs2):
         print(f'Differing trick: {gs1.trick} != {gs2.trick}')
     if gs1.milestone != gs2.milestone:
         print(f'Differing milestone: {gs1.milestone} != {gs2.milestone}')
-    if gs1.konami_step != gs2.konami_step:
-        print(f'Differing konami_step: {gs1.konami_step} != {gs2.konami_step}')
+    if gs1.puzzle_step != gs2.puzzle_step:
+        print(f'Differing puzzle_step: {gs1.puzzle_step} != {gs2.puzzle_step}')
     if gs1.hidden_triggers != gs2.hidden_triggers:
         print(f'Differing hidden_triggers: {gs1.hidden_triggers}\n!=\n{gs2.hidden_triggers}')
     if gs1.triggers_activated != gs2.triggers_activated:

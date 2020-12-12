@@ -1,11 +1,6 @@
 <!-- NEXT STEPS:
-- lever puzzle -> draw lever slot side: staff-in-slot pos: x=76, y=31
-- abyss bottom minor text/img rendering glitch
-- access to FOUNTAIN_HINT must be blocked until all 3 mimics are dead
-- trigger scene after beating skeleton + checkpoint before
-- "you get a armor part"
-- make storm dragon battle longer
-- add SFX for spells: cf. https://www.patreon.com/posts/dark-magic-8600078 & https://www.patreon.com/posts/light-magic-8781428
+- make storm dragon battle longer & more tactical
+- add SFX for spells: cf. https://www.patreon.com/posts/dark-magic-8600078 & https://www.patreon.com/posts/light-magic-8781428 + attacks-sfx.md
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"
   -> face 2 enemies => 2 health bars & 2 attacks -> undead-fossil / flying demon with daggers / upscaled-dragon-skeleton ?
@@ -18,8 +13,6 @@
   * MUSIC: certaines sont trop rapprochées
   * seamus fight without buckler frustrating
   * skeleton fight : too hard ? hint at critical ?
-  * SCENARIO: aurait aimé avoir plus de réponses
-  * glitch boulder rendering with tree (GIF from Maxime ?)
 - feedback Henri:
   * ajouter un journal rappelant tous les indices trouvés, à apparition unique
 - redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
@@ -27,7 +20,7 @@
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
   * maze rendering glitch
-- post-release: publish small assets & create a music collection
+- post-release: publish small assets
 - make a PDF quine (a program generating a PDF displaying its own source code)
 - VF?
 - a11y:
@@ -59,7 +52,8 @@
   * try other PDF features: PrevPage ? sub-page navigation ?
   * implement monster arrival animations & attacks & delayed log msgs using PDF `Transitions` or as a GIF (_cf._ [Patrick Gallot article](https://www.datalogics.com/blog/corporate/the-making-of-a-pdf-presentation/))
   * use navigation node `Dur` to implement QTEs / real-time game mechanics ?
-  * enemies: griffon, allacrost daemarbora, demonic_essence & skeleton_with_axe
+  * enemies: griffon, allacrost daemarbora, demonic_essence & skeleton_with_axe, Cethiel-Dragon
+  * great illustrations: fortuneteller, animated_torch, knight, lylfDW-wizard, TheSamta-Crusader
 - secrets: ABYSS_BOTTOM, DEAD_TREE, FOUNTAIN_WISH, KONAMI_CODE
   * [x] empress soul at the bottom of the abyss
   * [x] throwing gold piece in fountain (hint hidden on a special wall sprite)
@@ -159,7 +153,7 @@ This game also makes use of the following assets, some of which I ported to the 
 - all [the original art](https://opengameart.org/content/first-person-dungeon-crawl-art-pack) was made by Clint Bellanger for the original Heroine Dusk game - [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - enemies come from [Redshrike remix of Heroine Dusk original ones](https://opengameart.org/content/first-person-dungeon-crawl-enemies-remixed).
 Fossil dino come from [Fossil (Undead) RPG Enemy Sprites](https://opengameart.org/content/fossil-undead-rpg-enemy-sprites),
-flying demon with daggers from [More RPG enemies!](https://opengameart.org/content/more-rpg-enemies), Seamus wizard & demon portrait from his [6 More RPG Enemies spritesheet](https://opengameart.org/content/6-more-rpg-enemies), black bird from his [Tower Defense Prototyping Assets]( https://opengameart.org/content/tower-defense-prototyping-assets-4-monsters-some-tiles-a-background-image) and blowfish from his [3 RPG enemy remixes](https://opengameart.org/content/3-rpg-enemy-remixes) - all [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+flying demon with daggers from [More RPG enemies!](https://opengameart.org/content/more-rpg-enemies), Seamus wizard, demon & gorgon portraits from his [6 More RPG Enemies spritesheet](https://opengameart.org/content/6-more-rpg-enemies), black bird from his [Tower Defense Prototyping Assets]( https://opengameart.org/content/tower-defense-prototyping-assets-4-monsters-some-tiles-a-background-image) and blowfish from his [3 RPG enemy remixes](https://opengameart.org/content/3-rpg-enemy-remixes) - all [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 Shadow soul extra frames come from [Bosses and monsters spritesheets (Ars Notoria) by Balmer](https://opengameart.org/content/bosses-and-monsters-spritesheets-ars-notoria) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - most new sprites (direction arrow, items, tiles) come from the awesome [_Recolor all the items!!!_ spritesheet by Marcus Ihde](https://opengameart.org/content/recolor-all-the-items) - [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - bible, fish & scroll 16x16 icons from [Kyrise's Free 16x16 RPG Icon Pack](https://opengameart.org/content/kyrises-free-16x16-rpg-icon-pack) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
@@ -227,12 +221,15 @@ on top of black characters.
 ### Music
 Songs used in the game :
 - [M31 by Yubatake](https://soundcloud.com/yubatake/m31) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
-- [A Darkness Opus](https://opengameart.org/content/a-darkness-opus), [Audience](https://opengameart.org/content/audience), [Caves of sorrow](https://opengameart.org/content/caves-of-sorrow), [Dark Hall](https://opengameart.org/content/north-wind-more-music-inside), [Full of memories](https://opengameart.org/content/full-of-memories), [Insight](https://opengameart.org/content/insight), [Mystery Forest](https://opengameart.org/content/mystery-forest), [Mystical Theme](https://opengameart.org/content/mystical-theme) & [Treasures Of Ancient Dungeon 2](https://opengameart.org/content/treasures-of-ancient-dungeon-2) by Alexandr Zhelanov - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [A Darkness Opus](https://opengameart.org/content/a-darkness-opus), [Audience](https://opengameart.org/content/audience), [Caves of sorrow](https://opengameart.org/content/caves-of-sorrow), [Dark Hall](https://opengameart.org/content/north-wind-more-music-inside), [Full of memories](https://opengameart.org/content/full-of-memories), [Insight](https://opengameart.org/content/insight), [Journey to the East Rocks](https://opengameart.org/content/journey-to-the-east-rocks) [Mystery Forest](https://opengameart.org/content/mystery-forest), [Mystical Theme](https://opengameart.org/content/mystical-theme) & [Treasures Of Ancient Dungeon 2](https://opengameart.org/content/treasures-of-ancient-dungeon-2) by Alexandr Zhelanov - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [10 Mysteries of The Mechanical Prince](https://opengameart.org/content/10-mysteries-of-the-mechanical-prince) by Tomasz Kucza (Magnesus) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [Fantasy Music - Night Town by Angus Macnaughton](https://opengameart.org/content/fantasy-music-night-town) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - [Dark Winds](https://opengameart.org/content/orchestral-epic-fantasy-music) & [Orchestral Looming Battle](https://opengameart.org/content/orchestral-battle-music) by Johan Jansen (Zefz) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [Dark Descent](https://opengameart.org/content/dark-descent), [Defying Commodus](https://opengameart.org/content/defying-commodus), [Heroic Demise](https://opengameart.org/content/heroic-demise-updated-version), [Soliloquy](https://opengameart.org/content/soliloquy), [Spiritwatcher](https://opengameart.org/content/spiritwatcher) & [The Fall of Arcana](https://opengameart.org/content/the-fall-of-arcana-epic-game-theme-music) by Matthew Pablo - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [Old Crypt by Janne Hanhisuanto](https://opengameart.org/content/radakan-old-crypt) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- [Walking with Poseidon by Marcus Rasseli](https://opengameart.org/content/walking-with-poseidon) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+
+They have all been collected in [this collection on OGA](https://opengameart.org/content/music-for-undying-dusk-pdf-game).
 
 Also, this game was mostly coded while listening to _Lance's Dark Mood Party Mixes_!
 

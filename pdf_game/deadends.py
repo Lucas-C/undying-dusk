@@ -4,10 +4,7 @@ A "dead-end" state is a GameState that cannot lead to either a GAMEOVER or a VIC
 import os
 from queue import LifoQueue
 
-try:  # Optional dependency:
-    from tqdm import tqdm
-except ImportError:
-    tqdm = lambda _: _
+from .optional_deps import tqdm
 
 
 def detect_deadends(game_views):

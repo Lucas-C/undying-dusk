@@ -1,12 +1,7 @@
-try:
-    from humanfriendly.terminal import ansi_wrap
-except ImportError:
-    ansi_wrap = lambda msg, color=None, bold=None: msg
-
-
 from .js import atlas
 from .mapscript import mapscript_tile_script_type
 from .mazemap import mazemap_is_exit, mazemap_is_shop
+from .optional_deps import ansi_wrap
 
 
 def map_as_string(game_view):

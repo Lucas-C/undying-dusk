@@ -197,8 +197,12 @@ def iterate_game_views(checkpoint, checkpoint_id, start_views, _GameView):
                         combat = new_game_view.state.combat
                         log_msg += f' - on round {combat.round} - {combat.enemy.name} hp: {combat.enemy.hp}'
                         post_defeat = combat.enemy.post_defeat
-                        if post_defeat and not hasattr(post_defeat, 'game_view'):
-                            post_defeat.game_view = GameView(src_view=game_view, renderer=post_defeat)
+                        if post_defeat and combat.enemy.post_defeat_condition:
+                            should_render_post_defeat = combat.enemy.post_defeat_condition(new_game_view.state)
+                        else:
+                            should_render_post_defeat = bool(post_defeat)
+                        if should_render_post_defeat and not hasattr(post_defeat, 'game_view'):
+                            post_defeat.game_view = GameView(src_view=new_game_view, renderer=post_defeat)
                             game_views.add(post_defeat.game_view)
                             processed.add(hash(post_defeat.game_view))
                     if new_game_view.state.rolling_boulder:

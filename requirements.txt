@@ -1,5 +1,5 @@
+fpdf2
 humanfriendly  # purely optional
-git+git://github.com/Lucas-C/pyfpdf.git@master
 pikepdf  # optional, allows to set PDF metadata
 pillow
 pyduktape

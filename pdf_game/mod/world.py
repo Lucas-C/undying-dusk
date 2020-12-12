@@ -2,9 +2,29 @@ from . import Proxy
 from .scenes import patch_map_shops
 
 
-MAUSOLEUM_PORTAL_COORDS = (8, 2, 12)
-VILLAGE_PORTAL_COORDS = (5, 9, 3)
 WALKABLE_BONES_AND_BOXES = False  # for --no-script mode
+MAUSOLEUM_PORTAL_COORDS = (8, 2, 12)
+MAUSOLEUM_EXIT_COORDS = (8, 15, 7)
+BOX_MIMIC_POS = (8, 3, 2)
+DOOR_MIMIC_POS = (8, 5, 2)
+VILLAGE_PORTAL_COORDS = (5, 9, 3)
+CLICK_ZONES = {
+    'OPEN_DOOR':            {'x': 62, 'y': 43, 'width': 35, 'height': 54},
+    'PASS_BEHIND_IVY':      {'x': 54, 'y': 36, 'width': 49, 'height': 58},
+    'PASS_PORTAL':          {'x': 50, 'y': 26, 'width': 60, 'height': 61},
+    'RAISE_LEVER':          {'x': 67, 'y': 43, 'width': 21, 'height': 49},
+    'PICK_FISH_ON_A_STICK': {'x': 50, 'y': 32, 'width': 38, 'height': 47},
+    'PICK_STAFF':           {'x': 43, 'y': 18, 'width': 15, 'height': 79},
+    'REFLECT_GORGON':       {'x': 15, 'y': 17, 'width': 46, 'height': 72},
+    'TURN_LEVER_0':         {'x': 76, 'y': 25, 'width': 10, 'height': 16},
+    'TURN_LEVER_1':         {'x': 98, 'y': 42, 'width': 11, 'height': 15},
+    'TURN_LEVER_2':         {'x': 108,'y': 64, 'width': 10, 'height': 15},
+    'TURN_LEVER_3':         {'x': 95, 'y': 83, 'width': 12, 'height': 15},
+    'TURN_LEVER_4':         {'x': 74, 'y': 83, 'width': 11, 'height': 15},
+    'TURN_LEVER_5':         {'x': 56, 'y': 83, 'width': 9,  'height': 15},
+    'TURN_LEVER_6':         {'x': 41, 'y': 64, 'width': 15, 'height': 16},
+    'TURN_LEVER_7':         {'x': 52, 'y': 42, 'width': 10, 'height': 16},
+}
 
 
 def custom_can_burn(game_state):
@@ -13,7 +33,10 @@ def custom_can_burn(game_state):
 
 
 def custom_can_push(game_state, actions):
-    if (game_state.coords, game_state.facing) == ((8, 9, 2), 'south'):
+    # pylint: disable=import-outside-toplevel
+    from ..mazemap import mazemap_next_pos_facing
+    next_pos_facing = mazemap_next_pos_facing(*game_state.coords[1:], game_state.facing)
+    if (game_state.map_id, *next_pos_facing) == BOX_MIMIC_POS:
         # Facing box mimic in Mausoleum: if the player tries to push it, it triggers a fight!
         return 'PUSH', actions['MOVE-FORWARD']
     return None
@@ -32,7 +55,7 @@ def custom_can_move_to(_map, x, y, game_state):
         if (x, y) == VILLAGE_PORTAL_COORDS[1:]:
             return game_state.tile_override_at(VILLAGE_PORTAL_COORDS) and not is_instinct_preventing_to_pass_village_portal(game_state)
         if (x, y) == (9, 11):  # south exit
-            assert not game_state.tile_override_at(VILLAGE_PORTAL_COORDS), f'No going back to Zututh Plains once portal is open!\n{game_state}'
+            assert not game_state.tile_override_at(VILLAGE_PORTAL_COORDS), f'No going back to Zuruth Plains once portal is open!\n{game_state}'
     if _map.name == 'Zuruth Plains':
         if (x, y) == (13, 14) and 'BOOTS' in game_state.items:
             return True  # can enter shallow waters to access the chest
@@ -52,10 +75,10 @@ def custom_can_move_to(_map, x, y, game_state):
             return True  # can walk on shallow waters
         if (x, y) == MAUSOLEUM_PORTAL_COORDS[1:]:
             return game_state.tile_override_at(MAUSOLEUM_PORTAL_COORDS) and not is_instinct_preventing_to_pass_mausoleum_portal(game_state)
-        if (x, y) == (9, 3):  # allow to move on box mimic tile:
+        if (x, y) == BOX_MIMIC_POS[1:]:  # allow to move on box mimic tile:
             return True
-        if (x, y) == (15, 7):  # exit to Dead Walkways, require door mimic to be beaten:
-            return (8, 14, 7) in game_state.vanquished_enemies
+        if (x, y) == (4, 2):  # behind door mimic, not walkable until beaten
+            return DOOR_MIMIC_POS in game_state.vanquished_enemies
     return None
 
 
@@ -74,8 +97,9 @@ def is_instinct_preventing_to_enter_templar_academy(game_state):
 
 def is_instinct_preventing_to_pass_mausoleum_portal(game_state):
     # We forbid to get back to village if the heroine has the UNLOCK spell,
-    # but hasn't collected all the armor parts yet:
-    return game_state.spellbook == 3 and game_state.items.count('ARMOR_PART') < 4
+    # but hasn't collected all the armor parts yet, or hasn't solved the rotating lever puzzle:
+    gs = game_state
+    return gs.spellbook == 3 and (gs.items.count('ARMOR_PART') < 4 or not gs.tile_override_at(MAUSOLEUM_EXIT_COORDS))
 
 
 def is_instinct_preventing_to_pass_village_portal(game_state):
@@ -83,7 +107,8 @@ def is_instinct_preventing_to_pass_village_portal(game_state):
         return False  # No need to display a message when the portal is not open yet
     # We forbid to get back to Mausoleum if the heroine hasn't picked the UNLOCK spell yet,
     # hasn't taken a night of rest at the inn, or hasn't picked up the staff on the petrified gorgon yet:
-    return game_state.spellbook < 3 or game_state.gold >= 10 or 'STAFF' not in game_state.items
+    has_staff_been_picked_up = 'STAFF' in game_state.items or game_state.tile_override_at(MAUSOLEUM_EXIT_COORDS)
+    return game_state.spellbook < 3 or game_state.gold >= 10 or not has_staff_been_picked_up
 
 
 def patch_tileset(tileset):
@@ -151,6 +176,7 @@ def _patch_map_name(name):
 def _patch_tiles(_map):
     tiles = [list(row) for row in _map.tiles]
     # if _map.name == 'Serf Quarters':  tiles[3][1] = 34  # test bookshelf
+    # if _map.name == 'Serf Quarters':  tiles[3][1] = 48  # test staff-in-lever
     if _map.name == 'Monk Quarters':  # new map: Scriptorium
         return [  # This is meant as a simple enigma & tutorial map
           [ 2, 2, 2,32, 2],
@@ -241,16 +267,19 @@ def _patch_tiles(_map):
         x, y = 7, 3;   tiles[y][x] = 8   # ... to block the path north
         x, y = 7, 4;   tiles[y][x] = 26  # portcullis
         x, y = 10, 10; tiles[y][x] = 26  # portcullis
-        x, y = 3, 2;   tiles[y][x] = 5   # removing north-west chest
-        x, y = 9, 3;   tiles[y][x] = 33  # adding a box (mimic) in northern corridor alcove, behind water
+        x, y = 3, 2;   tiles[y][x] = 33  # replacing north-west chest by a box (mimic)
+        x, y = 4, 2;   tiles[y][x] = 3   # door (mimic) blocking access to north-west alcove
         x, y = 8, 11;  tiles[y][x] = 37  # adding hay pile in southern corridor alcove, behind water
         x, y = 2, 2;   tiles[y][x] = 34  # bookshelf
         x, y = 3, 3;   tiles[y][x] = 30  # dungeon_wall_tagged with FOUNTAIN_HINT
         x, y = 7, 11;  tiles[y][x] = 2   # wall after warp south-west in central room
         x, y = 10, 3;  tiles[y][x] = 2   # wall after warp north-east in central room
-        x, y = 12, 7;  tiles[y][x] = 48  # replacing straight path to exit by lever down
+        x, y = 12, 7;  tiles[y][x] = 48  # replacing straight path to exit by lever slot
         x, y = 12, 6;  tiles[y][x] = 32  # surrounded by torchs on wall
         x, y = 12, 8;  tiles[y][x] = 32  # surrounded by torchs on wall
+        x, y = 14, 4;  tiles[y][x] = 34  # bookshelf, north, in east corridor
+        x, y = 14, 10; tiles[y][x] = 34  # bookshelf, south, in east corridor
+        x, y = 15, 7;  tiles[y][x] = 26  # portcullis blocking exit
     if _map.name == 'Dead Walkways':
         x, y = 1, 5;   tiles[y][x] = 0   # no going back
         x, y = 4, 8;   tiles[y][x] = 4   # pillar, for symetry
@@ -308,7 +337,7 @@ def _patch_exits(_map):
     if _map.name == "Zuruth Plains":
         return [
             _set_exit_facing(_map.exits[0], 'north'),  # to Cedar Village
-            _set_exit_facing(_map.exits[1], 'east'),   # to Canal Boneyard
+            # _set_exit_facing(_map.exits[1], 'east'),   # to Canal Boneyard (unused due to "risking_it_all" CutScene)
             _set_exit_facing(_map.exits[2], 'south'),  # to Trade Tunnel
             Proxy(exit_x=14, exit_y=15, dest_map=10, dest_x=7, dest_y=4, facing='west'),  # to Trade Tunnel through door
         ]

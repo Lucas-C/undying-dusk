@@ -92,6 +92,7 @@ class Enemy(NamedTuple):
     invincible : bool = False  # useful while level designing
     music : str = ''
     loop_frames : bool = False
+    post_defeat_condition : Optional[Callable[['GameState'], bool]] = None  # GameState -> bool
     post_defeat : Optional[Callable[['FPDF'], None]] = None  # renderer function, will receive a .game_view attribute
     post_victory : Optional[Callable[['GameState'], Optional['GameState']]] = None  # GameState -> GameState
 
@@ -131,8 +132,9 @@ class Book(NamedTuple):
     bird_index: Optional[int] = None
     next: Optional['Book'] = None  # using a Forward Reference type hint
     portrait : Optional[int] = None
+    music : Optional[str] = None
     hidden_trigger : Optional[str] = None
-    sfx : SFX = None
+    sfx : Optional[SFX] = None
 
 
 class GameState(NamedTuple):
@@ -154,7 +156,7 @@ class GameState(NamedTuple):
     bonus_def: int = 0
     items: Tuple[str] = ()
     hidden_triggers: Tuple[str] = ()
-    konami_step: int = 0
+    puzzle_step: Optional[int] = None
     rolling_boulder: Optional[RollingBoulder] = None
     triggers_activated: Tuple[Tuple[int]] = ()  # sequence of coords
     # Tile-transient state:
@@ -183,7 +185,8 @@ class GameState(NamedTuple):
                              milestone=GameMilestone.NONE,
                              book=None, treasure_id=0, extra_render=None, sfx=None,
                              music='', music_btn_pos=None,
-                             trick=None, reverse_id=False, fixed_id=0,
+                             trick=None, puzzle_step=None if self.puzzle_step is None else 0,
+                             reverse_id=False, fixed_id=0,
                              combat=self.combat and self.combat._replace(
                                 avatar_log=None,
                                 enemy_log=None))
@@ -394,7 +397,8 @@ class GameView:
         # removing non-serializable fields:
         view_dict['extra_render'] = bool(view_dict['extra_render'])
         if combat:
-            view_dict['combat'] = combat._replace(enemy=combat.enemy._replace(post_defeat=None, post_victory=None))
+            view_dict['combat'] = combat._replace(enemy=combat.enemy._replace(
+                    post_defeat_condition=None, post_defeat=None, post_victory=None))
         view_dict['actions'] = {action: next_gv.page_id if next_gv else None
                                 for action, next_gv in self.actions.items()}
         return view_dict
