@@ -219,7 +219,8 @@ def check_no_duplicate(game_views):
     print('Ensuring no duplicate GameViews exist...')
     gvs_per_hash = defaultdict(list)
     for gv in game_views:
-        gvs_per_hash[hash(gv)].append(gv)
+        if gv.state:
+            gvs_per_hash[hash(gv)].append(gv)
     duplicate_gvs_str = '\n'.join('\n'.join(map(str, gvs)) for gvs in gvs_per_hash.values() if len(gvs) > 1)
     assert not duplicate_gvs_str, f'Duplicate game views found:\n{duplicate_gvs_str}'
     print('Check passed ✔️')
