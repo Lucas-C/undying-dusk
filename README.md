@@ -1,6 +1,4 @@
 <!-- NEXT STEPS:
-- make storm dragon battle longer & more tactical
-- add SFX for spells: cf. https://www.patreon.com/posts/dark-magic-8600078 & https://www.patreon.com/posts/light-magic-8781428 + attacks-sfx.md
 - final fight extra phases (must add checkpoints):
   + empress-defeated: "Noooo! Come to me my minions!"
   -> face 2 enemies => 2 health bars & 2 attacks -> undead-fossil / flying demon with daggers / upscaled-dragon-skeleton ?
@@ -9,6 +7,7 @@
   -> face undead Dominik, with impress in foreground
   -> he reflects all attacks
   -> winning strategy: HEAL + click him? keep parying?
+- add SFX for spells: cf. https://www.patreon.com/posts/dark-magic-8600078 & https://www.patreon.com/posts/light-magic-8781428 + attacks-sfx.md
 - feedback Maxime:
   * MUSIC: certaines sont trop rapprochées
   * seamus fight without buckler frustrating
@@ -20,8 +19,7 @@
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
   * maze rendering glitch
-- post-release: publish small assets
-- make a PDF quine (a program generating a PDF displaying its own source code)
+- post-release: publish assets
 - VF?
 - a11y:
   * add alt desc on action links -> https://www.w3.org/TR/WCAG20-TECHS/pdf#PDF13
@@ -33,7 +31,7 @@
   * stats on what fights / tiles get the most rendered
   * MARGINAL EXPECTED EFFECT: pngoptimizer / optimize tilesets : many have redundant sections, a pre-rendering pass could extract tiles from tilesets and put them in a unique PNG, with mappings for the rendering step
 - ideas for another time:
-  * clickable reveal animation with crack
+  * animations (with full page clickable): crack opening, moving box, raising portcullis, contextual actions...
   * for a sequel, start off with Empress chasing player! (not doable due to #states explosion with secrets)
     -> must go back through whole level without slowing down, with Empress following
     -> pickup itemX * 3 (with buckler?) on the way, in order to face Empress again with 3 throwable weapons
@@ -42,6 +40,7 @@
   * drunk/potion -> mess with direction arrows (reversed / all over the page)
   * moving enemy: either with a looping pattern, or that must be caught when running away, thanks to a shortcut
   * cloak to bypass enemy (avoid an encounter)
+  * enemy with several hit zones, where the pattern to beat it is the solution of a logic puzzle
   * light up torch and go to some place previously very dark
   * place bomb on stone door doorstep (require a "broken wall" tile)
   * item to jump/teleport over a fixed distance
@@ -160,7 +159,7 @@ Shadow soul extra frames come from [Bosses and monsters spritesheets (Ars Notori
 - cloudy town, animated flying demon, prie-dieu, statue, wood box & well from [GothicVania Patreon Collection](http://pixelgameart.org/web/portfolio/gothicvania/), [GothicVania Church assets](https://opengameart.org/content/gothicvania-church-pack), [GothicVania Cemetery assets](https://opengameart.org/content/gothicvania-cemetery-pack), [GothicVania Town assets](https://opengameart.org/content/gothicvania-town), [Forest Background](https://opengameart.org/content/forest-background) & [Mountain at Dusk Background](https://opengameart.org/content/mountain-at-dusk-background) by Luis Zuno (@ansimuz) - public domain
 - [forest fringe](https://opengameart.org/content/forest-and-grave) & [valley village](https://opengameart.org/content/village-in-the-valley) backgrounds by trulio - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [!$dungeon Of Sorrow Gate](https://www.deviantart.com/nicnubill/art/dungeon-Of-Sorrow-Gate-407553705) & [!$Secret Passage](https://www.deviantart.com/nicnubill/art/Secret-Passage-716158385) by Nicnubill
-- portculli from [LPC castle by Evert](https://opengameart.org/content/lpc-castle) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- portcullis from [LPC castle by Evert](https://opengameart.org/content/lpc-castle) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - cauldron & fire from [[LPC] Dungeon Elements by Sharm](https://opengameart.org/content/lpc-dungeon-elements) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - [Boulder pixel art by TdeLeeuw](https://www.deviantart.com/tdeleeuw/art/Boulder-pixel-art-427731885) - [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/)
 - portal by [LetargicDev](https://opengameart.org/content/portals) - CC0

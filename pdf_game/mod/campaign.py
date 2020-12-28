@@ -685,15 +685,15 @@ def script_it():
             return CR('Tail slap', atk=18, enemy_frame=0)
         if 'WINGS' in combat.enemy.hit_zone_names:
             return CR('Wing thump', atk=14, enemy_frame=1)
-        return CR('Bite', atk=15, enemy_frame=2)
+        return CR('Bite', atk=14, enemy_frame=2)
     def _ensure_beaten_with_st_knight_armor(gs, src_view):
-        if gs.armor <= 1 or gs.hp != 3:
+        if gs.armor <= 1 or gs.hp != 2:
             log_combat(src_view)
             assert gs.armor > 1, 'Storm Dragon beaten without St Knight armor!'
             assert gs.hp == 2, f'Hero should have 2 HP after beating the Storm Dragon, in order to face the druid later on, but has: {gs.hp} HP'
     mapscript_add_enemy((9, 2, 5), 'storm_dragon',  # required to win: St Knight armor, great sword & > 11 HP
         category=ENEMY_CATEGORY_BEAST,
-        hp=51, max_rounds=6, hit_zones=(
+        hp=64, max_rounds=6, hit_zones=(
             ('HEAD', Position(x=98, y=20)),
             ('TAIL', Position(x=30, y=44)),
             ('WINGS', Position(x=98, y=81)),

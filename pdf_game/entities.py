@@ -94,8 +94,8 @@ class Enemy(NamedTuple):
     music : str = ''
     loop_frames : bool = False
     hit_zones : tuple = ()  # mapping items: name str -> Position
-    withstand_logic : Optional[Callable[['CombatState'], tuple]] = None  # CombatState -> (CombatState, log_result)
-    attack_logic : Optional[Callable[['CombatState', 'int'], CombatRound]] = None  # (CombatState, round) -> CombatRound
+    withstand_logic : Optional[Callable[['CombatState', int], tuple]] = None  # (CombatState, attack_damage) -> (CombatState, log_result)
+    attack_logic : Optional[Callable[['CombatState'], CombatRound]] = None  # CombatState -> CombatRound
     post_defeat_condition : Optional[Callable[['GameState'], bool]] = None  # GameState -> bool
     post_defeat : Optional[Callable[['FPDF'], None]] = None  # renderer function, will receive a .game_view attribute
     post_victory : Optional[Callable[['GameState'], Optional['GameState']]] = None  # GameState -> GameState
@@ -121,15 +121,13 @@ class CombatState(NamedTuple):
     zone_hit: Optional[str] = None  # if enemy.hit_zones and round > 0, hit zone clicked by player in previous round
     def combat_round(self, after_round_end=False):
         # If `after_round_end`, `combat.round` is decremented:
-        # pylint: disable=no-member
-        combat = self._replace(round=self.round - 1) if after_round_end else self
-        enemy_rounds = combat.enemy.rounds
-        if enemy_rounds:
+        combat = self._replace(round=self.round - 1) if after_round_end else self  # pylint: disable=no-member
+        if combat.enemy.rounds:
             assert not combat.zone_hit, f'Hit zones are not expected with fixed rounds: {combat}'
-            return enemy_rounds[combat.round % len(enemy_rounds)]
+            return combat.enemy.rounds[combat.round % len(combat.enemy.rounds)]
         assert combat.enemy.attack_logic, f'Enemy must either have a non-empty .rounds attribute, or an .attack_logic: {combat.enemy}'
         # Here .attack_logic must handle a `None` value for combat.zone_hit,
-        # as it is the case 1st round or if the player choose a non-ATTACK action:
+        # as it is the case on 1st round, or if the player choose a non-ATTACK action:
         return combat.enemy.attack_logic(combat)
 
 
