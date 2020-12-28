@@ -248,8 +248,8 @@ class GameState(NamedTuple):
             self_val, other_val = getattr(self, field), getattr(other, field)
             if self_val != other_val:
                 out += f'{field}: '
-                if isinstance(self_val, tuple):
-                    self_val_set, other_val_set = set(self_val), set(other_val)
+                if isinstance(self_val, tuple) or isinstance(other_val, tuple):
+                    self_val_set, other_val_set = set(self_val or ()), set(other_val or ())
                     left_diff, right_diff = self_val_set - other_val_set, other_val_set - self_val_set
                     left_diff = ('+' + ','.join(map(str, left_diff))) if left_diff else ''
                     right_diff = ('+' + ','.join(map(str, right_diff))) if right_diff else ''

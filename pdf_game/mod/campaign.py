@@ -673,7 +673,7 @@ def script_it():
             return combat, 'Parried!'
         log_result = 'Tail cut' if hit_zone_name == 'TAIL' else f'{attack_damage} damage'
         if hit_zone_name == 'WINGS' and combat.enemy.hp >= 2 * attack_damage:
-            # The wings are not severed on the 1st hit, only after the 2nd cut:
+            # The wings are not severed on the first hits, only after the 3rd cut:
             new_hit_zones = combat.enemy.hit_zones
         else:
             new_hit_zones = tuple((name, pos) for (name, pos) in combat.enemy.hit_zones if name != hit_zone_name)
