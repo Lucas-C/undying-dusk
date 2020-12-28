@@ -51,6 +51,7 @@ class CombatRound(NamedTuple):
     run_away : bool = False
     ask_for_mercy : tuple = ()  # (offer_msg, func[GameState->GameState])
     boneshield_up : bool = False
+    enemy_frame : Optional[int] = None
     treasure_id : int = 0
     sfx : SFX = None
 
@@ -79,7 +80,7 @@ class Enemy(NamedTuple):
     category : int
     hp : int
     max_hp : int
-    rounds : Tuple[CombatRound]
+    rounds : Tuple[CombatRound] = ()  # if empty, attack_logic must be defined
     type : Optional[int] = None
     show_on_map : bool = True
     intro_msg : str = ''
@@ -92,9 +93,17 @@ class Enemy(NamedTuple):
     invincible : bool = False  # useful while level designing
     music : str = ''
     loop_frames : bool = False
+    hit_zones : tuple = ()  # mapping items: name str -> Position
+    withstand_logic : Optional[Callable[['CombatState'], tuple]] = None  # CombatState -> (CombatState, log_result)
+    attack_logic : Optional[Callable[['CombatState', 'int'], CombatRound]] = None  # (CombatState, round) -> CombatRound
     post_defeat_condition : Optional[Callable[['GameState'], bool]] = None  # GameState -> bool
     post_defeat : Optional[Callable[['FPDF'], None]] = None  # renderer function, will receive a .game_view attribute
     post_victory : Optional[Callable[['GameState'], Optional['GameState']]] = None  # GameState -> GameState
+    @property
+    def hit_zone_names(self):
+        return tuple(name for (name, pos) in self.hit_zones)
+    def hit_zone_pos_for(self, hit_zone_name):
+        return dict(self.hit_zones)[hit_zone_name]
 
 
 class CombatLog(NamedTuple):
@@ -109,6 +118,19 @@ class CombatState(NamedTuple):
     avatar_log: Optional[CombatLog] = None
     enemy_log: Optional[CombatLog] = None
     boneshield_up: bool = False
+    zone_hit: Optional[str] = None  # if enemy.hit_zones and round > 0, hit zone clicked by player in previous round
+    def combat_round(self, after_round_end=False):
+        # If `after_round_end`, `combat.round` is decremented:
+        # pylint: disable=no-member
+        combat = self._replace(round=self.round - 1) if after_round_end else self
+        enemy_rounds = combat.enemy.rounds
+        if enemy_rounds:
+            assert not combat.zone_hit, f'Hit zones are not expected with fixed rounds: {combat}'
+            return enemy_rounds[combat.round % len(enemy_rounds)]
+        assert combat.enemy.attack_logic, f'Enemy must either have a non-empty .rounds attribute, or an .attack_logic: {combat.enemy}'
+        # Here .attack_logic must handle a `None` value for combat.zone_hit,
+        # as it is the case 1st round or if the player choose a non-ATTACK action:
+        return combat.enemy.attack_logic(combat)
 
 
 class RollingBoulder(NamedTuple):
@@ -188,8 +210,7 @@ class GameState(NamedTuple):
                              trick=None, puzzle_step=None if self.puzzle_step is None else 0,
                              reverse_id=False, fixed_id=0,
                              combat=self.combat and self.combat._replace(
-                                avatar_log=None,
-                                enemy_log=None))
+                                avatar_log=None, enemy_log=None, zone_hit=None))
     def tile_override_at(self, coords):
         try:
             return next(tile_id for (pos, tile_id) in self.tile_overrides if pos == coords)

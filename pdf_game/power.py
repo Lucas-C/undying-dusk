@@ -16,8 +16,7 @@ def power_enemy_attack(game_state, parried=False):
     Return: (next_state, extra_actions)
     '''
     combat = game_state.combat
-    enemy_rounds = combat.enemy.rounds
-    _round = enemy_rounds[combat.round % len(enemy_rounds)]
+    _round = combat.combat_round()
     if _round.run_away:
         assert not (_round.miss or _round.atk or _round.hp_drain or _round.mp_drain or _round.boneshield_up)
         return game_state._replace(combat=combat._replace(enemy=combat.enemy._replace(hp=0, gold=0, reward=None)),
@@ -26,7 +25,8 @@ def power_enemy_attack(game_state, parried=False):
         assert combat.enemy.hp > 0, f'Dead enemies cannot ask for mercy: {game_state.coords} round={combat.round} eHP={combat.enemy.hp}'
         offer_msg, agreed_func = _round.ask_for_mercy
         next_state = game_state._replace(message=f'\n{offer_msg}')
-        state_if_agreed = next_state._replace(combat=combat._replace(enemy=combat.enemy._replace(hp=0, gold=0, reward=None)))
+        state_if_agreed = next_state._replace(combat=combat._replace(avatar_log=None,
+                enemy=combat.enemy._replace(hp=0, gold=0, reward=None)))
         actions = {'END-COMBAT-AFTER-VICTORY': agreed_func(state_if_agreed)}
         return next_state, actions
     attack_damage, log_result = 0, ''
@@ -63,8 +63,7 @@ def power_enemy_attack(game_state, parried=False):
 def power_hero_attack(game_state):
     'Modded function to make combats fully predictable'
     combat = game_state.combat
-    enemy_rounds = combat.enemy.rounds
-    _round = enemy_rounds[combat.round % len(enemy_rounds)]
+    _round = combat.combat_round()
     log_action = "Attack!"
     if _round.dodge:
         assert not _round.hero_crit  # we prevent wasted critical hit for now
@@ -82,8 +81,11 @@ def power_hero_attack(game_state):
         if _round.hero_crit:
             attack_damage += atk_max
             log_action = "Critical hit!"
-        combat = combat._replace(enemy=combat.enemy._replace(hp=combat.enemy.hp - attack_damage))
-        log_result = f"{attack_damage} damage"
+        if combat.enemy.withstand_logic:
+            combat, log_result = combat.enemy.withstand_logic(combat, attack_damage)
+        else:
+            combat = combat._replace(enemy=combat.enemy._replace(hp=combat.enemy.hp - attack_damage))
+            log_result = f"{attack_damage} damage"
     combat = combat._replace(avatar_log=CombatLog(action=log_action, result=log_result))
     return game_state._replace(combat=combat)
 
@@ -120,8 +122,7 @@ def power_burn(game_state, next_pos_facing=None, next_tile_facing=None):
     if game_state.mp == 0:
         return None
     if game_state.mode == GameMode.COMBAT:
-        _enemy = game_state.combat.enemy
-        _round = _enemy.rounds[game_state.combat.round % len(_enemy.rounds)]
+        _enemy, _round = game_state.combat.enemy, game_state.combat.combat_round()
         attack_damage, log_action = 0, 'Cast "Burn"'
         if _round.dodge:
             assert not _round.hero_crit
@@ -163,8 +164,7 @@ def power_unlock(game_state, next_pos_facing=None):
     if game_state.mp == 0:
         return None
     if game_state.mode == GameMode.COMBAT:
-        _enemy = game_state.combat.enemy
-        _round = _enemy.rounds[game_state.combat.round % len(_enemy.rounds)]
+        _enemy, _round = game_state.combat.enemy, game_state.combat.combat_round()
         attack_damage, log_action = 0, 'Cast "Unlock"'
         if _round.dodge:
             assert not _round.hero_crit

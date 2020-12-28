@@ -210,7 +210,7 @@ def script_it():
     # - Sage Therel             teach BURN spell in exchange for the scroll / teach UNLOCK spell later on, again in exchange for a scroll
 
     # Block exit to the plains; required to win: a night of rest
-    def _post_1st_zombie_fight(gs):
+    def _post_1st_zombie_fight(gs, _):
         assert gs.hp == 8 and not gs.mp, gs
     mapscript_add_enemy((5, 9, 10), 'zombie',
         hp=5, gold=3, rounds=(                 # best moves:
@@ -257,7 +257,7 @@ def script_it():
             CR('Sword slash', atk=12),                   # HEAL           -> hero HP=18 | skeleton HP=32
             CR('Sword thrust', atk=14, hero_crit=True),  # CRITICAL BURN! -> hero HP=4  | skeleton HP=0
         ), music=BASE_MUSIC_URL + 'MatthewPablo-DarkDescent.mp3',
-        post_victory=lambda gs: gs._replace(mode=GameMode.DIALOG, shop_id=risking_it_all().id))
+        post_victory=lambda gs, _: gs._replace(mode=GameMode.DIALOG, shop_id=risking_it_all().id))
 
     # An invisible chest is hidden behind a wall, behind a pillar:
     def _grant_scroll(game_view, _):
@@ -358,7 +358,7 @@ def script_it():
     mapscript_add_trigger((7, 2, 5), _signal_portcullis)  # one-time event/message
 
     # Entrance to Mausoleum is blocked by a zombie; required to win: full HP & full fire boost buff (+9 dmg)
-    def _post_canal_zombie_fight(gs):
+    def _post_canal_zombie_fight(gs, _):
         assert gs.hp == 4 and not gs.mp, gs
     mapscript_add_enemy((7, 9, 5), 'zombie',
         hp=27, gold=5, rounds=(                # best moves:
@@ -443,7 +443,7 @@ def script_it():
     mapscript_remove_chest((8, 3, 12))  # used to be: Magic Sapphire (MP Up)
 
     # 3 mimics possess the St Knight armor parts; required to win: UNLOCK spell + 1 MP each + enough HP (= 1 night of rest @ Inn)
-    def _on_mimic_vanquished(gs):
+    def _on_mimic_vanquished(gs, _):
         assert gs.spellbook >= 3, f'Mimic @{gs.coords} beaten without UNLOCK spell!'
         if gs.coords == BOX_MIMIC_POS:  # box mimic beaten => inscription on wall can be seen
             gs = gs.with_hidden_trigger('FOUNTAIN_HINT')
@@ -551,7 +551,7 @@ def script_it():
     # Sage Therel will trade the scroll for the UNLOCK spell
 
     gorgon_pos = (5, 9, 9)
-    def _unbelievable(_):
+    def _unbelievable(*_):
         assert False, 'Gorgon vanquished in fair battle!'
     mapscript_add_enemy(gorgon_pos, 'gorgon',
         condition=lambda gs: gs.tile_override_at(MAUSOLEUM_PORTAL_COORDS),
@@ -663,21 +663,44 @@ def script_it():
     #---------------------------
     # Entering: Dead Walkways (map: 9 - checkpoint)
     #---------------------------
-    # The heroine has 0/3 MP, 3/4 gold, boots, the HEAL, BURN & UNLOCK spells, St Knight armor (def 12) and does 13 dmg with their sword.
-    # Pre-dragon-fight avatar has 12 HP.
-    def _ensure_beaten_with_st_knight_armor(gs):
-        assert gs.armor > 1, 'Hero should have the St Knight armor to beat the Storm Dragon'
+    # The heroine has 12/30 HP, 0/3 MP, 3/4 gold, boots, the HEAL, BURN & UNLOCK spells, St Knight armor (def 12) and does 13 dmg with their sword.
+    def dragon_withstand_logic(combat, attack_damage):
+        assert attack_damage == 13, f'Storm dragon received unexpected damage: {attack_damage}'
+        hit_zone_name = combat.zone_hit
+        assert hit_zone_name in combat.enemy.hit_zone_names or not hit_zone_name, hit_zone_name
+        if hit_zone_name == 'HEAD' and len(combat.enemy.hit_zones) > 1:
+            # Head cannot be injured until all other members are severed:
+            return combat, 'Parried!'
+        log_result = 'Tail cut' if hit_zone_name == 'TAIL' else f'{attack_damage} damage'
+        if hit_zone_name == 'WINGS' and combat.enemy.hp >= 2 * attack_damage:
+            # The wings are not severed on the 1st hit, only after the 2nd cut:
+            new_hit_zones = combat.enemy.hit_zones
+        else:
+            new_hit_zones = tuple((name, pos) for (name, pos) in combat.enemy.hit_zones if name != hit_zone_name)
+        new_hp = combat.enemy.hp - attack_damage
+        return combat._replace(enemy=combat.enemy._replace(hp=new_hp, hit_zones=new_hit_zones)), log_result
+    def dragon_attack_logic(combat):
+        if 'TAIL' in combat.enemy.hit_zone_names:
+            # Most lethal, kill the hero in 2 hits, must be cut 1st:
+            return CR('Tail slap', atk=18, enemy_frame=0)
+        if 'WINGS' in combat.enemy.hit_zone_names:
+            return CR('Wing thump', atk=14, enemy_frame=1)
+        return CR('Bite', atk=15, enemy_frame=2)
+    def _ensure_beaten_with_st_knight_armor(gs, src_view):
+        if gs.armor <= 1 or gs.hp != 3:
+            log_combat(src_view)
+            assert gs.armor > 1, 'Storm Dragon beaten without St Knight armor!'
+            assert gs.hp == 2, f'Hero should have 2 HP after beating the Storm Dragon, in order to face the druid later on, but has: {gs.hp} HP'
     mapscript_add_enemy((9, 2, 5), 'storm_dragon',  # required to win: St Knight armor, great sword & > 11 HP
         category=ENEMY_CATEGORY_BEAST,
-        hp=38, max_rounds=6, rounds=(             # best moves:
-            CR('Tail slap', atk=13),              # player ATTACK -> hero HP=11 | dragon HP=25
-            CR('Wing thump', atk=12, dodge=True), # player ATTACK -> hero HP=10 | dragon HP=25
-            CR('Critical bite', atk=17),          # player ATTACK -> hero HP=5  | dragon HP=12
-            CR('Bite', atk=14),                   # player ATTACK -> hero HP=3  | dragon HP=-1
-        ), post_defeat_condition=lambda gs: gs.armor <= 1,
+        hp=51, max_rounds=6, hit_zones=(
+            ('HEAD', Position(x=98, y=20)),
+            ('TAIL', Position(x=30, y=44)),
+            ('WINGS', Position(x=98, y=81)),
+        ), withstand_logic=dragon_withstand_logic, attack_logic=dragon_attack_logic,
+        post_defeat_condition=lambda gs: gs.armor <= 1,   # only display hint if not wearing strong armor
         post_defeat=render_storm_dragon_post_defeat_hint,
         post_victory=_ensure_beaten_with_st_knight_armor)
-    # Post-dragon-fight avatar has 3 HP.
 
     goblin_bribe = Bribe(gold=3, result_msg='He runs away with your gold')
     mapscript_add_enemy((9, 3, 3), 'goblin',  # deal is a red-herring, run away if fought
@@ -686,8 +709,8 @@ def script_it():
 
     mapscript_add_enemy((9, 3, 7), 'druid',   # ask for mercy if fought -> restore hero HP/MP
         hp=40, rounds=(
-            CR('Dagger slash', atk=7),
-            CR('Life drain', atk=12, hp_drain=True),
+            CR('Dagger slash', atk=7),  # fully withstanded by armor, but still gives 1 damage
+            CR('Life drain', miss=True),
             CR('', ask_for_mercy=('Mercy! Spare me!',
                                   # The gold reset to zero helps limiting the #states
                                   lambda gs: gs._replace(gold=0, hp=gs.max_hp, mp=gs.max_mp, treasure_id=25,
@@ -696,13 +719,15 @@ def script_it():
         ))
 
     def _pass_arch1(game_view, _):
+        gs = game_view.state
+        assert gs.hp == gs.max_hp, f'Hero should have full HP on 1st arch passing, but has: {gs.hp} HP'
+        assert gs.mp == 2, f'Hero should have 2 MP on 1st arch passing, but has: {gs.mp} MP'
         msg = 'The Empress voice echoes:\n'
         msg += '\n"Go away, impostor!\nYou have nothing of a knight!"\n'
         # Doing a bit of unnecessary state cleanup:
-        game_view.state = game_view.state._replace(tile_overrides=(((9, 4, 5), 26),),  # portcullis block the way back
-                                                   triggers_activated=(game_view.state.coords,),
-                                                   vanquished_enemies=(),
-                                                   message=msg)
+        game_view.state = gs._replace(tile_overrides=(((9, 4, 5), 26),),  # portcullis block the way back
+                                      triggers_activated=(gs.coords,), vanquished_enemies=(),
+                                      message=msg)
     mapscript_add_trigger((9, 5, 5), _pass_arch1)
 
     def _grant_buckler(game_view, _GameView):
@@ -721,9 +746,11 @@ def script_it():
     mapscript_add_trigger((9, 8, 2), _pass_arch2)
 
     # Block access to the Empress boss; required to win: full HP & St Knight armor & a bucklet
-    def _ensure_beaten_with_buckler(gs):
-        assert 'BUCKLER' in gs.items, 'Demon Seamus beaten without buckler!'
-        assert gs.hp == 16
+    def _ensure_beaten_with_buckler(gs, src_view):
+        if 'BUCKLER' not in gs.items or gs.hp != 16:
+            log_combat(src_view)
+            assert 'BUCKLER' in gs.items, 'Demon Seamus beaten without buckler!'
+            assert gs.hp == 16, f'Hero should have 16 HP after beating Demon Seamus, but has: {gs.hp} HP'
     mapscript_add_enemy((9, 9, 3), 'demon_seamus',
         condition=lambda gs: 'SEAMUS_TRANSFORMED' in gs.hidden_triggers,
         category=enemy().ENEMY_CATEGORY_DEMON, hp=13*5-2, max_rounds=7, rounds=(
@@ -759,7 +786,7 @@ def script_it():
             # Death voice                                    # player BURN -> hero HP=5    | empress HP=13
             # Dark lightning                                 # player PARRY -> hero HP=5   | empress HP=13
             # Bone shield                                    # player ATTACK -> hero HP=2  | empress HP=0
-        ), post_victory=lambda gs: gs._replace(mode=GameMode.DIALOG, shop_id=the_end().id))
+        ), post_victory=lambda gs, _: gs._replace(mode=GameMode.DIALOG, shop_id=the_end().id))
 
 
 def render_abyss_filler_page(pdf, i):
@@ -788,7 +815,7 @@ def render_staff_puzzle(lever_angle_index):
     return extra_render
 RENDER_STAFF_PUZZLE = tuple(render_staff_puzzle(i) for i in range(8))
 
-LEVER_STAFF_POS = (  # match assets/lever-staff-$i.png files
+LEVER_STAFF_POS = (  # order matches assets/lever-staff-$i.png files
     Position(x=76, y=41),
     Position(x=77, y=47),
     Position(x=80, y=69),

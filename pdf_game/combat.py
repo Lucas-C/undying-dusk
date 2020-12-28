@@ -14,8 +14,8 @@ def combat_logic(game_view, actions, _GameView):
         next_gs = game_state.with_vanquished_enemy(game_state.coords)\
                             ._replace(mode=GameMode.EXPLORE, combat=None,
                                       bonus_atk=0, bonus_def=0)  # Temporary boosts stops after a combat
-        if game_state.combat.enemy.post_victory and game_state.hp > 0:
-            next_gs = game_state.combat.enemy.post_victory(next_gs) or next_gs
+        if _enemy.post_victory and game_state.hp > 0:
+            next_gs = _enemy.post_victory(next_gs, game_view) or next_gs
         actions['END-COMBAT-AFTER-VICTORY'] = _GameView(next_gs)
         return
     if game_state.combat.round > _enemy.max_rounds:
@@ -36,7 +36,12 @@ def combat_logic(game_view, actions, _GameView):
             next_state = enter_map(next_state, map_exit)
         # Unlike the original game, running away "pushes back" the avatar 1 tile away.
         actions['RUN'] = _GameView(next_state)
-    actions['ATTACK'] = combat_round(power_hero_attack(game_state), _GameView)
+    if _enemy.hit_zones:
+        for hit_zone_name, _ in _enemy.hit_zones:
+            new_gs = game_state._replace(combat=game_state.combat._replace(zone_hit=hit_zone_name))
+            actions[f'ATTACK_{hit_zone_name}'] = combat_round(power_hero_attack(new_gs), _GameView)
+    else:
+        actions['ATTACK'] = combat_round(power_hero_attack(game_state), _GameView)
     if 'BUCKLER' in game_state.items:
         next_gs, parried = power_hero_parry(game_state, 'BUCKLER')
         actions['BUCKLER'] = combat_round(next_gs, _GameView, parried=parried)
@@ -47,7 +52,7 @@ def combat_logic(game_view, actions, _GameView):
         elif bribe.gold and bribe.gold <= game_state.gold:
             assert 'THROW-COIN' not in actions, f'Several gold bribes can be offered {_enemy.name}@{game_state.coords} at the same time'
             actions['THROW-COIN'] = combat_bribe(game_state, bribe, _GameView)
-    if _is_enemy_running_away(game_state.combat):
+    if game_state.combat.combat_round().run_away:
         # This is a hack, but we don't want to allow the player to stupidly loose a MP
         # if the enemy is running away anyway.
         # (this can happen when fighting goblin after druid in Death Walkaways)
@@ -74,12 +79,6 @@ def combat_logic(game_view, actions, _GameView):
         actions['EMPTY_BOTTLE'] = combat_round(item_empty_bottle(game_state), _GameView)
     if 'HOLY_WATER' in game_state.items:
         actions['HOLY_WATER'] = combat_round(item_holy_water(game_state), _GameView)
-
-
-def _is_enemy_running_away(combat):
-    enemy_rounds = combat.enemy.rounds
-    _round = enemy_rounds[combat.round % len(enemy_rounds)]
-    return _round.run_away
 
 
 def combat_round(game_state, _GameView, parried=False):

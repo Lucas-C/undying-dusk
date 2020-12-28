@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Displaying water on minimap
 - More helpful hints than _"Trust your instinct: no need to go back for now"_
 - new checkpoint after bribing the goblin
+- 3 distinct hit zones during Storm Dragon battle
 
 ### Changed
 - Improved hints in Zuruth plain, for bottle & hidden chest

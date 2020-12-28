@@ -109,6 +109,11 @@ def render_page(pdf, game_view, render_victory):
             elif action_name in ACTION_BUTTONS:
                 action_button_render(pdf, action_name,
                                      page_id=next_game_view.page_id if next_game_view else None)
+            elif action_name.startswith('ATTACK_'):
+                _, hit_zone_name = action_name.split('_')
+                hit_zone_pos = game_state.combat.enemy.hit_zone_pos_for(hit_zone_name)
+                action_button_render(pdf, 'ATTACK', btn_pos=hit_zone_pos,
+                                     page_id=next_game_view.page_id if next_game_view else None)
             else:
                 arrow_button_render(pdf, action_name, next_game_view.page_id)
     if game_view.state.bonus_atk and game_state.mode in (GameMode.EXPLORE, GameMode.INFO):
@@ -250,7 +255,7 @@ def combat_render(pdf, game_state):
     _enemy = game_state.combat.enemy
     enemy_has_frames = get_image_info(pdf, _enemy_img_filepath(_enemy))['w'] > config().VIEW_WIDTH
     if _enemy.hp > 0 or enemy_has_frames:  # if the enemy visual is made of several frames, assume there is one for its death
-        enemy_render(pdf, _enemy, game_state.combat.round)
+        enemy_render(pdf, game_state.combat)
         if game_state.combat.boneshield_up:
             pdf.image('assets/enemies/bone_shield.png', x=0, y=0)  # Replicates boss_boneshield_render
     if _enemy.hp <= 0 and game_state.combat.enemy.gold:
@@ -280,17 +285,22 @@ def combat_render_log(pdf, prefix, log, start_y):
         bitfont_render(pdf, log.result, 2, start_y+20)
 
 
-def enemy_render(pdf, _enemy, _round=0):
-    img_filepath = _enemy_img_filepath(_enemy)
+def enemy_render(pdf, combat):
+    _enemy, _round = combat.enemy, combat.round
+    combat_round, img_filepath = combat.combat_round(after_round_end=True), _enemy_img_filepath(_enemy)
     # If the image is larger than the VIEW_WIDTH,
     # it is sliced in frames, and the one corresponding to the current round is used.
     # In case there are more rounds than frames, the last one is used for the remaining rounds.
-    frames = get_image_info(pdf, img_filepath)['w'] / config().VIEW_WIDTH
-    x = - config().VIEW_WIDTH * (_round % frames if (_enemy.loop_frames or _round < frames) else frames - 1)
-    pdf.image(img_filepath, x=x, y=0)
-    _combat_round = _enemy.rounds[(_round - 1) % len(_enemy.rounds)]
-    if _round and _combat_round.sfx:
-        sfx_render(pdf, _combat_round.sfx)
+    frame_count = get_image_info(pdf, img_filepath)['w'] / config().VIEW_WIDTH
+    if _round >= frame_count and not _enemy.loop_frames:
+        frame = frame_count - 1
+    elif combat_round.enemy_frame is None:
+        frame = _round % frame_count
+    else:
+        frame = combat_round.enemy_frame
+    pdf.image(img_filepath, x=-frame*config().VIEW_WIDTH, y=0)
+    if _round and combat_round.sfx:
+        sfx_render(pdf, combat_round.sfx)
 
 
 def enemy_render_small(pdf, _enemy, scale=2/3):
