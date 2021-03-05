@@ -641,7 +641,7 @@ def script_it():
         if gs.puzzle_step is not None:
             lever_angle_index = gs.puzzle_step % 10
             if not gs.extra_render:  # happens when moving to this tile from another one
-                assert gs.puzzle_step == 0
+                assert gs.puzzle_step == 0, gs.puzzle_step
                 game_view.state = game_view.state._replace(extra_render=RENDER_STAFF_PUZZLE[0])
             if gs.puzzle_step == ROTATING_LEVER_CORRECT_SEQUENCE:
                 game_view.state = game_view.state.with_tile_override(5, MAUSOLEUM_EXIT_COORDS)._replace(

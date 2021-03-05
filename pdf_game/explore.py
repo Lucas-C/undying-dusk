@@ -45,7 +45,7 @@ def explore_logic(game_view, actions, _GameView):
     actions['SHOW-INFO'] = info_view
     # Third, considering the 2 rotations always available:
     for action_name, facing in ROTATIONS_PER_FACING[game_state.facing].items():
-        actions[action_name] = _GameView(custom_explore_logic(action_name, game_state, game_state._replace(facing=facing)))
+        actions[action_name] = _GameView(custom_explore_logic(action_name, game_view.state, game_state._replace(facing=facing)))
     # Fourth, considering moving forward/backward:
     _map = atlas().maps[game_state.map_id]
     for action_name in ('MOVE-FORWARD', 'MOVE-BACKWARD'):
@@ -76,7 +76,7 @@ def explore_logic(game_view, actions, _GameView):
                 message = "Seems like something\nis blocking the door\nfrom behind"
                 actions[action_name] = _GameView(game_state._replace(message=message))
             continue
-        actions[action_name] = _GameView(custom_explore_logic(action_name, game_state, game_state._replace(x=x, y=y)))
+        actions[action_name] = _GameView(custom_explore_logic(action_name, game_view.state, game_state._replace(x=x, y=y)))
     if BURN_AND_PUSH_ALLOWED and next_tile_facing in (33, 36):  # facing a box
         custom = custom_can_push(game_state, actions)
         if custom:

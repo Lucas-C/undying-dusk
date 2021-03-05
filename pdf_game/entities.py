@@ -228,7 +228,7 @@ class GameState(NamedTuple):
                              milestone=GameMilestone.NONE,
                              book=None, treasure_id=0, extra_render=None, sfx=None,
                              music='', music_btn_pos=None,
-                             trick=None, puzzle_step=None if self.puzzle_step is None else 0,
+                             trick=None, puzzle_step=None if self.puzzle_step is None else 0,  # 0 indicates that staff is in slot
                              reverse_id=False, fixed_id=0,
                              combat=self.combat and self.combat._replace(
                                 avatar_log=None, enemy_log=None, action_name=None))

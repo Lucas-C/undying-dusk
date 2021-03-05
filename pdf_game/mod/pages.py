@@ -15,7 +15,7 @@ from ..render_utils import action_button_render, white_arrow_render
 METADATA = {
     'dc:title': 'Undying Dusk',
     'dc:description': 'PDF port of Clint Bellanger 2013 RPG dungeon crawl game',
-    'dc:creator': 'Lucas Cimon',
+    'dc:creator': ['Lucas Cimon'],
     'pdf:Keywords': 'pdf interactive game video-game dungeon crawl',
     'pdf:Producer': f'PyFPDF/fpdf{FPDF_VERSION}',
     'xmp:CreatorTool': 'Lucas-C/undying-dusk',
