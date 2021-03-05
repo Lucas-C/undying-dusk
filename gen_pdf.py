@@ -13,7 +13,8 @@ from pdf_game.perfs import print_perf_stats, trace_time, PerfsMonitorWrapper
 from pdf_game.render import render_page
 
 from pdf_game.mod import campaign
-from pdf_game.mod.pages import render_credit_pages, render_intro_pages, render_victory, METADATA, XMP_METADATA
+from pdf_game.mod.metadata import METADATA, XMP_METADATA
+from pdf_game.mod.pages import render_credit_pages, render_intro_pages, render_victory
 # Note that there are other changes made from the "mod" package that are applied through patch* functions
 
 
@@ -65,7 +66,6 @@ def parse_args():
     parser.add_argument("--iter-logs", action="store_true", help=" ")
     parser.add_argument("--no-script", action="store_true", help=" ")
     parser.add_argument("--no-reducer", action="store_true", help=" ")
-    parser.add_argument("--no-metadata", action="store_true", help=" ")
     parser.add_argument("--no-pdf", action="store_true", help=" ")
     parser.add_argument("--detect-deadends", action="store_true", help="Sanity check")
     parser.add_argument("--print-reduced-views", action="store_true", help=" ")

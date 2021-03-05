@@ -1,7 +1,4 @@
 from base64 import urlsafe_b64encode
-from datetime import datetime
-
-from fpdf import FPDF_VERSION
 
 from .. import __version__
 from ..bitfont import bitfont_set_color_red, bitfont_color_red, bitfont_render, Justify
@@ -10,46 +7,6 @@ from ..js import REL_RELEASE_DIR
 from ..render import arrow_button_render, ARROW_BUTTONS_POS
 from ..render_info import info_render_button
 from ..render_utils import action_button_render, white_arrow_render
-
-
-METADATA = {
-    'dc:title': 'Undying Dusk',
-    'dc:description': 'PDF port of Clint Bellanger 2013 RPG dungeon crawl game',
-    'dc:creator': 'Lucas Cimon',
-    'pdf:Keywords': 'pdf interactive game video-game dungeon crawl',
-    'pdf:Producer': f'PyFPDF/fpdf{FPDF_VERSION}',
-    'xmp:CreatorTool': 'Lucas-C/undying-dusk',
-    'xmp:MetadataDate': datetime.now(datetime.utcnow().astimezone().tzinfo).isoformat()
-}
-XMP_METADATA = f'''<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="fpdf2">
-  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <rdf:Description rdf:about="">
-      <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">
-        <rdf:Alt>
-          <rdf:li xml:lang="x-default">{METADATA['dc:title']}</rdf:li>
-        </rdf:Alt>
-      </dc:title>
-    </rdf:Description>
-    <rdf:Description rdf:about="">
-      <dc:description xmlns:dc="http://purl.org/dc/elements/1.1/">
-        <rdf:Alt>
-          <rdf:li xml:lang="x-default">{METADATA['dc:description']}</rdf:li>
-        </rdf:Alt>
-      </dc:description>
-    </rdf:Description>
-    <rdf:Description rdf:about="">
-      <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">
-        <rdf:Seq>
-          <rdf:li>{METADATA['dc:creator']}</rdf:li>
-        </rdf:Seq>
-      </dc:creator>
-    </rdf:Description>
-    <rdf:Description xmlns:pdf="http://ns.adobe.com/pdf/1.3/" rdf:about="" pdf:Keywords="{METADATA['pdf:Keywords']}"/>
-    <rdf:Description xmlns:pdf="http://ns.adobe.com/pdf/1.3/" rdf:about="" pdf:Producer="{METADATA['pdf:Producer']}"/>
-    <rdf:Description xmlns:xmp="http://ns.adobe.com/xap/1.0/" rdf:about="" xmp:CreatorTool="{METADATA['xmp:CreatorTool']}"/>
-    <rdf:Description xmlns:xmp="http://ns.adobe.com/xap/1.0/" rdf:about="" xmp:MetadataDate="{METADATA['xmp:MetadataDate']}"/>
-  </rdf:RDF>
-</x:xmpmeta>'''
 
 
 def render_intro_pages(pdf, start_page_id):
@@ -137,9 +94,10 @@ def _render_title(pdf, start_page_id):
 def _render_how_to_play(pdf, start_page_id):
     pdf.add_page()
     pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
-    bitfont_render(pdf, 'This is an interactive game.\nYou play it by clicking on\n\nand image links\nlike the arrow below', 80, 10, Justify.CENTER)
+    bitfont_render(pdf, 'This is an interactive game.\nYou play it by clicking on', 80, 20, Justify.CENTER)
     with bitfont_color_red():
-        bitfont_render(pdf, 'text links', 80, 70, Justify.CENTER, page_id=3)
+        bitfont_render(pdf, 'text links', 80, 50, Justify.CENTER, page_id=3)
+    bitfont_render(pdf, 'and image links\nlike the arrow below', 80, 70, Justify.CENTER)
     white_arrow_render(pdf, 'NEXT', 142, 104, page_id=3)
 
     pdf.add_page()

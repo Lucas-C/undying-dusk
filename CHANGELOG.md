@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [0.9.5] - not released yet
+## [0.9.5] - 2021-03-05
 ### Added
 - new monster & puzzle to defeat it : the Gorgon!
 - new books-based rotating-lever puzzle to leave the Mausoleum

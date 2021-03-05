@@ -34,7 +34,6 @@ def custom_explore_logic(action_name, gs, new_gs):
                 if puzzle_step == 4:
                     return gs_with_msg(new_gs, 5)
             elif action_name == 'MOVE-FORWARD' and 'KONAMI_CODE' not in gs.secrets_found:
-                print('Step #1')
                 return gs_with_msg(new_gs, 1)
         elif facing == FACING_SIDE and action_name == 'TURN-RIGHT':
             if puzzle_step == 7:
