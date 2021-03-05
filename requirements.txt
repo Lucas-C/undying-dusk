@@ -1,4 +1,4 @@
-fpdf2==2.1.0
+fpdf2
 humanfriendly  # purely optional
 pikepdf  # optional, allows to set PDF metadata
 pillow

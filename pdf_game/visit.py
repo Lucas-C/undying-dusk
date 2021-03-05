@@ -112,7 +112,8 @@ def visit_game_views(args):
                 initial_views = checkpoint_game_views
             else:
                 break
-        assert start_view, f'No start view found: maybe due to an invalid --start-at-checkpoint ({start_at_checkpoint}) ? #checkpoints=({len(CHECKPOINTS)})'
+        # pylint: disable=undefined-loop-variable
+        assert start_view, f'No start view found: maybe due to an invalid --start-at-checkpoint ({start_at_checkpoint}) ? #checkpoints={len(CHECKPOINTS)} last-#GameViews={len(game_views_until_checkpoint)} last-i={i}'
         print(f'{len(game_views)} views have been iterated')
 
     check_no_duplicate(game_views)
@@ -168,7 +169,7 @@ def iterate_game_views(checkpoint, checkpoint_id, start_views, _GameView):
         for action_name, new_game_view in list(actions.items()):  # list copy as it can be modified in the loop
             if not new_game_view:
                 continue
-            if new_game_view.state.mode == GameMode.EXPLORE and checkpoint.matches(new_game_view.state) and new_game_view.state.hp > 0:
+            if new_game_view.state.mode == checkpoint.mode and checkpoint.matches(new_game_view.state) and new_game_view.state.hp > 0:
                 milestone = GameMilestone.VICTORY if checkpoint == VICTORY_POS else GameMilestone.CHECKPOINT
                 new_gs_marked_as_milestone = new_game_view.state._replace(milestone=milestone, last_checkpoint=checkpoint_id)
                 if new_gs_marked_as_milestone not in set(cp_gv.state for cp_gv in checkpoint_game_views):
@@ -226,12 +227,13 @@ def check_no_duplicate(game_views):
     print('Check passed ✔️')
 
 
-def _normalized_state(gv, min_checkpoint_to_ignore_gold=9):
+def _normalized_state(game_view, min_checkpoint_to_ignore_gold=9):
     # Some secrets are achieved by using gold (e.g. fountain):
-    ignore_gold = gv.state.last_checkpoint >= min_checkpoint_to_ignore_gold
-    return gv.state.clean_copy()._replace(facing='',
-                                          # Ignoring fields varying due to secrets:
-                                          gold=0 if ignore_gold else gv.state.gold,
-                                          hidden_triggers=(), secrets_found=(),
-                                          vanquished_enemies=(),  # (e.g. shadow soul secret)
-                                          tile_overrides=(), triggers_activated=())  # (e.g. shadow soul secret)
+    gs = game_view.state.clean_copy()
+    ignore_gold = gs.last_checkpoint >= min_checkpoint_to_ignore_gold
+    return gs._replace(facing='',
+                       # Ignoring fields varying due to secrets:
+                       gold=0 if ignore_gold else gs.gold,
+                       hidden_triggers=(), secrets_found=(),
+                       vanquished_enemies=(),  # (e.g. shadow soul secret)
+                       tile_overrides=(), triggers_activated=())  # (e.g. shadow soul secret)

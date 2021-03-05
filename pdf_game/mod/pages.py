@@ -1,4 +1,7 @@
 from base64 import urlsafe_b64encode
+from datetime import datetime
+
+from fpdf import FPDF_VERSION
 
 from .. import __version__
 from ..bitfont import bitfont_set_color_red, bitfont_color_red, bitfont_render, Justify
@@ -14,14 +17,16 @@ METADATA = {
     'dc:description': 'PDF port of Clint Bellanger 2013 RPG dungeon crawl game',
     'dc:creator': 'Lucas Cimon',
     'pdf:Keywords': 'pdf interactive game video-game dungeon crawl',
+    'pdf:Producer': f'PyFPDF/fpdf{FPDF_VERSION}',
+    'xmp:CreatorTool': 'Lucas-C/undying-dusk',
+    'xmp:MetadataDate': datetime.now(datetime.utcnow().astimezone().tzinfo).isoformat()
 }
 
 
 def render_intro_pages(pdf, start_page_id):
     bitfont_set_color_red(False)
     link_to_credits = _render_title(pdf, start_page_id)
-    _render_disclaimer(pdf)
-    _render_tutorial(pdf, start_page_id)
+    _render_how_to_play(pdf, start_page_id)
     return link_to_credits
 
 
@@ -100,23 +105,27 @@ def _render_title(pdf, start_page_id):
     return bitfont_render(pdf, 'CREDITS', 80, 88, Justify.CENTER, page_id=1)  # creating a dummy link to credits for now
 
 
-def _render_disclaimer(pdf):
+def _render_how_to_play(pdf, start_page_id):
     pdf.add_page()
     pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
-    bitfont_render(pdf, 'Please do not use\nAdobe Acrobat Reader\nto play this game, as it is\nnot performant enough\n\nuse instead', 80, 10, Justify.CENTER)
+    bitfont_render(pdf, 'This is an interactive game.\nYou play it by clicking on\n\nand image links\nlike the arrow below', 80, 10, Justify.CENTER)
+    with bitfont_color_red():
+        bitfont_render(pdf, 'text links', 80, 70, Justify.CENTER, page_id=3)
+    white_arrow_render(pdf, 'NEXT', 142, 104, page_id=3)
+
+    pdf.add_page()
+    pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
+    bitfont_render(pdf, 'Please do not use\nAdobe Acrobat Reader\nto play this game, as it\nrenders pages too slowly.\n\nuse instead', 80, 10, Justify.CENTER)
     with bitfont_color_red():
         bitfont_render(pdf, 'another PDF reader', 80, 70, Justify.CENTER, url='https://github.com/Lucas-C/undying-dusk#compatible-pdf-readers')
     bitfont_render(pdf, 'and zoom in it in order for', 80, 80, Justify.CENTER)
     bitfont_render(pdf, 'each page to take', 80, 90, Justify.CENTER)
     bitfont_render(pdf, 'the full height', 80, 100, Justify.CENTER)
-    # bitfont_render(pdf, '(text in red is clickable)', 80, 90, Justify.CENTER)
-    white_arrow_render(pdf, 'NEXT', 142, 104, page_id=3)
+    white_arrow_render(pdf, 'NEXT', 142, 104, page_id=4)
 
-
-def _render_tutorial(pdf, start_page_id):
     pdf.add_page()
     pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
-    bitfont_render(pdf, 'Click those buttons to\nnavigate between pages', 80, 9, Justify.CENTER)
+    bitfont_render(pdf, 'Interface buttons to\nnavigate between pages:', 80, 9, Justify.CENTER)
     for direction in ARROW_BUTTONS_POS:
         arrow_button_render(pdf, direction, shift_x=-85, shift_y=38)
     bitfont_render(pdf, 'LEFT/RIGHT :\nturn around', 45, 33)
@@ -127,7 +136,7 @@ def _render_tutorial(pdf, start_page_id):
     info_render_button(pdf, btn_pos=Position(85, start_y))
     bitfont_render(pdf, 'INFO', 105, start_y + 6)
     bitfont_render(pdf, 'Do NOT use your\nkeyboard arrow keys', 80, 98, Justify.CENTER)
-    white_arrow_render(pdf, 'NEXT', 142, 104, page_id=4)
+    white_arrow_render(pdf, 'NEXT', 142, 104, page_id=5)
 
     pdf.add_page()
     pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
@@ -136,10 +145,10 @@ def _render_tutorial(pdf, start_page_id):
     bitfont_render(pdf, 'indicates a music track.', 80, 32, Justify.CENTER)
     bitfont_render(pdf, 'Click on it when you see it!', 80, 50, Justify.CENTER)
     bitfont_render(pdf, 'A song will start in your', 80, 68, Justify.CENTER)
-    bitfont_render(pdf, ' web browser. Keep the music', 80, 78, Justify.CENTER)
-    bitfont_render(pdf, 'playing in the background,', 80, 88, Justify.CENTER)
-    bitfont_render(pdf, '& switch back to the game.', 80, 98, Justify.CENTER)
-    white_arrow_render(pdf, 'NEXT', 142, 104, page_id=5)
+    bitfont_render(pdf, ' web browser. Listen to the', 80, 78, Justify.CENTER)
+    bitfont_render(pdf, 'music in the background,', 80, 88, Justify.CENTER)
+    bitfont_render(pdf, 'and keep playing!', 80, 98, Justify.CENTER)
+    white_arrow_render(pdf, 'NEXT', 142, 104, page_id=6)
 
     pdf.add_page()
     pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
@@ -149,11 +158,11 @@ def _render_tutorial(pdf, start_page_id):
     bitfont_render(pdf, "MP 0/1", 2, 53)
     bitfont_render(pdf, "-> means you have\n    zero magic point\n    over 1 max", 45, 53)
     bitfont_render(pdf, "During your adventure, \nyou'll also find weapons,\narmor, items & spells.", 8, 87)
-    white_arrow_render(pdf, 'NEXT', 142, 104, page_id=6)
+    white_arrow_render(pdf, 'NEXT', 142, 104, page_id=7)
 
     pdf.add_page()
     pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
-    bitfont_render(pdf, 'TO SAVE/LOAD YOUR GAME,\nSIMPLY NOTE THE PAGE NUMBER', 80, 12, Justify.CENTER)
+    bitfont_render(pdf, 'To save or load your game,\nsimply note the page number', 80, 12, Justify.CENTER)
     with bitfont_color_red():
         bitfont_render(pdf, 'NOW ENTER\nTHE DUNGEON', 80, 37, Justify.CENTER, page_id=start_page_id)
     link = pdf.add_link()

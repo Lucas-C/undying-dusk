@@ -45,9 +45,8 @@ def print_perf_stats(header='Stage', timings_in_ms_per_stage=_EXEC_TIMES_MS):
 
 class PerfsMonitorWrapper:
     'Measure execution times of all method calls performed on a given class instance'
-    def __init__(self, instance, class_name=''):
+    def __init__(self, instance):
         self.instance = instance
-        self.class_name = class_name
         self.timings_in_ms_per_method = defaultdict(list)
 
     def __getattr__(self, name):
@@ -55,7 +54,7 @@ class PerfsMonitorWrapper:
             return getattr(self.instance, name)
 
     def print_perf_stats(self):
-        print(f'Perf stats of all calls made to {self.class_name} methods:')
+        print(f'Perf stats of all calls made to {self.instance.__class__.__name__} methods:')
         print_perf_stats('Method name', self.timings_in_ms_per_method)
 
 

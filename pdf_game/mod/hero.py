@@ -1,9 +1,21 @@
 from . import Proxy
+from ..entities import CombatLog, ParryItem
 
 
-_PATCHED_AVATAR = {
+_PATCHED_AVATAR = {  # Starting stats that differ from Heroine Dusk:
     'mp': 1,
     'max_mp': 1,
+}
+
+
+def scepter_parry_logic(gs, _round):
+    avatar_log = CombatLog(action='Parry', result='Magic absorbed!')
+    return gs._replace(combat=gs.combat._replace(avatar_log=avatar_log), mp=min(gs.mp + 2, gs.max_mp))
+
+
+PARRY_ITEMS = {
+    'BUCKLER': ParryItem(max_parries=2),
+    'SCEPTER': ParryItem(max_parries=2, logic=scepter_parry_logic),
 }
 
 

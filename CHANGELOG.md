@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - More helpful hints than _"Trust your instinct: no need to go back for now"_
 - new checkpoint after bribing the goblin
 - 3 distinct hit zones during Storm Dragon battle
+- phase 2 of the final boss battle
 
 ### Changed
 - Improved hints in Zuruth plain, for bottle & hidden chest

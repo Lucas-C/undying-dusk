@@ -48,10 +48,10 @@ class CombatRound(NamedTuple):
     hero_crit : bool = False
     hp_drain : bool = False
     mp_drain : bool = False
+    heal : int = 0
     run_away : bool = False
     ask_for_mercy : tuple = ()  # (offer_msg, func[GameState->GameState])
     boneshield_up : bool = False
-    enemy_frame : Optional[int] = None
     treasure_id : int = 0
     sfx : SFX = None
 
@@ -72,7 +72,20 @@ class Bribe(NamedTuple):
     item: str = ''
     gold: int = 0
     successful: bool = True
-    handshake : Callable[['GameState'], 'GameState'] = None
+    handshake : Optional[Callable[['GameState'], 'GameState']] = None
+
+
+class CustomCombatAction(NamedTuple):
+    """
+    Usually an action with a custom action button position,
+    associated with a custom attack/withstand logic for the enemy.
+    """
+    name: str  # must start with a known action: ATTACK_, HEAL_, etc.
+    btn_pos: Optional[Position] = None  # lookup ACTION_BUTTON_POS if not set
+    renderer : Optional[Callable[['FPDF', int], None]] = None  # renderer function, receives (pdf, page_id)
+    @property
+    def btn_type(self):
+        return self.name.split('_', 1)[0]
 
 
 class Enemy(NamedTuple):
@@ -93,17 +106,19 @@ class Enemy(NamedTuple):
     invincible : bool = False  # useful while level designing
     music : str = ''
     loop_frames : bool = False
-    hit_zones : tuple = ()  # mapping items: name str -> Position
-    withstand_logic : Optional[Callable[['CombatState', int], tuple]] = None  # (CombatState, attack_damage) -> (CombatState, log_result)
+    custom_actions : Tuple[CustomCombatAction] = ()
+    withstand_logic : Optional[Callable[['GameState', int], tuple]] = None  # (GameState, attack_damage) -> (GameState, log_result)
     attack_logic : Optional[Callable[['CombatState'], CombatRound]] = None  # CombatState -> CombatRound
+    enemy_frame : Optional[Callable[['GameState'], int]] = None
     post_defeat_condition : Optional[Callable[['GameState'], bool]] = None  # GameState -> bool
     post_defeat : Optional[Callable[['FPDF'], None]] = None  # renderer function, will receive a .game_view attribute
+    victory_msg : str = ''
     post_victory : Optional[Callable[['GameState'], Optional['GameState']]] = None  # GameState -> GameState
     @property
-    def hit_zone_names(self):
-        return tuple(name for (name, pos) in self.hit_zones)
-    def hit_zone_pos_for(self, hit_zone_name):
-        return dict(self.hit_zones)[hit_zone_name]
+    def custom_actions_names(self):
+        return tuple(cca.name for cca in self.custom_actions)
+    def custom_action_for(self, action_name):
+        return next((cca for cca in self.custom_actions if cca.name == action_name), None)
 
 
 class CombatLog(NamedTuple):
@@ -113,22 +128,29 @@ class CombatLog(NamedTuple):
 
 class CombatState(NamedTuple):
     enemy: Enemy
-    round: int = 0
+    combat_round: CombatRound = None
+    round: int = -1
     parries: int = 0  # ignores times when Enemy did not attack
     avatar_log: Optional[CombatLog] = None
     enemy_log: Optional[CombatLog] = None
     boneshield_up: bool = False
-    zone_hit: Optional[str] = None  # if enemy.hit_zones and round > 0, hit zone clicked by player in previous round
-    def combat_round(self, after_round_end=False):
-        # If `after_round_end`, `combat.round` is decremented:
-        combat = self._replace(round=self.round - 1) if after_round_end else self  # pylint: disable=no-member
-        if combat.enemy.rounds:
-            assert not combat.zone_hit, f'Hit zones are not expected with fixed rounds: {combat}'
-            return combat.enemy.rounds[combat.round % len(combat.enemy.rounds)]
-        assert combat.enemy.attack_logic, f'Enemy must either have a non-empty .rounds attribute, or an .attack_logic: {combat.enemy}'
-        # Here .attack_logic must handle a `None` value for combat.zone_hit,
-        # as it is the case on 1st round, or if the player choose a non-ATTACK action:
-        return combat.enemy.attack_logic(combat)
+    action_name: Optional[str] = None  # if round > 0, name of the action clicked by the player on the previous round
+    def incr_round(self):
+        # pylint: disable=no-member,protected-access
+        combat_state = self._replace(round=self.round + 1)
+        return combat_state._replace(combat_round=combat_state._combat_round())
+    def _combat_round(self):
+        assert self.round >= 0
+        if self.enemy.rounds:
+            assert not self.enemy.attack_logic, f'Enemy must either have a non-empty .rounds attribute, or an .attack_logic: {self.enemy}'
+            return self.enemy.rounds[self.round % len(self.enemy.rounds)]
+        assert self.enemy.attack_logic, f'Enemy must either have a non-empty .rounds attribute, or an .attack_logic: {self.enemy}'
+        return self.enemy.attack_logic(self)
+
+
+class ParryItem(NamedTuple):
+    max_parries: int   # after more hits withstanded, destroyed
+    logic: Optional[Callable[['GameState', CombatRound], Optional['GameState']]] = None
 
 
 class RollingBoulder(NamedTuple):
@@ -143,7 +165,8 @@ class Trick(NamedTuple):
     filler_pages: int = 0
     background: str = ''
     music: str = ''
-    filler_renderer : Optional[Callable[['FPDF', int], None]] = None
+    filler_renderer: Optional[Callable[['FPDF', int], None]] = None
+
 
 class Book(NamedTuple):
     text: str
@@ -208,12 +231,9 @@ class GameState(NamedTuple):
                              trick=None, puzzle_step=None if self.puzzle_step is None else 0,
                              reverse_id=False, fixed_id=0,
                              combat=self.combat and self.combat._replace(
-                                avatar_log=None, enemy_log=None, zone_hit=None))
+                                avatar_log=None, enemy_log=None, action_name=None))
     def tile_override_at(self, coords):
-        try:
-            return next(tile_id for (pos, tile_id) in self.tile_overrides if pos == coords)
-        except StopIteration:
-            return None
+        return next((tile_id for (pos, tile_id) in self.tile_overrides if pos == coords), None)
     def with_hidden_trigger(self, hidden_trigger):
         assert hidden_trigger not in self.hidden_triggers
         return self._replace(hidden_triggers=tuple(sorted(self.hidden_triggers + (hidden_trigger,))))
@@ -238,6 +258,8 @@ class GameState(NamedTuple):
     def with_vanquished_enemy(self, enemy_coords):
         assert enemy_coords not in self.vanquished_enemies
         return self._replace(vanquished_enemies=tuple(sorted(self.vanquished_enemies + (enemy_coords,))))
+    def with_combat_action(self, action_name):
+        return self._replace(combat=self.combat._replace(action_name=action_name))
     @property
     def coords(self):
         'Hero avatar coordinates'
@@ -425,7 +447,8 @@ class GameView:
 
 class Checkpoint(NamedTuple):
     coords: Tuple[int]
-    description: str = ''
+    description: str
+    mode: GameMode = GameMode.EXPLORE
     condition: Optional[Callable[[GameState], bool]] = None  # GameState -> bool
     def matches(self, game_state):
         # pylint: disable=not-callable

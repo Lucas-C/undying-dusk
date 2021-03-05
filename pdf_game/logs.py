@@ -64,8 +64,10 @@ def log_combat(start_gv):
     while not start_gv.state.combat:
         start_gv = start_gv.src_view
     for gv, prev_gv in reversed(list(_iter_path_view_logs(start_gv, stop_at_cond=lambda gv: not gv.state.combat))):
-        # depending on where this utility function is called, not all .actions may be filled:
-        action_name = next(name for name, next_gv in prev_gv.actions.items() if next_gv == gv) if prev_gv.actions else '?'
+        try:
+            action_name = next(name for name, next_gv in prev_gv.actions.items() if next_gv == gv)
+        except StopIteration:  # depending on where this utility function is called, not all .actions may be filled:
+            action_name = gv.state.combat.action_name
         _print_action(gv, action_name)
 
 def _print_action(gv, action_name):
@@ -84,9 +86,9 @@ def _print_action(gv, action_name):
 
 def _combat_line(gs):
     combat = gs.combat
-    line = f'Round {combat.round}: eHP={combat.enemy.hp:>2} aHP={gs.hp:>2} aMP={gs.mp:>2}'
+    line = f'Round {combat.round}: eHP={combat.enemy.hp:>2}/{combat.enemy.max_hp} aHP={gs.hp:>2}/{gs.max_hp} aMP={gs.mp:>2}'
     if combat.avatar_log:
-        line += f' | Hero: {combat.avatar_log.action:<7} {combat.avatar_log.result:<9}'
+        line += f' | Hero: {combat.avatar_log.action:<12} {combat.avatar_log.result:<9}'
     if combat.enemy_log:
         line += f' | Enemy: {combat.enemy_log.action} {combat.enemy_log.result}'
     return line

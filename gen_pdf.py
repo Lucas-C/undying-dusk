@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.8
 
 import argparse, json, logging, os
 
@@ -80,8 +80,9 @@ def parse_args():
 def init_pdf(start_page_id):
     dimensions = [config().VIEW_WIDTH, config().VIEW_HEIGHT]
     pdf = fpdf.FPDF(format=dimensions, unit='pt')
+    pdf.alias_nb_pages(None)  # disabling this feature for performance reasons
     pdf.set_auto_page_break(False)
-    pdf = PerfsMonitorWrapper(pdf, class_name='FPDF')
+    pdf = PerfsMonitorWrapper(pdf)
     links_to_credits = render_intro_pages(pdf, start_page_id)
     return pdf, links_to_credits
 

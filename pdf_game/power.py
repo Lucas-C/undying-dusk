@@ -1,51 +1,67 @@
 from math import floor
 
-from .entities import CombatLog, GameMode
+from .entities import CombatLog, CustomCombatAction, GameMode
 from .js import atlas, enemy, info
 from .logs import log
 
 
-MAX_PARRIES_PER_ITEM = {  # after more hits withstanded, destroyed
-    'BUCKLER': 2
-}
-
-
-def power_enemy_attack(game_state, parried=False):
+def power_enemy_attack(game_state, parry_item=None):
     '''
     Modded function to make combats fully predictable
     Return: (next_state, extra_actions)
     '''
     combat = game_state.combat
-    _round = combat.combat_round()
+    _round = combat.combat_round
     if _round.run_away:
-        assert not (_round.miss or _round.atk or _round.hp_drain or _round.mp_drain or _round.boneshield_up)
+        assert not (_round.ask_for_mercy or _round.miss or _round.atk or _round.hp_drain or _round.mp_drain or _round.heal or _round.boneshield_up)
         return game_state._replace(combat=combat._replace(enemy=combat.enemy._replace(hp=0, gold=0, reward=None)),
                                    message='The enemy ran away'), {}
     if _round.ask_for_mercy:
+        assert not (_round.miss or _round.atk or _round.hp_drain or _round.mp_drain or _round.heal or _round.boneshield_up)
         assert combat.enemy.hp > 0, f'Dead enemies cannot ask for mercy: {game_state.coords} round={combat.round} eHP={combat.enemy.hp}'
         offer_msg, agreed_func = _round.ask_for_mercy
         next_state = game_state._replace(message=f'\n{offer_msg}')
         state_if_agreed = next_state._replace(combat=combat._replace(avatar_log=None,
                 enemy=combat.enemy._replace(hp=0, gold=0, reward=None)))
-        actions = {'END-COMBAT-AFTER-VICTORY': agreed_func(state_if_agreed)}
-        return next_state, actions
+        extra_actions = {'END-COMBAT-AFTER-VICTORY': agreed_func(state_if_agreed)}
+        return next_state, extra_actions
     attack_damage, log_result = 0, ''
     if _round.miss:
-        assert not (_round.atk or _round.hp_drain or _round.mp_drain or _round.boneshield_up)
+        assert not (_round.atk or _round.hp_drain or _round.mp_drain or _round.heal or _round.boneshield_up)
         log_result = "Miss!"
     elif _round.mp_drain:
-        assert not (_round.atk or _round.hp_drain)
+        assert not (_round.atk or _round.hp_drain or _round.heal or _round.boneshield_up)
         log_result = "-0 MP"
         if game_state.mp > 0:
             game_state = game_state._replace(mp=game_state.mp - 1)
             log_result = "-1 MP"
+    elif _round.heal:
+        new_hp = min(combat.enemy.hp + _round.heal, combat.enemy.max_hp)
+        log_result = f"+{new_hp - combat.enemy.hp} HP"
+        combat = combat._replace(enemy=combat.enemy._replace(hp=new_hp))
     elif _round.atk:
         armor_def = info().armors[game_state.armor]['def']
         attack_damage = max(1, _round.atk - armor_def)
         log_result = f"{attack_damage} damage"
-        if parried:
+        if parry_item:
+            parry_outcome = True
+            if parry_item.logic:
+                parry_outcome = parry_item.logic(game_state, _round)
+                if parry_outcome:
+                    game_state = parry_outcome
+                    combat = game_state.combat
+                else:
+                    combat = combat._replace(avatar_log=CombatLog(action='Parry', result='Inadequate!'))
+        if parry_item and parry_outcome:
             log_result += ' avoided'
-            combat = combat._replace(parries=combat.parries + 1)
+            parries = combat.parries + 1
+            combat = combat._replace(parries=parries)
+            if parries == parry_item.max_parries:
+                game_state = game_state._replace(items=tuple(item for item in game_state.items if item != combat.action_name))
+                # Notify the player about the broken parry item:
+                combat = combat._replace(avatar_log=CombatLog(action=f'{combat.action_name} destroyed', result='(too many hits)'))
+            elif parry_outcome is True:  # else is a GameState and parry_item.logic has already set avatar_log
+                combat = combat._replace(avatar_log=CombatLog(action='Parry', result='Blocked!'))
         else:
             game_state = game_state._replace(hp=game_state.hp - attack_damage)
             if _round.hp_drain:
@@ -53,7 +69,7 @@ def power_enemy_attack(game_state, parried=False):
                 combat = combat._replace(enemy=combat.enemy._replace(hp=new_hp))
         if _round.boneshield_up:
             combat = combat._replace(boneshield_up=True)
-    if combat.enemy.hp > 0 or log_result == "-1 MP" or attack_damage:
+    if combat.enemy.hp > 0 or log_result == "-1 MP" or _round.heal or attack_damage:
         # Minor rendering optim: not rendering final enemy log on combat victory page,
         # if avatar suffered no harm during this last round (makes flying_demon combat end better)
         combat = combat._replace(enemy_log=CombatLog(action=_round.attack_name, result=log_result))
@@ -63,7 +79,7 @@ def power_enemy_attack(game_state, parried=False):
 def power_hero_attack(game_state):
     'Modded function to make combats fully predictable'
     combat = game_state.combat
-    _round = combat.combat_round()
+    _round = combat.combat_round
     log_action = "Attack!"
     if _round.dodge:
         assert not _round.hero_crit  # we prevent wasted critical hit for now
@@ -82,21 +98,13 @@ def power_hero_attack(game_state):
             attack_damage += atk_max
             log_action = "Critical hit!"
         if combat.enemy.withstand_logic:
-            combat, log_result = combat.enemy.withstand_logic(combat, attack_damage)
+            game_state, log_result = combat.enemy.withstand_logic(game_state, attack_damage)
+            combat = game_state.combat
         else:
             combat = combat._replace(enemy=combat.enemy._replace(hp=combat.enemy.hp - attack_damage))
             log_result = f"{attack_damage} damage"
     combat = combat._replace(avatar_log=CombatLog(action=log_action, result=log_result))
     return game_state._replace(combat=combat)
-
-
-def power_hero_parry(game_state, parry_item):
-    combat = game_state.combat
-    action, result, parried = 'Parry!', '', True
-    if combat.parries >= MAX_PARRIES_PER_ITEM[parry_item]:
-        game_state = game_state._replace(items=tuple(item for item in game_state.items if item != parry_item))
-        action, result, parried = f'{parry_item.lower()} destroyed', '(too many hits)', False
-    return game_state._replace(combat=combat._replace(avatar_log=CombatLog(action, result))), parried
 
 
 def power_heal(game_state):
@@ -122,7 +130,8 @@ def power_burn(game_state, next_pos_facing=None, next_tile_facing=None):
     if game_state.mp == 0:
         return None
     if game_state.mode == GameMode.COMBAT:
-        _enemy, _round = game_state.combat.enemy, game_state.combat.combat_round()
+        combat = game_state.combat
+        _enemy, _round = combat.enemy, combat.combat_round
         attack_damage, log_action = 0, 'Cast "Burn"'
         if _round.dodge:
             assert not _round.hero_crit
@@ -136,10 +145,13 @@ def power_burn(game_state, next_pos_facing=None, next_tile_facing=None):
             if _round.hero_crit:
                 attack_damage *= 2  # damages are doubled in case of a critical hit
                 log_action = "Critical " + log_action
-            log_result = f"{attack_damage} damage"
-        combat = game_state.combat._replace(enemy=_enemy._replace(hp=_enemy.hp - attack_damage),
-                                            avatar_log=CombatLog(action=log_action, result=log_result),
-                                            boneshield_up=False)
+            if combat.enemy.withstand_logic:
+                game_state, log_result = combat.enemy.withstand_logic(game_state, attack_damage)
+                combat = game_state.combat
+            else:
+                combat = combat._replace(enemy=combat.enemy._replace(hp=combat.enemy.hp - attack_damage))
+                log_result = f"{attack_damage} damage"
+        combat = combat._replace(avatar_log=CombatLog(action=log_action, result=log_result), boneshield_up=False)
         game_state = game_state._replace(combat=combat)
         log(game_state, f"BURN: {attack_damage} damage")
     else:
@@ -164,7 +176,8 @@ def power_unlock(game_state, next_pos_facing=None):
     if game_state.mp == 0:
         return None
     if game_state.mode == GameMode.COMBAT:
-        _enemy, _round = game_state.combat.enemy, game_state.combat.combat_round()
+        combat = game_state.combat
+        _enemy, _round = combat.enemy, combat.combat_round
         attack_damage, log_action = 0, 'Cast "Unlock"'
         if _round.dodge:
             assert not _round.hero_crit
@@ -175,9 +188,13 @@ def power_unlock(game_state, next_pos_facing=None):
             if _round.hero_crit:
                 attack_damage *= 2  # damages are doubled in case of a critical hit
                 log_action = "Critical " + log_action
-            log_result = f"{attack_damage} damage"
-        combat = game_state.combat._replace(enemy=_enemy._replace(hp=_enemy.hp - attack_damage),
-                                            avatar_log=CombatLog(action=log_action, result=log_result))
+            if combat.enemy.withstand_logic:
+                game_state, log_result = combat.enemy.withstand_logic(game_state, attack_damage)
+                combat = game_state.combat
+            else:
+                combat = combat._replace(enemy=combat.enemy._replace(hp=combat.enemy.hp - attack_damage))
+                log_result = f"{attack_damage} damage"
+        combat = combat._replace(avatar_log=CombatLog(action=log_action, result=log_result))
         game_state = game_state._replace(combat=combat)
         log(game_state, f"UNLOCK: {attack_damage} damage")
     else:
@@ -199,6 +216,16 @@ def item_crucifix(game_state):
 
 def item_empty_bottle(game_state):
     return game_state._replace(combat=game_state.combat._replace(avatar_log=CombatLog(action="throw bottle", result="no effect")))
+
+
+def take_scepter(game_state):
+    combat = game_state.combat
+    assert 'TAKE_SCEPTER' in combat.enemy.custom_actions_names
+    new_custom_actions = tuple(cca for cca in combat.enemy.custom_actions if cca.name != 'TAKE_SCEPTER')
+    new_custom_actions += (CustomCombatAction('SCEPTER'),)
+    return game_state._replace(combat=combat._replace(avatar_log=CombatLog(action="scepter picked", result=''),
+                                                      enemy=combat.enemy._replace(custom_actions=new_custom_actions)),
+                               items=game_state.items + ('SCEPTER',))
 
 
 def item_holy_water(game_state):

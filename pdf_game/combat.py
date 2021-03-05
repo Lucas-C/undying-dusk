@@ -5,10 +5,13 @@ from .logs import log, log_combat
 from .mazemap import mazemap_is_exit
 from .power import *
 
+from .mod.hero import PARRY_ITEMS
+
 
 def combat_logic(game_view, actions, _GameView):
     'Put next game states in actions dict, depending on player choices'
     game_state = game_view.state.clean_copy()
+    game_state = game_state._replace(combat=game_state.combat.incr_round())
     _enemy = game_state.combat.enemy
     if _enemy.hp <= 0:
         next_gs = game_state.with_vanquished_enemy(game_state.coords)\
@@ -36,23 +39,26 @@ def combat_logic(game_view, actions, _GameView):
             next_state = enter_map(next_state, map_exit)
         # Unlike the original game, running away "pushes back" the avatar 1 tile away.
         actions['RUN'] = _GameView(next_state)
-    if _enemy.hit_zones:
-        for hit_zone_name, _ in _enemy.hit_zones:
-            new_gs = game_state._replace(combat=game_state.combat._replace(zone_hit=hit_zone_name))
-            actions[f'ATTACK_{hit_zone_name}'] = combat_round(power_hero_attack(new_gs), _GameView)
-    else:
-        actions['ATTACK'] = combat_round(power_hero_attack(game_state), _GameView)
-    if 'BUCKLER' in game_state.items:
-        next_gs, parried = power_hero_parry(game_state, 'BUCKLER')
-        actions['BUCKLER'] = combat_round(next_gs, _GameView, parried=parried)
+    def get_action_names(action_name):  # return None if action is not available, else the final action name, that can be custom
+        if not _enemy.custom_actions:
+            return [action_name]
+        return [cca.name for cca in _enemy.custom_actions if cca.name.startswith(action_name)]
+    for action_name in get_action_names('ATTACK'):
+        actions[action_name] = combat_round(power_hero_attack(game_state.with_combat_action(action_name)), _GameView)
+    for parry_item_name in ('BUCKLER', 'SCEPTER'):
+        if parry_item_name in game_state.items:
+            for action_name in get_action_names(parry_item_name):
+                actions[action_name] = combat_round(game_state.with_combat_action(action_name), _GameView, PARRY_ITEMS[parry_item_name])
     for bribe in _enemy.bribes:
         if bribe.item and bribe.item in game_state.items:
             assert bribe.item not in actions, f'Several bribes can be offered to {_enemy.name}@{game_state.coords} with the same item: {bribe.item}'
-            actions[bribe.item] = combat_bribe(game_state, bribe, _GameView)
+            for action_name in get_action_names(bribe.item):
+                actions[action_name] = combat_bribe(game_state.with_combat_action(action_name), bribe, _GameView)
         elif bribe.gold and bribe.gold <= game_state.gold:
             assert 'THROW-COIN' not in actions, f'Several gold bribes can be offered {_enemy.name}@{game_state.coords} at the same time'
-            actions['THROW-COIN'] = combat_bribe(game_state, bribe, _GameView)
-    if game_state.combat.combat_round().run_away:
+            for action_name in get_action_names('THROW-COIN'):
+                actions[action_name] = combat_bribe(game_state.with_combat_action(action_name), bribe, _GameView)
+    if game_state.combat.combat_round.run_away:
         # This is a hack, but we don't want to allow the player to stupidly loose a MP
         # if the enemy is running away anyway.
         # (this can happen when fighting goblin after druid in Death Walkaways)
@@ -68,30 +74,38 @@ def combat_logic(game_view, actions, _GameView):
     # Else they are displayed but do not generate a new state (= no link),
     # so insert them in "actions" with a None value.
     if game_state.spellbook >= 1:
-        actions['HEAL'] = combat_round(power_heal(game_state), _GameView)
+        for action_name in get_action_names('HEAL'):
+            actions[action_name] = combat_round(power_heal(game_state.with_combat_action(action_name)), _GameView)
     if game_state.spellbook >= 2:
-        actions['BURN'] = combat_round(power_burn(game_state), _GameView)
+        for action_name in get_action_names('BURN'):
+            actions[action_name] = combat_round(power_burn(game_state.with_combat_action(action_name)), _GameView)
     if game_state.spellbook >= 3:
-        actions['UNLOCK'] = combat_round(power_unlock(game_state), _GameView)
+        for action_name in get_action_names('UNLOCK'):
+            actions[action_name] = combat_round(power_unlock(game_state.with_combat_action(action_name)), _GameView)
     if 'CRUCIFIX' in game_state.items:
-        actions['CRUCIFIX'] = combat_round(item_crucifix(game_state), _GameView)
+        for action_name in get_action_names('CRUCIFIX'):
+            actions[action_name] = combat_round(item_crucifix(game_state.with_combat_action(action_name)), _GameView)
     if 'EMPTY_BOTTLE' in game_state.items:
-        actions['EMPTY_BOTTLE'] = combat_round(item_empty_bottle(game_state), _GameView)
+        for action_name in get_action_names('EMPTY_BOTTLE'):
+            actions[action_name] = combat_round(item_empty_bottle(game_state.with_combat_action(action_name)), _GameView)
     if 'HOLY_WATER' in game_state.items:
-        actions['HOLY_WATER'] = combat_round(item_holy_water(game_state), _GameView)
+        for action_name in get_action_names('HOLY_WATER'):
+            actions[action_name] = combat_round(item_holy_water(game_state.with_combat_action(action_name)), _GameView)
+    if 'SCEPTER' not in game_state.items and any(cca.name == 'TAKE_SCEPTER' for cca in _enemy.custom_actions):
+        for action_name in get_action_names('TAKE_SCEPTER'):
+            actions[action_name] = combat_round(take_scepter(game_state.with_combat_action(action_name)), _GameView)
 
 
-def combat_round(game_state, _GameView, parried=False):
+def combat_round(game_state, _GameView, parry_item=None):
     'Hero attack has already been resolved, now performing enemy attack'
     if not game_state:
         return None
-    game_state, extra_actions = power_enemy_attack(game_state, parried=parried)
+    game_state, extra_actions = power_enemy_attack(game_state, parry_item)
     if game_state.hp <= 0:
         game_state = game_state._replace(milestone=GameMilestone.GAME_OVER)
     elif game_state.combat.enemy.hp <= 0:
         game_state = combat_determine_reward(game_state)
-    combat = game_state.combat
-    next_gv = _GameView(game_state._replace(combat=combat._replace(round=combat.round + 1)))
+    next_gv = _GameView(game_state)
     for action_name, next_state in extra_actions.items():
         if action_name in next_gv.actions:
             assert next_gv.actions[action_name].state == next_state
@@ -106,6 +120,7 @@ def combat_bribe(game_state, bribe, _GameView):
     log(game_state, f'bribe attempt with {bribe_name}')
     if bribe.successful:
         combat = combat._replace(enemy=combat.enemy._replace(hp=0, gold=0, reward=None))
+    # Note: using a central message instead of the left-side avatar_log to focus on this special situation:
     message = 'You offer'
     message += '\n' if len(bribe_name) >= 19 else ' '
     message += f'{bribe_name}.\n{bribe.result_msg}'
@@ -126,7 +141,7 @@ def combat_determine_reward(game_state):
                     f' hp={game_state.hp}/{game_state.max_hp} mp={game_state.mp}/{game_state.max_mp}')
     if _enemy.hidden_trigger:
         game_state = game_state.with_hidden_trigger(_enemy.hidden_trigger)
-    msg = 'Victory!'
+    msg = _enemy.victory_msg or 'Victory!'
     if _enemy.reward:
         assert not _enemy.gold, 'Not implemented yet'
         if isinstance(_enemy.reward, RewardItem):

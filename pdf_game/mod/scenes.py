@@ -58,7 +58,7 @@ def intro(scene_id):
     )
     def dream_extra_render(pdf):
         pdf.image('assets/dominik-small.png', x=63, y=0)
-        bitfont_render(pdf, 'You dream a long dream.\nAs it ends\nthe only thing you remember\nis the face of a man.', 80, 55, Justify.CENTER)
+        bitfont_render(pdf, 'You dream a long dream.\n\nAs it ends\nthe only thing you remember\nis the face of a man.', 80, 55, Justify.CENTER)
     intro_7 = CutScene.new(
         extra_render=dream_extra_render,
         next_scene_id=intro_8.id,
@@ -102,15 +102,15 @@ def intro(scene_id):
 @cached()
 def seamus_through_small_window():
     dialog_5 = CutScene.new(
-        extra_render=seamus_speaks('In case of trouble\nuse your arcane talent:\nALT + LEFT ARROW KEY \nwill rewind time', behind_bars=True),
+        extra_render=seamus_speaks('In case of trouble\nuse your arcane talent:\nALT KEY + LEFT ARROW KEY \nwill rewind time', behind_bars=True),
         # treasure_id=32,
     )
     dialog_4 = CutScene.new(
-        extra_render=seamus_speaks('You must get out\nand meet me at the door.', behind_bars=True),
+        extra_render=seamus_speaks('You must get out\nand meet me at the door.\n\nFirst off, find a way\nbehind those boxes.', behind_bars=True),
         next_scene_id=dialog_5.id,
     )
     dialog_3 = CutScene.new(
-        extra_render=seamus_speaks("I brought you\ninside this Monastery\nfor your safety,\nbut monks became demons\nand I can't come back inside!", behind_bars=True),
+        extra_render=seamus_speaks("For your safety I brought\nyou inside this Monastery.\nBut I can't come back inside, as monks turned into demons!", behind_bars=True),
         next_scene_id=dialog_4.id,
     )
     dialog_2 = CutScene.new(

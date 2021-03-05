@@ -1,9 +1,12 @@
 name: build
 
-on:
+on:  # cf. https://github.community/t/how-to-trigger-an-action-on-push-or-pull-request-but-not-both/16662
   push:
     branches:
-    - '*'
+    - master
+  pull_request:
+    branches:
+    - master
 
 jobs:
   build:
@@ -12,10 +15,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set up Python 3.7
+      - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.8
       - name: Install dependencies
         run: |
           pip install flask livereload pylint pytest -r requirements.txt

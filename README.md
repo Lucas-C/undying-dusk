@@ -1,36 +1,25 @@
 <!-- NEXT STEPS:
-- final fight extra phases (must add checkpoints):
-  + empress-defeated: "Noooo! Come to me my minions!"
-  -> face 2 enemies => 2 health bars & 2 attacks -> undead-fossil / flying demon with daggers / upscaled-dragon-skeleton ?
-  -> one is sometimes looting, which is key to victory
-  + empress-defeated: "Noooo!" -> "Come back to help me Dominik!"
-  -> face undead Dominik, with impress in foreground
-  -> he reflects all attacks
-  -> winning strategy: HEAL + click him? keep parying?
+- check HOW TO PLAY & SEAMUS TRHOUGH CELL new rendering
 - add SFX for spells: cf. https://www.patreon.com/posts/dark-magic-8600078 & https://www.patreon.com/posts/light-magic-8781428 + attacks-sfx.md
+- create itch.io page
+- Androïd & Linux PDF readers?
+- post-release: publish assets
+- a11y? questions to Sandra Bruel: + quels lecteurs PDF vos amis emploient ?
 - feedback Maxime:
   * MUSIC: certaines sont trop rapprochées
   * seamus fight without buckler frustrating
   * skeleton fight : too hard ? hint at critical ?
-- feedback Henri:
-  * ajouter un journal rappelant tous les indices trouvés, à apparition unique
-- redemander feedbacks Androïd & Linux PDF readers à Nicolas (Evince, Okular...)
-- create itch.io page
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
   * maze rendering glitch
-- post-release: publish assets
+  * make "mod" a class instance, so that customization no more relies on imports, and make mapscript.SCRIPTS_PER_TILE a class property
 - VF?
-- a11y:
-  * add alt desc on action links -> https://www.w3.org/TR/WCAG20-TECHS/pdf#PDF13
-  * questions to Sandra Bruel:
-    + quels lecteurs PDF vos amis emploient ?
-    + comment rendre des liens de type image accessibles ?
 - size improvements:
   * 34M music/AlexandrZhelanov-ADarknessOpus.ogg
   * stats on what fights / tiles get the most rendered
   * MARGINAL EXPECTED EFFECT: pngoptimizer / optimize tilesets : many have redundant sections, a pre-rendering pass could extract tiles from tilesets and put them in a unique PNG, with mappings for the rendering step
 - ideas for another time:
+  * ajouter un journal rappelant tous les indices trouvés, à apparition unique (idée Henri)
   * animations (with full page clickable): crack opening, moving box, raising portcullis, contextual actions...
   * for a sequel, start off with Empress chasing player! (not doable due to #states explosion with secrets)
     -> must go back through whole level without slowing down, with Empress following
@@ -151,8 +140,7 @@ First of all, this game uses the great 16 color palette made by [DawnBringer at 
 This game also makes use of the following assets, some of which I ported to the DawnBringer palette:
 - all [the original art](https://opengameart.org/content/first-person-dungeon-crawl-art-pack) was made by Clint Bellanger for the original Heroine Dusk game - [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - enemies come from [Redshrike remix of Heroine Dusk original ones](https://opengameart.org/content/first-person-dungeon-crawl-enemies-remixed).
-Fossil dino come from [Fossil (Undead) RPG Enemy Sprites](https://opengameart.org/content/fossil-undead-rpg-enemy-sprites),
-flying demon with daggers from [More RPG enemies!](https://opengameart.org/content/more-rpg-enemies), Seamus wizard, demon & gorgon portraits from his [6 More RPG Enemies spritesheet](https://opengameart.org/content/6-more-rpg-enemies), black bird from his [Tower Defense Prototyping Assets]( https://opengameart.org/content/tower-defense-prototyping-assets-4-monsters-some-tiles-a-background-image) and blowfish from his [3 RPG enemy remixes](https://opengameart.org/content/3-rpg-enemy-remixes) - all [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+Seamus wizard, demon & gorgon portraits from his [6 More RPG Enemies spritesheet](https://opengameart.org/content/6-more-rpg-enemies), black bird from his [Tower Defense Prototyping Assets]( https://opengameart.org/content/tower-defense-prototyping-assets-4-monsters-some-tiles-a-background-image) and blowfish from his [3 RPG enemy remixes](https://opengameart.org/content/3-rpg-enemy-remixes) - all [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 Shadow soul extra frames come from [Bosses and monsters spritesheets (Ars Notoria) by Balmer](https://opengameart.org/content/bosses-and-monsters-spritesheets-ars-notoria) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - most new sprites (direction arrow, items, tiles) come from the awesome [_Recolor all the items!!!_ spritesheet by Marcus Ihde](https://opengameart.org/content/recolor-all-the-items) - [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - bible, fish & scroll 16x16 icons from [Kyrise's Free 16x16 RPG Icon Pack](https://opengameart.org/content/kyrises-free-16x16-rpg-icon-pack) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
@@ -182,6 +170,7 @@ DawnLike 16x16 Universal Rogue-like tileset
 - [Temple background by Ironthunder](https://opengameart.org/content/temple-background) - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - boat from [Mythical Ruins Tileset by voec](https://opengameart.org/content/mythical-ruins-tileset) - CC0
 - knight from [Dungeon Crawl 32x32 tiles](https://opengameart.org/content/dungeon-crawl-32x32-tiles) - CC0
+- other knight from [2d Lost Garden Zelda style tiles resized to 32x32 with additions](https://opengameart.org/node/11758) by Daniel Cook, Jetrel, Saphy (TMW), Zabin, Bertram - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - small mimics from [Chest and Mimic by IndigoFenix](https://opengameart.org/content/chest-and-mimic) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [blood splat by PWL](https://opengameart.org/content/blood-splats) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [Rose Flower by Lovecraft](https://opengameart.org/content/rose-flower-pyxeledit-document-and-image) - CC0
@@ -192,7 +181,6 @@ DawnLike 16x16 Universal Rogue-like tileset
 - attacks SFXs from [Dungeon Crawl Stone Soup](http://crawl.develz.org/wordpress/) - CC0
 - gorgon's staff downscaled from [Staff by LordNeo](https://opengameart.org/content/staff-64-x64)
 <!--
-* knight from [2d Lost Garden Zelda style tiles resized to 32x32 with additions](https://opengameart.org/node/11758) by Daniel Cook, Jetrel, Saphy (TMW), Zabin, Bertram - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 * griffon: Lanea Zimmerman (AKA Sharm) https://forums.rpgmakerweb.com/index.php?threads/sharms-stuff.26278/
 * scene_cave: https://opengameart.org/content/parallax-halloween-2d-game-backgrounds
 -->

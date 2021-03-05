@@ -106,16 +106,18 @@ def render_page(pdf, game_view, render_victory):
                 rotation = click_zone.pop('rotation', 0)
                 link_alt = action_name.replace('_', ' ')
                 add_link(pdf, **click_zone, rotation=rotation, page_id=next_game_view.page_id, link_alt=link_alt)
-            elif action_name in ACTION_BUTTONS:
-                action_button_render(pdf, action_name,
-                                     page_id=next_game_view.page_id if next_game_view else None)
-            elif action_name.startswith('ATTACK_'):
-                _, hit_zone_name = action_name.split('_')
-                hit_zone_pos = game_state.combat.enemy.hit_zone_pos_for(hit_zone_name)
-                action_button_render(pdf, 'ATTACK', btn_pos=hit_zone_pos,
-                                     page_id=next_game_view.page_id if next_game_view else None)
             else:
-                arrow_button_render(pdf, action_name, next_game_view.page_id)
+                page_id = next_game_view.page_id if next_game_view else None
+                custom_action = game_state.combat and game_state.combat.enemy.custom_action_for(action_name)
+                if custom_action:
+                    if custom_action.renderer:
+                        custom_action.renderer(pdf, page_id)
+                    else:
+                        action_button_render(pdf, btn_type=custom_action.btn_type, btn_pos=custom_action.btn_pos, page_id=page_id)
+                elif action_name in ACTION_BUTTONS:
+                    action_button_render(pdf, action_name, page_id=page_id)
+                else:
+                    arrow_button_render(pdf, action_name, page_id)
     if game_view.state.bonus_atk and game_state.mode in (GameMode.EXPLORE, GameMode.INFO):
         action_button_render(pdf, 'ATK_BOOST')
         bitfont_render(pdf, f'+{game_view.state.bonus_atk}', 10, 90)
@@ -252,17 +254,18 @@ def action_render(pdf, spellbook, items):
 
 def combat_render(pdf, game_state):
     'Replicates combat_render_input'
-    _enemy = game_state.combat.enemy
+    combat = game_state.combat
+    _enemy = combat.enemy
     enemy_has_frames = get_image_info(pdf, _enemy_img_filepath(_enemy))['w'] > config().VIEW_WIDTH
     if _enemy.hp > 0 or enemy_has_frames:  # if the enemy visual is made of several frames, assume there is one for its death
-        enemy_render(pdf, game_state.combat)
-        if game_state.combat.boneshield_up:
+        enemy_render(pdf, combat)
+        if combat.boneshield_up:
             pdf.image('assets/enemies/bone_shield.png', x=0, y=0)  # Replicates boss_boneshield_render
-    if _enemy.hp <= 0 and game_state.combat.enemy.gold:
-        treasure_render_gold(pdf, game_state.combat.enemy.gold)
-    if game_state.combat.round > 0:
+    if _enemy.hp <= 0 and combat.enemy.gold:
+        treasure_render_gold(pdf, combat.enemy.gold)
+    if combat.round >= 0:
         render_bar(pdf, _enemy.hp, _enemy.max_hp)
-    else:  # == combat round 0
+    else:  # == combat round -1
         bitfont_render(pdf, patch_enemy_name(_enemy.name).replace('_', ' '), 80, 2, Justify.CENTER)
         if _enemy.intro_msg:
             bitfont_render(pdf, _enemy.intro_msg, 2, 13)
@@ -271,8 +274,8 @@ def combat_render(pdf, game_state):
             # Beware not to hide Empress face (around x=72)
             action_button_render(pdf, 'MUSIC', url=_enemy.music, btn_pos=Position(50, 9))
     info_render_hpmp(pdf, game_state)
-    combat_render_log(pdf, "You:", game_state.combat.avatar_log, 20)
-    combat_render_log(pdf, "Enemy:", game_state.combat.enemy_log, 60)
+    combat_render_log(pdf, "You:", combat.avatar_log, 20)
+    combat_render_log(pdf, "Enemy:", combat.enemy_log, 60)
     if game_state.hp <= 0:
         next_page_id = _enemy.post_defeat.game_view.page_id if _enemy.post_defeat else 1
         bitfont_render(pdf, 'You are defeated...', 158, 100, Justify.RIGHT, page_id=next_page_id)
@@ -287,19 +290,19 @@ def combat_render_log(pdf, prefix, log, start_y):
 
 def enemy_render(pdf, combat):
     _enemy, _round = combat.enemy, combat.round
-    combat_round, img_filepath = combat.combat_round(after_round_end=True), _enemy_img_filepath(_enemy)
-    # If the image is larger than the VIEW_WIDTH,
-    # it is sliced in frames, and the one corresponding to the current round is used.
-    # In case there are more rounds than frames, the last one is used for the remaining rounds.
+    combat_round, img_filepath = combat.combat_round, _enemy_img_filepath(_enemy)
+    # If the image is larger than the VIEW_WIDTH, it is sliced in frames:
     frame_count = get_image_info(pdf, img_filepath)['w'] / config().VIEW_WIDTH
-    if _round >= frame_count and not _enemy.loop_frames:
-        frame = frame_count - 1
-    elif combat_round.enemy_frame is None:
-        frame = _round % frame_count
-    else:
-        frame = combat_round.enemy_frame
+    # Some enemies explicitely state the frame to display:
+    frame = _enemy.enemy_frame and _enemy.enemy_frame(combat)
+    if frame is None:
+        # Else, the frame corresponding to the current round is used:
+        if _round + 1 >= frame_count and not _enemy.loop_frames:
+            frame = frame_count - 1  # In case there are more rounds than frames, the last one is used for the remaining rounds:
+        else:
+            frame = (_round + 1) % frame_count
     pdf.image(img_filepath, x=-frame*config().VIEW_WIDTH, y=0)
-    if _round and combat_round.sfx:
+    if _round >= 0 and combat_round and combat_round.sfx:
         sfx_render(pdf, combat_round.sfx)
 
 

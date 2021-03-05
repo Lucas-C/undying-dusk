@@ -12,7 +12,7 @@ from .mod.campaign import CHECKPOINTS
 from .mod.easteregg import insert_eegggv
 
 
-START_PAGE_ID = 7  # skipping title, disclaimer & 4 pages of tutorial
+START_PAGE_ID = 8  # skipping title & 6 pages of disclaimer/tutorial
 
 
 def assign_page_ids(game_views, assign_special_pages=True):

@@ -1,15 +1,20 @@
 # pylint: disable=inconsistent-return-statements
 from ..ascii import map_as_string
 from ..bitfont import bitfont_color_red, bitfont_render, bitfont_set_color_red, Justify
-from ..entities import Bribe, Checkpoint, CombatRound as CR, MessagePlacement, Position, RewardItem, RewardTreasure, SFX, Trick
+from ..entities import Bribe, CustomCombatAction as CCA, Checkpoint, CombatRound as CR, MessagePlacement, Position, RewardItem, RewardTreasure, SFX, Trick
 from ..js import REL_RELEASE_DIR
 from ..logs import log, log_combat, log_path_to
 from ..mapscript import *
 from ..render import render_bar
-from ..render_utils import portrait_render, white_arrow_render
+from ..render_utils import add_link, portrait_render, white_arrow_render
 
 from .scenes import abyss_bottom, risking_it_all, seamus_through_small_window, the_end, BASE_MUSIC_URL
 from .world import is_instinct_preventing_to_enter_village, is_instinct_preventing_to_enter_templar_academy, is_instinct_preventing_to_pass_mausoleum_portal, is_instinct_preventing_to_pass_village_portal, BOX_MIMIC_POS, DOOR_MIMIC_POS, MAUSOLEUM_PORTAL_COORDS, MAUSOLEUM_EXIT_COORDS
+
+EMPRESS_INTERPHASE_LINES = (
+    'Nooooo!',
+    'Come back to help me\nDominik!',
+)
 
 VICTORY_POS = Checkpoint((9, 11, 5), 'ending after beating the Empress')
 CHECKPOINTS = (  # intermediate positions that should be reachable through a unique path only
@@ -41,6 +46,8 @@ CHECKPOINTS = (  # intermediate positions that should be reachable through a uni
     Checkpoint((9, 8, 2),   'after passing 2nd Dead Walkways arch',
                             condition=lambda gs: 'BUCKLER' in gs.items),
     Checkpoint((9, 9, 3),   'after flying demon fight, about to face Empress'),
+    Checkpoint((9, 11, 5),  'start of phase 2 of Empress boss fight', mode=GameMode.COMBAT,
+                            condition=lambda gs: gs.message == EMPRESS_INTERPHASE_LINES[-1]),
     VICTORY_POS,
 )
 # VICTORY_POS = Checkpoint((0, 1, 1)); CHECKPOINTS = (VICTORY_POS,)  # stop after intro
@@ -143,14 +150,14 @@ def script_it():
                                                    items=game_view.state.items + ('EMPTY_BOTTLE',))
     mapscript_add_chest((4, 11, 9), 34, _grant_empty_bottle)
 
-    # Block access to the village entrance at first, then to a SECRET; required to win: St Knight armor (def 12), a Great Sword (13 dmg), 0 MP & 12 HP
+    # Block access to the village entrance at first, then to a SECRET; required to win: St Knight armor (def 12), a Great Sword (13 dmg), 0 MP & 15 HP
     shadow_soul_stats = dict(
         hp=53, rounds=(
             CR('Magic drain', mp_drain=True),
             CR('Magic pump', mp_drain=True),
             CR('Magic suck', mp_drain=True),
-            CR('Critical blast!', atk=20),
-            CR('Critical blast!', atk=15),
+            CR('Critical blast!', atk=20),  # => 7 dmg with St Knight armor
+            CR('Critical blast!', atk=17),  # => 5 dmg with St Knight armor
         ))
     mapscript_add_enemy((4, 9, 9), 'shadow_soul', **shadow_soul_stats)
 
@@ -188,7 +195,7 @@ def script_it():
         game_view.actions['LIGHT'] = _GameView(game_view.state.with_secret('DEAD_TREE')
                                                         # opening locked door to Cedar Village:
                                                         .without_tile_override((4, 10, 15))
-                                                        ._replace(message=msg, hp=12,  # restoring HP
+                                                        ._replace(message=msg, hp=15,  # restoring HP
                                                                   music=music, music_btn_pos=btn_pos))
     mapscript_add_trigger((4, 10, 12), _facing_dead_tree, facing='north', permanent=True,
                                        condition=lambda gs: 'BEEN_TO_VILLAGE' in gs.hidden_triggers and 'DEAD_TREE' not in gs.secrets_found)
@@ -452,7 +459,7 @@ def script_it():
     _mimic_stats = lambda first_atk_name: dict(
         category=enemy().ENEMY_CATEGORY_AUTOMATON, show_on_map=False,  # rendered by the chest tile
         hp=30, rounds=(
-            CR(first_atk_name, atk=6),    # Hero must be able to stand this x3
+            CR(first_atk_name, atk=5),    # Hero must be able to stand this x3
             CR('Critical bite', atk=30),  # The hero must not be able to beat a mimic without the UNLOCK spell.
                                           # Knowing he can HEAL on 1st round, a quick way to ensure this is to one-shot him on 2nd round.
         ), post_victory=_on_mimic_vanquished)
@@ -552,7 +559,7 @@ def script_it():
 
     gorgon_pos = (5, 9, 9)
     def _unbelievable(*_):
-        assert False, 'Gorgon vanquished in fair battle!'
+        assert False, 'Gorgon vanquished in a fair battle!'
     mapscript_add_enemy(gorgon_pos, 'gorgon',
         condition=lambda gs: gs.tile_override_at(MAUSOLEUM_PORTAL_COORDS),
         category=enemy().ENEMY_CATEGORY_DEMON,
@@ -663,41 +670,53 @@ def script_it():
     #---------------------------
     # Entering: Dead Walkways (map: 9 - checkpoint)
     #---------------------------
-    # The heroine has 12/30 HP, 0/3 MP, 3/4 gold, boots, the HEAL, BURN & UNLOCK spells, St Knight armor (def 12) and does 13 dmg with their sword.
-    def dragon_withstand_logic(combat, attack_damage):
-        assert attack_damage == 13, f'Storm dragon received unexpected damage: {attack_damage}'
-        hit_zone_name = combat.zone_hit
-        assert hit_zone_name in combat.enemy.hit_zone_names or not hit_zone_name, hit_zone_name
-        if hit_zone_name == 'HEAD' and len(combat.enemy.hit_zones) > 1:
+    # The heroine has 15/30 HP, 0/3 MP, 3/4 gold, boots, the HEAL, BURN & UNLOCK spells, St Knight armor (def 12) and does 13 dmg with their sword.
+    def dragon_withstand_logic(game_state, attack_damage):
+        combat = game_state.combat
+        members_count = sum(1 for action_name in combat.enemy.custom_actions_names if action_name.startswith('ATTACK'))
+        if combat.action_name == 'ATTACK_HEAD' and members_count > 1:
             # Head cannot be injured until all other members are severed:
-            return combat, 'Parried!'
-        log_result = 'Tail cut' if hit_zone_name == 'TAIL' else f'{attack_damage} damage'
-        if hit_zone_name == 'WINGS' and combat.enemy.hp >= 2 * attack_damage:
+            return game_state, 'Parried!'
+        log_result = 'Tail cut' if combat.action_name == 'ATTACK_TAIL' else f'{attack_damage} damage'
+        if combat.action_name == 'ATTACK_WINGS' and combat.enemy.hp >= 2 * attack_damage:
             # The wings are not severed on the first hits, only after the 3rd cut:
-            new_hit_zones = combat.enemy.hit_zones
-        else:
-            new_hit_zones = tuple((name, pos) for (name, pos) in combat.enemy.hit_zones if name != hit_zone_name)
+            new_custom_actions = combat.enemy.custom_actions
+        else:  # Member is severed and cannot be clicked:
+            new_custom_actions = tuple(cca for cca in combat.enemy.custom_actions if cca.name != combat.action_name)
         new_hp = combat.enemy.hp - attack_damage
-        return combat._replace(enemy=combat.enemy._replace(hp=new_hp, hit_zones=new_hit_zones)), log_result
+        combat = combat._replace(enemy=combat.enemy._replace(hp=new_hp, custom_actions=new_custom_actions))
+        return game_state._replace(combat=combat), log_result
     def dragon_attack_logic(combat):
-        if 'TAIL' in combat.enemy.hit_zone_names:
-            # Most lethal, kill the hero in 2 hits, must be cut 1st:
-            return CR('Tail slap', atk=18, enemy_frame=0)
-        if 'WINGS' in combat.enemy.hit_zone_names:
-            return CR('Wing thump', atk=14, enemy_frame=1)
-        return CR('Bite', atk=14, enemy_frame=2)
+        if 'ATTACK_TAIL' in combat.enemy.custom_actions_names:  # = tail not cut yet
+            # Tail is the most lethal attack, it kills the hero in 2 hits, and hence must be cut 1st:
+            return CR('Tail slap', atk=16)
+        if 'ATTACK_WINGS' in combat.enemy.custom_actions_names:  # = wing not cut yet
+            return CR('Wing thump', atk=14)
+        if 'ATTACK_HEAD' in combat.enemy.custom_actions_names:  # = head not cut yet
+            return CR('Bite', atk=15)
+        return CR()  # dies without attacking
+    def dragon_enemy_frame(combat):
+        if 'ATTACK_TAIL' in combat.enemy.custom_actions_names:  # = tail not cut yet
+            return 0
+        if 'ATTACK_WINGS' in combat.enemy.custom_actions_names:  # = wing not cut yet
+            return 1
+        if 'ATTACK_HEAD' in combat.enemy.custom_actions_names:  # = head not cut yet
+            return 2
+        return 3  # head severed
     def _ensure_beaten_with_st_knight_armor(gs, src_view):
         if gs.armor <= 1 or gs.hp != 2:
             log_combat(src_view)
             assert gs.armor > 1, 'Storm Dragon beaten without St Knight armor!'
             assert gs.hp == 2, f'Hero should have 2 HP after beating the Storm Dragon, in order to face the druid later on, but has: {gs.hp} HP'
+            # 2 final HP = 15 initial HP - 4 dmg (tail slap round 1) - 3*2 dmg (wing thumps round 2, 3 & 4) - 3 dmg (final bite round 5)
     mapscript_add_enemy((9, 2, 5), 'storm_dragon',  # required to win: St Knight armor, great sword & > 11 HP
         category=ENEMY_CATEGORY_BEAST,
-        hp=64, max_rounds=6, hit_zones=(
-            ('HEAD', Position(x=98, y=20)),
-            ('TAIL', Position(x=30, y=44)),
-            ('WINGS', Position(x=98, y=81)),
-        ), withstand_logic=dragon_withstand_logic, attack_logic=dragon_attack_logic,
+        hp=64, max_rounds=6, custom_actions=(
+            CCA('ATTACK_HEAD', Position(x=98, y=20)),
+            CCA('ATTACK_TAIL', Position(x=30, y=44)),
+            CCA('ATTACK_WINGS', Position(x=98, y=81)),
+            CCA('HEAL'), CCA('BURN'), CCA('UNLOCK'),
+        ), withstand_logic=dragon_withstand_logic, attack_logic=dragon_attack_logic, enemy_frame=dragon_enemy_frame,
         post_defeat_condition=lambda gs: gs.armor <= 1,   # only display hint if not wearing strong armor
         post_defeat=render_storm_dragon_post_defeat_hint,
         post_victory=_ensure_beaten_with_st_knight_armor)
@@ -747,9 +766,14 @@ def script_it():
 
     # Block access to the Empress boss; required to win: full HP & St Knight armor & a bucklet
     def _ensure_beaten_with_buckler(gs, src_view):
-        if 'BUCKLER' not in gs.items or gs.hp != 16:
+        buckler_used, gv = False, src_view.src_view
+        assert 'BUCKLER' not in gv.state.items
+        while gv.state.combat:
+            buckler_used = 'BUCKLER' in gv.state.items
+            gv = gv.src_view
+        if not buckler_used or gs.hp != 16:
             log_combat(src_view)
-            assert 'BUCKLER' in gs.items, 'Demon Seamus beaten without buckler!'
+            assert buckler_used, 'Demon Seamus beaten without buckler!'
             assert gs.hp == 16, f'Hero should have 16 HP after beating Demon Seamus, but has: {gs.hp} HP'
     mapscript_add_enemy((9, 9, 3), 'demon_seamus',
         condition=lambda gs: 'SEAMUS_TRANSFORMED' in gs.hidden_triggers,
@@ -761,7 +785,8 @@ def script_it():
         ),
         loop_frames=True,
         music=BASE_MUSIC_URL + 'MatthewPablo-DefyingCommodus.mp3',
-        reward=RewardTreasure('Magic Diamond found\n(MP restored)', 15, lambda gs: gs._replace(mp=gs.max_mp)),
+        reward=RewardTreasure('Magic Diamond found\n(MP & buckler restored)', 15,
+                              lambda gs: gs._replace(mp=gs.max_mp, items=gs.items + ('BUCKLER',))),
         post_victory=_ensure_beaten_with_buckler
     )
 
@@ -770,23 +795,81 @@ def script_it():
         game_view.state = game_view.state._replace(message=msg)
     mapscript_add_trigger((9, 9, 5), _last_empress_words)  # one-time message
 
-    # The heroine has 16/30HP, 3/3 MP, the HEAL, BURN & UNLOCK spells, a BUCKLER, St Knight armor (def 12) and does 13 dmg with their sword.
+    def post_empress_phase1_victory(next_gs, src_view):
+        assert src_view.state.message in EMPRESS_INTERPHASE_LINES
+        # We extend the combat a little:
+        next_gs = next_gs._replace(mode=GameMode.COMBAT, vanquished_enemies=())  # Empress is not really vanquished yet!
+        if src_view.state.message == EMPRESS_INTERPHASE_LINES[-1]:
+            # Last Empress dialog line -> triggering phase 2 of the boss fight:
+            # The heroine has 3/30HP, 0/3 MP, the HEAL, BURN & UNLOCK spells, no BUCKLER,
+            # the St Knight armor (def 12) and does 13 dmg with their sword.
+            combat = src_view.state.combat
+            assert combat.round == 6, combat.round
+            assert next_gs.hp == 3, next_gs.hp
+            assert combat.enemy.hp == 0, combat.enemy.hp
+            phase2_enemy = Enemy(name='empress_+_dominik', category=enemy().ENEMY_CATEGORY_DEMON,
+                hp=1, max_hp=26,
+                max_rounds=19, custom_actions=(
+                    CCA('ATTACK_EMPRESS', Position(x=107, y=34)),
+                    CCA('ATTACK_DOMINIK', Position(x=62, y=86)),
+                    CCA('HEAL',           Position(x=140, y=34)),
+                    CCA('BURN_EMPRESS',   Position(x=107, y=51)),
+                    CCA('BURN_DOMINIK',   Position(x=44, y=86)),
+                    CCA('UNLOCK_EMPRESS', Position(x=107, y=68)),
+                    CCA('UNLOCK_DOMINIK', Position(x=80, y=86)),
+                    CCA('TAKE_SCEPTER',   renderer=render_scepter),
+                ), withstand_logic=phase2_withstand_logic, attack_logic=phase2_attack_logic, enemy_frame=phase2_enemy_frame,
+                post_victory=lambda gs, _: gs._replace(mode=GameMode.DIALOG, shop_id=the_end().id))
+            return next_gs._replace(combat=CombatState(enemy=phase2_enemy))
+        # Displaying next inter-phases Empress dialog line:
+        line_index = EMPRESS_INTERPHASE_LINES.index(src_view.state.message)
+        combat = src_view.state.combat._replace(avatar_log=None, enemy_log=None)
+        return next_gs._replace(combat=combat, message=EMPRESS_INTERPHASE_LINES[line_index + 1])
+
+    # The heroine has 16/30HP, 3/3 MP, the HEAL, BURN & UNLOCK spells, a BUCKLER,
+    # the St Knight armor (def 12) and does 13 dmg with their sword.
     mapscript_add_enemy((9, 11, 5), 'death_speaker',  # Empress
         show_on_map=False,  # rendered by the tile
         music=BASE_MUSIC_URL + 'MatthewPablo-HeroicDemise.mp3',
         # STRATEGY to beat her: parry lightning attacks, use 2 BURN to put shield down, 1 HEAL, else attack
         # Note that the Empress is of DEMON type, so BURN does her only 4 dmg (it ignores the shield)
-        hp=34, max_rounds=11, rounds=(                       # best moves:
+        hp=34, max_rounds=10, rounds=(                       # best moves:
             CR('Bone shield!', boneshield_up=True, atk=15),  # player ATTACK -> hero HP=13 | empress HP=21
             CR('Death voice!', atk=24,                       # player BURN -> hero HP=1    | empress HP=17
                sfx=SFX(id=8, pos=Position(64, 6))),
             CR('Dark lightning!', atk=38,                    # player PARRY -> hero HP=1   | empress HP=17
                sfx=SFX(id=2, pos=Position(64, 42))),
-            # Bone shield                                    # player HEAL -> hero HP=17   | empress HP=17
-            # Death voice                                    # player BURN -> hero HP=5    | empress HP=13
-            # Dark lightning                                 # player PARRY -> hero HP=5   | empress HP=13
-            # Bone shield                                    # player ATTACK -> hero HP=2  | empress HP=0
-        ), post_victory=lambda gs, _: gs._replace(mode=GameMode.DIALOG, shop_id=the_end().id))
+            # Bone shield                                    # player HEAL -> hero HP=18   | empress HP=17
+            # Death voice                                    # player BURN -> hero HP=6    | empress HP=13
+            # Dark lightning                                 # player PARRY -> hero HP=6   | empress HP=13
+            # Bone shield                                    # player ATTACK -> hero HP=3  | empress HP=0
+        ), victory_msg=EMPRESS_INTERPHASE_LINES[0], post_victory=post_empress_phase1_victory)
+
+    def phase2_withstand_logic(game_state, attack_damage):
+        combat = game_state.combat
+        if combat.action_name in ('ATTACK_DOMINIK', 'BURN_DOMINIK'):
+            # Dominik only reflects all attacks against him & heal the impress:
+            log_result = f'reflected {attack_damage} damage'
+            game_state = game_state._replace(hp=game_state.hp - attack_damage)
+        elif combat.action_name == 'UNLOCK_DOMINIK':
+            log_result = 'Dominik is dazed'
+            # Making this action unavailable, in order to avoid repeating it, and to signal a framme change:
+            new_custom_actions = tuple(cca for cca in combat.enemy.custom_actions if cca.name != combat.action_name)
+            combat = combat._replace(enemy=combat.enemy._replace(custom_actions=new_custom_actions))
+            game_state = game_state._replace(combat=combat)
+        else:
+            assert combat.action_name in ('ATTACK_EMPRESS', 'BURN_EMPRESS', 'UNLOCK_EMPRESS')
+            log_result = f'{attack_damage} damage'
+            new_hp = combat.enemy.hp - attack_damage
+            game_state = game_state._replace(combat=combat._replace(enemy=combat.enemy._replace(hp=new_hp)))
+        return game_state, log_result
+    def phase2_attack_logic(combat):
+        dominik_dazed = 'UNLOCK_DOMINIK' not in combat.enemy.custom_actions_names
+        if combat.enemy.hp < 20 and not dominik_dazed:
+            return CR('Dominik heal her', heal=combat.enemy.max_hp, sfx=SFX(id=9, pos=Position(75, 14)))
+        return CR('Death voice!', atk=22, sfx=SFX(id=8, pos=Position(98, 6)))
+    def phase2_enemy_frame(combat):
+        return 0 if 'UNLOCK_DOMINIK' in combat.enemy.custom_actions_names else 1
 
 
 def render_abyss_filler_page(pdf, i):
@@ -835,6 +918,12 @@ def render_storm_dragon_post_defeat_hint(pdf):
     bitfont_render(pdf, 'You need a better armor\nto stand the dragons attacks', 80, 40, Justify.CENTER, page_id=1)
     with bitfont_color_red():
         bitfont_render(pdf, 'Start over', 80, 100, Justify.CENTER, page_id=1)
+
+
+def render_scepter(pdf, page_id):
+    x, y = 103, 95
+    pdf.image('assets/empress-scepter.png', x=x, y=y)
+    add_link(pdf, x, y, width=54, height=16, page_id=page_id, link_alt='Take the empress scepter laying on the ground')
 
 
 def clear_hidden_triggers(gs):
