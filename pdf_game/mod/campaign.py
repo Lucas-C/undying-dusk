@@ -50,10 +50,10 @@ CHECKPOINTS = (  # intermediate positions that should be reachable through a uni
                             condition=lambda gs: gs.message == EMPRESS_INTERPHASE_LINES[-1]),
     VICTORY_POS,
 )
-# VICTORY_POS = Checkpoint((0, 1, 1)); CHECKPOINTS = (VICTORY_POS,)  # stop after intro
-# VICTORY_POS = Checkpoint((2, 3, 2)); CHECKPOINTS = (VICTORY_POS,)  # stop after leaving cell
-# VICTORY_POS = Checkpoint((2, 1, 2)); CHECKPOINTS = (VICTORY_POS,)  # stop after beating Scriptorium sokoban
-# VICTORY_POS = Checkpoint((3, 2, 3)); CHECKPOINTS = (VICTORY_POS,)  # stop after beating Shadow Tendrils
+# VICTORY_POS = Checkpoint((0, 1, 1), ''); CHECKPOINTS = (VICTORY_POS,)  # stop after intro
+# VICTORY_POS = Checkpoint((2, 3, 2), ''); CHECKPOINTS = (VICTORY_POS,)  # stop after leaving cell
+# VICTORY_POS = Checkpoint((2, 1, 2), ''); CHECKPOINTS = (VICTORY_POS,)  # stop after beating Scriptorium sokoban
+# VICTORY_POS = Checkpoint((3, 2, 3), ''); CHECKPOINTS = (VICTORY_POS,)  # stop after beating Shadow Tendrils
 
 ENEMY_CATEGORY_BEAST = 4  # new category, 1s unused integer among original ENEMY_CATEGORY_* constants
 PORTCULLIS_MUSIC_BTN_POS = Position(x=72, y=55)

@@ -8,8 +8,3 @@ try:
     from tqdm import tqdm
 except ImportError:
     tqdm = lambda _: _
-
-try:
-    import pikepdf
-except ImportError:
-    pikepdf = False

@@ -8,12 +8,12 @@ from pdf_game.visit import visit_game_views
 from pdf_game.js import config
 from pdf_game.logs import quiet_logging
 from pdf_game.mapscript import mapscript_remove_all
-from pdf_game.optional_deps import pikepdf, tqdm
+from pdf_game.optional_deps import tqdm
 from pdf_game.perfs import print_perf_stats, trace_time, PerfsMonitorWrapper
 from pdf_game.render import render_page
 
 from pdf_game.mod import campaign
-from pdf_game.mod.pages import render_credit_pages, render_intro_pages, render_victory, METADATA
+from pdf_game.mod.pages import render_credit_pages, render_intro_pages, render_victory, METADATA, XMP_METADATA
 # Note that there are other changes made from the "mod" package that are applied through patch* functions
 
 
@@ -54,11 +54,6 @@ def main():
     print(f'Output generation took: {trace.time:.2f}s')
     print_perf_stats()
     pdf.print_perf_stats()
-    if args.no_metadata:
-        return
-    with trace_time() as trace:
-        set_metadata('undying-dusk.pdf', METADATA)
-    print(f'Metadata addition took: {trace.time:.2f}s')
 
 
 def parse_args():
@@ -82,23 +77,20 @@ def init_pdf(start_page_id):
     pdf = fpdf.FPDF(format=dimensions, unit='pt')
     pdf.alias_nb_pages(None)  # disabling this feature for performance reasons
     pdf.set_auto_page_break(False)
+    pdf.set_title(METADATA['dc:title'])
+    pdf.set_subject(METADATA['dc:description'])
+    pdf.set_author(METADATA['dc:creator'])
+    pdf.set_keywords(METADATA['pdf:Keywords'])
+    pdf.set_creator(METADATA['xmp:CreatorTool'])
+    # Checking available methods while waiting for a new release of fpdf2:
+    # pylint: disable=no-member
+    if hasattr(pdf, 'set_producer'):
+        pdf.set_producer(METADATA['pdf:Producer'])
+    if hasattr(pdf, 'set_xmp_metadata'):
+        pdf.set_xmp_metadata(XMP_METADATA)
     pdf = PerfsMonitorWrapper(pdf)
     links_to_credits = render_intro_pages(pdf, start_page_id)
     return pdf, links_to_credits
-
-
-def set_metadata(filepath, metadata):
-    if not pikepdf:
-        print('Cannot set metadata: pikepdf package not installed')
-        return
-    start_size = os.stat(filepath).st_size
-    with pikepdf.open(filepath, allow_overwriting_input=True) as pdf:
-        with pdf.open_metadata(set_pikepdf_as_editor=False) as meta:
-            for key, value in metadata.items():
-                meta[key] = value
-        pdf.save()
-    end_size = os.stat(filepath).st_size
-    print(f'Final file size: {end_size / 1024**2:.0f}Mb (metada addition added {(end_size - start_size) / 1024**2:.0f}Mb)')
 
 
 if __name__ == '__main__':
