@@ -37,7 +37,7 @@ ACTION_BUTTON_POS = {
     'BLUE_KEY':           Position(x=140, y=88),
     'CRUCIFIX':           Position(x=140, y=88),
     'HAND_MIRROR':        Position(x=140, y=88),
-    'EMPTY_BOTTLE':       Position(x=140, y=88),
+    'EMPTY_BOTTLE':       Position(x=120, y=88),  # can be carried with CRUCIFIX and used at the same place!
     'FISH':               Position(x=140, y=88),
     'FISH_ON_A_STICK':    Position(x=140, y=88),
     'PUT_STICK_IN_LEVER': Position(x=136, y=97),

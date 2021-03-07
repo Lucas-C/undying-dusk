@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.9.6] - 2021-03-07
+### Fixed
+- rendering glitch when facing the well in the woods with both crucifix & empty bottle
+- a missing newline during "Seamus through bars" dialog
+
 ## [0.9.5] - 2021-03-05
 ### Added
 - new monster & puzzle to defeat it : the Gorgon!

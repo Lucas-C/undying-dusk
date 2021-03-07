@@ -1,5 +1,5 @@
 <!-- NEXT STEPS:
-- check HOW TO PLAY & SEAMUS TRHOUGH CELL new rendering
+- reduce the 1324x16 & 1598x16 states of the final fight 2 phases ?
 - add SFX for spells: cf. https://www.patreon.com/posts/dark-magic-8600078 & https://www.patreon.com/posts/light-magic-8781428 + attacks-sfx.md
 - create itch.io page
 - Androïd & Linux PDF readers?

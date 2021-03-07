@@ -110,7 +110,7 @@ def seamus_through_small_window():
         next_scene_id=dialog_5.id,
     )
     dialog_3 = CutScene.new(
-        extra_render=seamus_speaks("For your safety I brought\nyou inside this Monastery.\nBut I can't come back inside, as monks turned into demons!", behind_bars=True),
+        extra_render=seamus_speaks("For your safety I brought\nyou inside this Monastery.\nBut I can't come back inside,\nas monks turned into demons!", behind_bars=True),
         next_scene_id=dialog_4.id,
     )
     dialog_2 = CutScene.new(
