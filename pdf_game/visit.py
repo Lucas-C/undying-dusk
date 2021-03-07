@@ -137,6 +137,12 @@ def visit_game_views(args):
             checkpoint = next(cp for i, cp in enumerate(CHECKPOINTS, start=1)
                               if i == game_state.last_checkpoint)
             print(f'Page ID for checkpoint {game_state.last_checkpoint}: {game_view.page_id} ({game_state.facing}/{"+".join(game_state.secrets_found)}): {checkpoint.description}')
+            if game_state.milestone == GameMilestone.VICTORY:
+                depth = 1
+                while game_view.src_view:
+                    depth += 1
+                    game_view = game_view.src_view
+                print(f'(depth / #states from start: {depth})')
 
     scene_game_states = {}
     for game_view in game_views:

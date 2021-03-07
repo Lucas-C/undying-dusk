@@ -1,4 +1,5 @@
 <!-- NEXT STEPS:
+- epilog dialog : cannot remind of Dominik that was already mentioned!
 - reduce the 1324x16 & 1598x16 states of the final fight 2 phases ?
 - add SFX for spells: cf. https://www.patreon.com/posts/dark-magic-8600078 & https://www.patreon.com/posts/light-magic-8781428 + attacks-sfx.md
 - create itch.io page
@@ -67,12 +68,12 @@ The game is set in a fantasy realm where a curse set by the Empress keeps the wo
 You play a woman who recently found shelter in an eerie monastery.
 
 It features:
-- ~150 000 PDF pages
+- 200 000 PDF pages
 - a retrogaming aesthetic: 160x120 pixels resolution and a 16 colors palette
-- a grid-based world with 45 different tiles and 10 maps to explore
-- 30+ treasure items, weapons & spells to pick up in order to face 17 enemy monsters
-- 21 music tracks
-- 17530 "Game Over" pages, and a single path to victory
+- a grid-based world with 50 different tiles and 10 maps to explore
+- more than 30 treasure items, weapons & spells to pick up in order to face 15 enemy monsters
+- 20 music tracks
+- thousands of "Game Over" pages, and a single path to victory
 - 4 hidden secrets & a concealed epilogue
 - an online [hall of fame](https://chezsoi.org/lucas/undying-dusk/hall-of-fame)
 
