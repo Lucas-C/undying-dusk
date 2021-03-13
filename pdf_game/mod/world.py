@@ -49,8 +49,6 @@ def custom_can_move_to(_map, x, y, game_state):
     if _map.name == 'Monastery Trail':
         if (x, y) == (6, 1):
             return False  # removing exit to Monastery
-        if (x, y) in ((11, 7), (11, 8), (11, 9)):
-            return True  # secret passage through a tree to access a chest
     if _map.name == 'Cedar Village':
         if (x, y) == VILLAGE_PORTAL_COORDS[1:]:
             return game_state.tile_override_at(VILLAGE_PORTAL_COORDS) and not is_instinct_preventing_to_pass_village_portal(game_state)
@@ -149,6 +147,7 @@ def patch_tileset(tileset):
         True,   # 52 = dungeon_black_passage
         False,  # 53 = petrified_gorgon_with_staff
         False,  # 54 = petrified_gorgon
+        True,   # 55 = tree_alt
     ])
 
 
@@ -200,6 +199,8 @@ def _patch_tiles(_map):
         x, y = 1, 7;   tiles[y][x] = 6   # grass
     if _map.name == 'Monastery Trail':
         x, y = 2, 2;   tiles[y][x] = 31  # well
+        x, y = 11, 7;  tiles[y][x] = 55  # secret passage through the trees
+        x, y = 11, 8;  tiles[y][x] = 55  # secret passage through the trees
         x, y = 11, 9;  tiles[y][x] = 43  # adding stump hidden in the forest
     if _map.name == 'Cedar Village':
         x, y = 1, 10;  tiles[y][x] = 6   # allowing space for the boulder so that it does not block the passage

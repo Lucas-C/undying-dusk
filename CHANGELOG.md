@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.9.7] - 2021-03-13
+### Changed
+- made secret path in the woods easier to figure out
+- slightly reworked the ending
+
 ## [0.9.6] - 2021-03-07
 ### Fixed
 - rendering glitch when facing the well in the woods with both crucifix & empty bottle
@@ -17,7 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Cauldron fire boost is displayed more explicitly
 - Displaying water on minimap
 - More helpful hints than _"Trust your instinct: no need to go back for now"_
-- new checkpoint after bribing the goblin
 - 3 distinct hit zones during Storm Dragon battle
 - phase 2 of the final boss battle
 
@@ -28,14 +32,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - secrets were incorrectly reported to the Hall of Fame, due to a pages count over-optimization
-- Removed useless message in village when portal is not open yet: _"Trust your instinct: no need to go back for now"_
+- Removed useless message in village when portal is not open yet (_"Trust your instinct: no need to go back for now"_)
 
 ### Removed
-- boulder on Cedar Village exit, no more need thanks to the gorgon
+- boulder on Cedar Village exit, no more needed thanks to the gorgon
 
 ## [0.9.4] - 2020-11-03
 Special thanks to Maxime Lemanach for the detailed feedbacks that helped me
-to improve the game a lot in this new release!
+improve the game a lot in this new release!
 
 ### Added
 - hint in templar library on treasure hidden behind boulder trap

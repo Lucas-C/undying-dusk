@@ -102,4 +102,5 @@ _TILE_AS_EMOJI = [
     ansi_wrap('DD', bold=True),                # 52: dungeon_black_passage
     ansi_wrap('GE', color='cyan', bold=True),  # 53: petrified_gorgon_with_staff
     ansi_wrap('GE', color='cyan'),             # 54: petrified_gorgon
+    ansi_wrap('AA', color='yellow'),           # 55: tree_alt
 ]

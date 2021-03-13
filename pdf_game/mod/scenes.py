@@ -380,7 +380,7 @@ def seamus_transformation():
 def the_end():
     scene_9 = CutScene.new(
         background='bloodsplat',
-        text='At least, finally,\na memory came back.\nHis name.\nDominik.',
+        text='At least, one last time,\nyou met your only love.\n\nDominik.',
     )
     scene_8 = CutScene.new(
         background='bloodsplat',
@@ -389,27 +389,27 @@ def the_end():
     )
     scene_7 = CutScene.new(
         background='bloodsplat',
-        text='Are you the Empress?\nDid Seamus knew?',
+        text='\n\n\nWith your talent\nto alter time,\ncould you have caused\nall this?\n\nDid Seamus knew?',
         next_scene_id=scene_8.id,
     )
     scene_6 = CutScene.new(
         background='bloodsplat',
-        text='With your talent\nto alter time,\ncould you have caused\nall this?',
+        text='Is the curse lifted?\nWill time flow again?',
         next_scene_id=scene_7.id,
     )
     scene_5 = CutScene.new(
         background='bloodsplat',
-        text='Is the curse lifted?\nWill time flow again?',
+        text='\nAs you lay on the floor,\nbleeding,\nfatally wounded,\nyou wonder...',
         next_scene_id=scene_6.id,
     )
     scene_4 = CutScene.new(
-        background='bloodsplat',
-        text='\nAs you lay on the floor,\nbleeding,\nfatally wounded\nby your own hand,\nyou wonder...',
+        background='the_end_2',
+        text='You are not\nthe Empress!' + '\n' * 5,
         next_scene_id=scene_5.id,
     )
     scene_3 = CutScene.new(
         background='the_end_2',
-        text='\n\n\nNo.\n\nThat\ncannot\nbe.',
+        text='\n\n\nNo.\n\nImpossible.',
         next_scene_id=scene_4.id,
     )
     scene_2 = CutScene.new(
@@ -417,10 +417,15 @@ def the_end():
         text='\nYou look\ncloser.',
         next_scene_id=scene_3.id,
     )
+    scene_1 = CutScene.new(
+        background='the_end_1',
+        text="Something's\nodd..." + '\n' * 5,
+        next_scene_id=scene_2.id,
+    )
     return CutScene.new(
         text='\n\nThe Empress finally\ndefeated,\nyou look over her.\n\nA cheval mirror\nis standing behind.',
         music=BASE_MUSIC_URL + 'MatthewPablo-Soliloquy.mp3',
-        next_scene_id=scene_2.id,
+        next_scene_id=scene_1.id,
     )
 
 
