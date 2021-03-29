@@ -21,12 +21,8 @@ def mapscript_exec(game_view, _GameView):
     if game_view.state.rolling_boulder:
         _mapscript_move_boulder(game_view)
     if game_view.state.coords in SCRIPTS_PER_TILE:
-        script_type, script = SCRIPTS_PER_TILE.get(game_view.state.coords)
-        if script_type == 'warp':
-            map_id, x, y = script
-            game_view.state = game_view.state._replace(map_id=map_id, x=x, y=y)
-        else:
-            script(game_view, _GameView)
+        _, script = SCRIPTS_PER_TILE.get(game_view.state.coords)
+        script(game_view, _GameView)
 
 
 def mapscript_is_tile_scripted(*coords):
@@ -196,19 +192,6 @@ def mapscript_add_trigger(trigger_pos, func, condition=None, facing=None, perman
         func(game_view, _GameView)  # passing _GameView to allow populating .actions
         assert len(game_view.actions) == actions_count or permanent, f'Trigger @ {trigger_pos} add actions: it must be permanent!'
     SCRIPTS_PER_TILE[trigger_pos] = ('trigger', _mapscript_activate_trigger)
-
-def mapscript_add_warp(coords1, coords2):
-    assert coords1 not in SCRIPTS_PER_TILE
-    assert coords2 not in SCRIPTS_PER_TILE
-    SCRIPTS_PER_TILE[coords1] = ('warp', coords2)
-    SCRIPTS_PER_TILE[coords2] = ('warp', coords1)
-
-
-def mapscript_get_warped_coords(coords):
-    script = SCRIPTS_PER_TILE.get(coords)
-    if script and script[0] == 'warp':
-        return script[1]
-    return None
 
 
 def mapscript_remove_all():

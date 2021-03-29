@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.9.8] - not released yet
+### Added
+- SFX for spells
+
+### Fixed
+- full rewrite of the warp portals system that had glitches
+
 ## [0.9.7] - 2021-03-13
 ### Changed
 - made secret path in the woods easier to figure out

@@ -127,7 +127,7 @@ def seamus_through_small_window():
 def entering_monastery_courtyard():
     minimap_tip = CutScene.new(
         name='Tip',
-        text='\n' * 5 + 'Use the minimap\non the INFO page\nto help orient\nyourself',
+        text='\n' * 7 + 'Use the minimap\non the INFO page\nto help orient\nyourself',
         extra_render=lambda pdf: pdf.image('minimaps/map_1_.png', x=67, y=15),
         exit_msg='Enter courtyard',
     )
@@ -143,6 +143,7 @@ def entering_monastery_courtyard():
 def tuto_spells():
     return CutScene.new(
         text = '\n' * 10 + 'Casting a spell cost 1 MP.\n\nThe "HEAL" spell\ncan only be used\nduring battles.\n\nAn icon will show up\nwhen you can use\nother spells elsweshere.',
+        sfx=SFX(id=9, pos=Position(120, 34))
     )
 
 

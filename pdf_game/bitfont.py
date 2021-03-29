@@ -41,7 +41,7 @@ def bitfont_render(pdf, text, x, y, justify=Justify.LEFT, size=8, page_id=None, 
             max_x = max(max_x, start_x + text_width)
         if url or page_id or link:
             return add_link(pdf, x=min_x, y=y, width=max_x - min_x, height=10*len(lines) - 4,
-                            page_id=page_id, url=url, link=link)  # TODO: pass link_alt=
+                            page_id=page_id, url=url, link=link, link_alt=text)
     return None
 
 

@@ -176,6 +176,17 @@ def _patch_tiles(_map):
     tiles = [list(row) for row in _map.tiles]
     # if _map.name == 'Serf Quarters':  tiles[3][1] = 34  # test bookshelf
     # if _map.name == 'Serf Quarters':  tiles[3][1] = 48  # test staff-in-lever
+    # if _map.name == 'Serf Quarters':  # portals test map (exit must also be disabled)
+    #     return [
+    #         [2, 2, 2, 2, 2, 2, 2, 2],
+    #         [2, 2, 5, 2, 2, 5, 2, 2],
+    #         [2, 5, 5, 5, 5, 5, 5, 2],
+    #         [2, 5, 6, 6, 6, 6, 5, 2],
+    #         [5, 5, 6, 6, 6, 6, 5, 2],
+    #         [2, 5, 6, 6, 6, 6, 5, 2],
+    #         [2, 5, 5, 5, 5, 5, 5, 2],
+    #         [2, 2, 2, 2, 2, 2, 2, 2],
+    #     ]
     if _map.name == 'Monk Quarters':  # new map: Scriptorium
         return [  # This is meant as a simple enigma & tutorial map
           [ 2, 2, 2,32, 2],

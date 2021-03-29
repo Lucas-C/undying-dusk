@@ -1,7 +1,8 @@
 <!-- NEXT STEPS:
-- reduce the 1324x16 & 1598x16 states of the final fight 2 phases ?
-- add SFX for spells: cf. https://www.patreon.com/posts/dark-magic-8600078 & https://www.patreon.com/posts/light-magic-8781428 + attacks-sfx.md
+- l'envoyer à Jerome
 - create itch.io page
+- more GIFs for com'
+- reduce the 1324x16 & 1598x16 states of the final fight 2 phases ?
 - Androïd & Linux PDF readers?
 - post-release: publish assets
 - a11y? questions to Sandra Bruel: + quels lecteurs PDF vos amis emploient ?
@@ -11,7 +12,6 @@
   * skeleton fight : too hard ? hint at critical ?
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
-  * maze rendering glitch
   * make "mod" a class instance, so that customization no more relies on imports, and make mapscript.SCRIPTS_PER_TILE a class property
 - VF?
 - size improvements:

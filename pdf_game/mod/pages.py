@@ -154,7 +154,7 @@ def _render_how_to_play(pdf, start_page_id):
         bitfont_render(pdf, 'NOW ENTER\nTHE DUNGEON', 80, 37, Justify.CENTER, page_id=start_page_id)
     link = pdf.add_link()
     pdf.set_link(link, page=start_page_id)
-    pdf.image('assets/dungeon-door-opening.png', 48, 56, link=link)
+    pdf.image('assets/dungeon-door-opening.png', 48, 56, link=link, alt_text='OPEN THE DOOR')
 
 
 SECRET_ENDING_ID = 1059

@@ -35,6 +35,50 @@ class GameMilestone(IntEnum):
     VICTORY = 3
 
 
+class TileEdge(NamedTuple):
+    'A non-oriented, unique representation of an edge between 2 adjacent tiles'
+    pos1: Tuple[int]  # (x, y)
+    pos2: Tuple[int]  # (x, y)
+    facing: str
+    @classmethod
+    def new(cls, pos, facing):
+        # pylint: disable=import-outside-toplevel
+        from .mazemap import mazemap_mirror_facing, mazemap_next_pos_facing
+        next_pos = mazemap_next_pos_facing(*pos, facing)
+        if pos > next_pos:
+            pos, next_pos = next_pos, pos
+            facing = mazemap_mirror_facing(facing)
+        assert facing in ('east', 'south')
+        return cls(pos, next_pos, facing)
+    @classmethod
+    def from_positions(cls, pos1, pos2):
+        if pos1 > pos2:
+            pos1, pos2 = pos2, pos1
+        # pylint: disable=import-outside-toplevel
+        from .mazemap import mazemap_facing_from_positions
+        facing = mazemap_facing_from_positions(pos1, pos2)
+        assert facing in ('east', 'south')
+        return cls(pos1, pos2, facing)
+
+
+class WarpPortal(NamedTuple):
+    edge1: TileEdge
+    edge2: TileEdge
+    @classmethod
+    def new(cls, edge1, edge2):
+        if edge1 > edge2:
+            edge1, edge2 = edge2, edge1
+        return cls(edge1, edge2)
+    def has_edge(self, edge):
+        return edge in (self.edge1, self.edge2)
+    def translate(self, edge, x, y):
+        assert self.has_edge(edge)
+        src_edge, dst_edge = (self.edge1, self.edge2) if edge == self.edge1 else (self.edge2, self.edge1)
+        dx = dst_edge.pos1[0] - src_edge.pos1[0]
+        dy = dst_edge.pos1[1] - src_edge.pos1[1]
+        return x + dx, y + dy
+
+
 class SFX(NamedTuple):  # Special Effects !
     id : int
     pos : Position

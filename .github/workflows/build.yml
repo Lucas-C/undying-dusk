@@ -26,7 +26,7 @@ jobs:
       - name: Linter
         run: pylint pdf_game/ gen_pdf.py hall_of_fame/hof_app.py trailer/*.py
       - name: Tests
-        run: pytest pdf_game/
+        run: pytest pdf_game/ -vv --showlocals
       - name: Checking that all images use the DawnBringer palette
         run: ./check_dawnbringer.py $(git ls-files | grep .png | grep -v yellow-star.png)
       - name: Build PDF

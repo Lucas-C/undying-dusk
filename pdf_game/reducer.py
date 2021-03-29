@@ -106,8 +106,8 @@ class FakePdfRecorder:
     def set_text_color(self, r,g=-1,b=-1):
         self._calls.append(('set_text_color', r, g, b))
 
-    def image(self, name, x=None, y=None, w=0, h=0, link=''):
-        self._calls.append(('image', name, x, y, w, h, link))
+    def image(self, name, x=None, y=None, w=0, h=0, link='', title=None, alt_text=None):
+        self._calls.append(('image', name, x, y, w, h, link, title, alt_text))
 
     @contextmanager
     def rect_clip(self, x, y, w, h):
@@ -125,7 +125,7 @@ class FakePdfRecorder:
     def set_link(self, link, page=-1):
         self._links[link] = page
 
-    def link(self, x, y, w, h, link, alt_text=''):
+    def link(self, x, y, w, h, link, alt_text=None):
         page_or_url = link if isinstance(link, str) else self._links[link]
         self._calls.append(('link', x, y, w, h, page_or_url, alt_text))
 

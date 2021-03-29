@@ -50,6 +50,9 @@ def main():
             render_page(pdf, game_view, lambda pdf, gs: render_victory(pdf, gs, links_to_credits))
     render_credit_pages(pdf, links_to_credits)
     print(f'Rendering of {len(pdf.pages)} pages took: {trace.time:.2f}s')
+    if args.no_marked_content:
+        # pylint: disable=protected-access
+        pdf._marked_contents = None
     with trace_time() as trace:
         pdf.output('undying-dusk.pdf', 'F')
     print(f'Output generation took: {trace.time:.2f}s')
@@ -65,6 +68,7 @@ def parse_args():
     parser.add_argument("--json", action="store_true", help="Dump all generated game states in a JSON file")
     parser.add_argument("--iter-logs", action="store_true", help=" ")
     parser.add_argument("--no-script", action="store_true", help=" ")
+    parser.add_argument("--no-marked-content", action="store_true", help="Reduce PDF size by omiting links alternate descriptions")
     parser.add_argument("--no-reducer", action="store_true", help=" ")
     parser.add_argument("--no-pdf", action="store_true", help=" ")
     parser.add_argument("--detect-deadends", action="store_true", help="Sanity check")
@@ -82,12 +86,8 @@ def init_pdf(start_page_id):
     pdf.set_author(METADATA['dc:creator'])
     pdf.set_keywords(METADATA['pdf:Keywords'])
     pdf.set_creator(METADATA['xmp:CreatorTool'])
-    # Checking available methods while waiting for a new release of fpdf2:
-    # pylint: disable=no-member
-    if hasattr(pdf, 'set_producer'):
-        pdf.set_producer(METADATA['pdf:Producer'])
-    if hasattr(pdf, 'set_xmp_metadata'):
-        pdf.set_xmp_metadata(XMP_METADATA)
+    pdf.set_producer(METADATA['pdf:Producer'])
+    pdf.set_xmp_metadata(XMP_METADATA)
     pdf = PerfsMonitorWrapper(pdf)
     links_to_credits = render_intro_pages(pdf, start_page_id)
     return pdf, links_to_credits

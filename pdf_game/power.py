@@ -1,6 +1,6 @@
 from math import floor
 
-from .entities import CombatLog, CustomCombatAction, GameMode
+from .entities import CombatLog, CustomCombatAction, GameMode, Position, SFX
 from .js import atlas, enemy, info
 from .logs import log
 
@@ -116,13 +116,9 @@ def power_heal(game_state):
     new_hp = min(game_state.hp + heal_amount, max_hp)
     log(game_state, f"HEAL+{heal_amount}: hp={new_hp}/{max_hp}")
     game_state = game_state._replace(hp=new_hp, mp=game_state.mp - 1)
-    if game_state.mode == GameMode.COMBAT:
-        combat = game_state.combat._replace(avatar_log=CombatLog(action=log_action, result=f"+{heal_amount} HP"))
-        game_state = game_state._replace(combat=combat)
-    else:
-        assert game_state.mode == GameMode.INFO
-        game_state = game_state._replace(message=f"Heal!\n+{heal_amount} HP", mode=GameMode.EXPLORE)
-    return game_state
+    assert game_state.mode == GameMode.COMBAT
+    combat = game_state.combat._replace(avatar_log=CombatLog(action=log_action, result=f"+{heal_amount} HP"))
+    return game_state._replace(combat=combat, sfx=SFX(id=9, pos=Position(64, 2)))
 
 
 def power_burn(game_state, next_pos_facing=None, next_tile_facing=None):
@@ -168,7 +164,7 @@ def power_burn(game_state, next_pos_facing=None, next_tile_facing=None):
             game_state = game_state.with_tile_override(empty_tile_id, next_coords_facing)
         game_state = game_state._replace(message="Burn!\nCleared Path!", mode=GameMode.EXPLORE)
         log(game_state, f"BURN tile {next_tile_facing} @ {next_coords_facing}")
-    return game_state._replace(mp=game_state.mp - 1)
+    return game_state._replace(mp=game_state.mp - 1, sfx=SFX(id=10, pos=Position(64, 44)))
 
 
 def power_unlock(game_state, next_pos_facing=None):
@@ -195,14 +191,14 @@ def power_unlock(game_state, next_pos_facing=None):
                 combat = combat._replace(enemy=combat.enemy._replace(hp=combat.enemy.hp - attack_damage))
                 log_result = f"{attack_damage} damage"
         combat = combat._replace(avatar_log=CombatLog(action=log_action, result=log_result))
-        game_state = game_state._replace(combat=combat)
+        game_state = game_state._replace(combat=combat, sfx=SFX(id=11, pos=Position(64, 4)))
         log(game_state, f"UNLOCK: {attack_damage} damage")
     else:
         assert game_state.mode == GameMode.EXPLORE and next_pos_facing  # assume target tile is locked_door
         new_tile_id = 3  # dungeon door
         coords = (game_state.map_id, *next_pos_facing)
         game_state = game_state.with_tile_override(new_tile_id, coords)
-        game_state = game_state._replace(message="Unlock!\nDoor Opened!", mode=GameMode.EXPLORE)
+        game_state = game_state._replace(message="Unlock!\nDoor Opened!", mode=GameMode.EXPLORE, sfx=SFX(id=11, pos=Position(64, 46)))
         log(game_state, f"UNLOCK locked door @ {coords}")
     return game_state._replace(mp=game_state.mp - 1)
 

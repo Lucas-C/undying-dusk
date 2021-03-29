@@ -4,6 +4,7 @@ from .logs import log
 from .mapscript import mapscript_tile_script_type
 from .mazemap import avatar_can_move_to, mazemap_is_exit, mazemap_is_shop, mazemap_next_pos_facing, mazemap_get_tile
 from .power import power_burn, power_unlock
+from .warp_portals import warp_portal_teleport
 
 from .mod.books import examine_bookshelf
 from .mod.konami import custom_explore_logic
@@ -50,6 +51,7 @@ def explore_logic(game_view, actions, _GameView):
     _map = atlas().maps[game_state.map_id]
     for action_name in ('MOVE-FORWARD', 'MOVE-BACKWARD'):
         x, y = pos_for_move_action(game_state, action_name)
+        x, y = warp_portal_teleport(game_state.coords, (x, y))
         new_coords = (game_state.map_id, x, y)
         if not avatar_can_move_to(game_view, *new_coords):
             continue

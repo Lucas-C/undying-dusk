@@ -84,9 +84,14 @@ def visit_game_views(args):
                 game_view_per_state[state] = new_gv
                 # Executing it now/there ensures it is only performed once per GV:
                 mapscript_exec(new_gv, lambda state: _GameView(state, new_gv))
-                if new_gv.state != state:  # the GameState can be changed by the mapscript
+                # The GameState can be changed by the mapscript:
+                if new_gv.state != state:
                     del game_view_per_state[state]
-                    new_gv = game_view_per_state.get(new_gv.state) or new_gv
+                    existing_gv_for_state = game_view_per_state.get(new_gv.state)
+                    if existing_gv_for_state:
+                        # This could be problematic if a reference to new_gv has been "captured"
+                        # while executing mapscript, for example if "child" _GameView have been created...
+                        new_gv = existing_gv_for_state
             game_view_per_state[new_gv.state] = new_gv
         return new_gv
 

@@ -82,17 +82,17 @@ def action_button_render(pdf, btn_type, page_id=None, url='', btn_pos=None, item
     else:  # Newly introduced action:
         img_index -= 8
         img_filepath = 'assets/extra_action_buttons.png'
-    render_button(pdf, btn_pos, img_filepath, img_index, page_id=page_id, url=url, link_alt=btn_type)
+    render_button(pdf, btn_pos, img_filepath, img_index, page_id=page_id, url=url, link_alt=btn_type.replace('_', ' '))
 
 
 def white_arrow_render(pdf, name, x, y, page_id=None):
     img_index = WHITE_ARROW_NAMES.index(name)
     link = link_from_page_id(pdf, page_id) if page_id else None
     with pdf.rect_clip(x=x, y=y, w=WHITE_ARROW_SIZE, h=WHITE_ARROW_SIZE):
-        pdf.image('assets/white_arrows.png', x=x - img_index*WHITE_ARROW_SIZE, y=y, link=link)  # TODO: pass link_alt
+        pdf.image('assets/white_arrows.png', x=x - img_index*WHITE_ARROW_SIZE, y=y, link=link, alt_text=name)
 
 
-def render_button(pdf, btn_pos, img_filepath, img_index=0, page_id=None, url='', link_alt=''):
+def render_button(pdf, btn_pos, img_filepath, img_index=0, page_id=None, url='', link_alt=None):
     btn_size, btn_offset = action().BUTTON_SIZE, action().BUTTON_OFFSET
     x = btn_pos.x + btn_offset
     y = btn_pos.y + btn_offset
@@ -104,7 +104,7 @@ def render_button(pdf, btn_pos, img_filepath, img_index=0, page_id=None, url='',
     return None
 
 
-def add_link(pdf, x, y, width, height, rotation=None, page_id=None, url='', link=None, link_alt=''):
+def add_link(pdf, x, y, width, height, rotation=None, page_id=None, url='', link=None, link_alt=None):
     if page_id is not None:
         assert not (link or url)
         link = link_from_page_id(pdf, page_id)

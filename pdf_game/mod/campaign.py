@@ -7,6 +7,7 @@ from ..logs import log, log_combat, log_path_to
 from ..mapscript import *
 from ..render import render_bar
 from ..render_utils import add_link, portrait_render, white_arrow_render
+from ..warp_portals import warp_portal_add
 
 from .scenes import abyss_bottom, risking_it_all, seamus_through_small_window, the_end, BASE_MUSIC_URL
 from .world import is_instinct_preventing_to_enter_village, is_instinct_preventing_to_enter_templar_academy, is_instinct_preventing_to_pass_mausoleum_portal, is_instinct_preventing_to_pass_village_portal, BOX_MIMIC_POS, DOOR_MIMIC_POS, MAUSOLEUM_PORTAL_COORDS, MAUSOLEUM_EXIT_COORDS
@@ -61,6 +62,11 @@ ROTATING_LEVER_CORRECT_SEQUENCE = 406  # south-north-west
 
 
 def script_it():
+    # For portals test map:
+    # warp_portal_add(0, (2, 1), 'north', (5, 6), 'south')
+    # warp_portal_add(0, (2, 6), 'south', (5, 1), 'north')
+    # warp_portal_add(0, (0, 4), 'west', (7, 4), 'west')
+
     #---------------------------
     # Entering: Monastery (maps: 0, 1, 2 & 3)
     #---------------------------
@@ -331,8 +337,8 @@ def script_it():
         ))
 
     # Maze warp tiles setup:
-    mapscript_add_warp((10, 14, 1), (10, 9, 10))
-    mapscript_add_warp((10, 11, 6), (10, 12, 8))
+    warp_portal_add(10, (14, 1), 'north', (9, 10), 'south')
+    warp_portal_add(10, (11, 6), 'west', (12, 8), 'east')
     # Removing all existing chests, that were behind locked doors:
     mapscript_remove_chest((10, 11, 2))  # used to be: Magic Emerald (+5 HP)
     mapscript_remove_chest((10, 13, 2))  # used to be: 100 gold
@@ -444,7 +450,7 @@ def script_it():
                                                    music_btn_pos=PORTCULLIS_MUSIC_BTN_POS)
     mapscript_add_trigger((8, 6, 7), _lower_portcullis)  # one-time event/message
 
-    mapscript_add_warp((8, 7, 10), (8, 10, 4))  # so that player get lost a bit
+    warp_portal_add(8, (7, 10), 'south', (10, 4), 'north')  # so that player get lost a bit
     mapscript_remove_chest((8, 3, 2))   # used to be: Magic Ruby (Atk Up) - replaced by mimic
     mapscript_remove_chest((8, 6, 9))   # used to be: 25 gold - moved up & replaced by mimic:
     mapscript_remove_chest((8, 3, 12))  # used to be: Magic Sapphire (MP Up)

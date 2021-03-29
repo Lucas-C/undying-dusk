@@ -25,8 +25,6 @@ def _tile_as_char(game_view, _map, x, y, content):
     script_type = mapscript_tile_script_type(game_state.map_id, x, y)
     if script_type == 'message':
         return ansi_wrap('MM', color='green')
-    if script_type == 'warp':
-        return ansi_wrap('WW', color='magenta')
     tile_override = game_view.tile_override((game_state.map_id, x, y))
     tile_id = tile_override or content
     out_chars = _TILE_AS_EMOJI[tile_id]

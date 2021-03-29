@@ -6,14 +6,15 @@ from PIL import Image
 from .bitfont import bitfont_set_color_red, bitfont_render, Justify
 from .entities import GameMilestone, GameMode, Position
 from .js import action, atlas, config, enemy, tileset, REL_RELEASE_DIR
-from .mapscript import mapscript_get_enemy_at, mapscript_get_warped_coords
-from .mazemap import mazemap_bounds_check, mazemap_get_tile, mazemap_next_pos_facing
+from .mapscript import mapscript_get_enemy_at
+from .mazemap import mazemap_bounds_check, mazemap_get_tile, mazemap_next_pos_facing, DX_DY_PER_FACING_AND_RENDER_POS
 from .render_minimap import minimap_render
 from .perfs import trace_time
 from .render_dialog import dialog_render
 from .render_info import info_render, info_render_button, info_render_gold, info_render_hpmp
 from .render_treasure import treasure_render_collectible, treasure_render_gold, treasure_render_item
 from .render_utils import add_link, action_button_render, get_image_info, link_from_page_id, portrait_render, sfx_render, tileset_background_render, white_arrow_render, ACTION_BUTTONS
+from .warp_portals import warp_portal_in_sight
 
 from .mod.world import patch_enemy_name, CLICK_ZONES
 
@@ -57,6 +58,8 @@ def render_page(pdf, game_view, render_victory):
     if game_state.combat:
         with trace_time('render:3:combat'):
             combat_render(pdf, game_state)
+    elif game_state.sfx:
+        sfx_render(pdf, game_state.sfx)
     # Combat rendering must be done mefore .message rendering, for bribes messages to display well
     # Same with extra rendering: it must be done before displaying .message, e.g. for gorgon
     if game_state.extra_render:
@@ -85,8 +88,6 @@ def render_page(pdf, game_view, render_victory):
             treasure_render_gold(pdf, int(gold_found))
         else:
             treasure_render_item(pdf, game_state.treasure_id)
-    elif game_state.sfx:  # only used in EXPLORE mode so far
-        sfx_render(pdf, game_state.sfx)
     with trace_time('render:4:actions'):
         for action_name, next_game_view in game_view.actions.items():
             if action_name == 'SHOW-INFO':
@@ -104,8 +105,8 @@ def render_page(pdf, game_view, render_victory):
             elif action_name in CLICK_ZONES:
                 click_zone = CLICK_ZONES[action_name]
                 rotation = click_zone.pop('rotation', 0)
-                link_alt = action_name.replace('_', ' ')
-                add_link(pdf, **click_zone, rotation=rotation, page_id=next_game_view.page_id, link_alt=link_alt)
+                add_link(pdf, **click_zone, rotation=rotation, page_id=next_game_view.page_id,
+                         link_alt=action_name.replace('_', ' '))
             else:
                 page_id = next_game_view.page_id if next_game_view else None
                 custom_action = game_state.combat and game_state.combat.enemy.custom_action_for(action_name)
@@ -124,98 +125,28 @@ def render_page(pdf, game_view, render_victory):
 
 
 def mazemap_render(pdf, game_view):
+    tileset_background_render(pdf, atlas().maps[game_view.state.map_id].background)
+    dx_dy_per_render_pos = DX_DY_PER_FACING_AND_RENDER_POS[game_view.state.facing]
+    for render_pos in range(13):
+        dx, dy = dx_dy_per_render_pos[render_pos]
+        mazemap_render_tile(pdf, game_view, dx, dy, render_pos)
+
+
+def mazemap_render_tile(pdf, game_view, dx, dy, render_pos):
     map_id, x, y = game_view.state.coords
-    tileset_background_render(pdf, atlas().maps[map_id].background)
-    facing = game_view.state.facing
-    # Drawing is done in this order (a=10, b=11, c=12):
-    # ..02431..
-    # ..57986..
-    # ...acb...
-    if facing == "north":
-        # back row
-        mazemap_render_tile(pdf,game_view,x-2,y-2,0)
-        mazemap_render_tile(pdf,game_view,x+2,y-2,1)
-        mazemap_render_tile(pdf,game_view,x-1,y-2,2)
-        mazemap_render_tile(pdf,game_view,x+1,y-2,3)
-        mazemap_render_tile(pdf,game_view,x,  y-2,4)
-        # middle row
-        mazemap_render_tile(pdf,game_view,x-2,y-1,5)
-        mazemap_render_tile(pdf,game_view,x+2,y-1,6)
-        mazemap_render_tile(pdf,game_view,x-1,y-1,7)
-        mazemap_render_tile(pdf,game_view,x+1,y-1,8)
-        mazemap_render_tile(pdf,game_view,x,  y-1,9)
-        # front row
-        mazemap_render_tile(pdf,game_view,x-1,y, 10)
-        mazemap_render_tile(pdf,game_view,x+1,y, 11)
-        mazemap_render_tile(pdf,game_view,x,  y, 12)
-    elif facing == "south":
-        # back row
-        mazemap_render_tile(pdf,game_view,x+2,y+2,0)
-        mazemap_render_tile(pdf,game_view,x-2,y+2,1)
-        mazemap_render_tile(pdf,game_view,x+1,y+2,2)
-        mazemap_render_tile(pdf,game_view,x-1,y+2,3)
-        mazemap_render_tile(pdf,game_view,x,y+2,4)
-        # middle row
-        mazemap_render_tile(pdf,game_view,x+2,y+1,5)
-        mazemap_render_tile(pdf,game_view,x-2,y+1,6)
-        mazemap_render_tile(pdf,game_view,x+1,y+1,7)
-        mazemap_render_tile(pdf,game_view,x-1,y+1,8)
-        mazemap_render_tile(pdf,game_view,x,y+1,9)
-        # front row
-        mazemap_render_tile(pdf,game_view,x+1,y,10)
-        mazemap_render_tile(pdf,game_view,x-1,y,11)
-        mazemap_render_tile(pdf,game_view,x,y,12)
-    elif facing == "west":
-        # back row
-        mazemap_render_tile(pdf,game_view,x-2,y+2,0)
-        mazemap_render_tile(pdf,game_view,x-2,y-2,1)
-        mazemap_render_tile(pdf,game_view,x-2,y+1,2)
-        mazemap_render_tile(pdf,game_view,x-2,y-1,3)
-        mazemap_render_tile(pdf,game_view,x-2,y,4)
-        # middle row
-        mazemap_render_tile(pdf,game_view,x-1,y+2,5)
-        mazemap_render_tile(pdf,game_view,x-1,y-2,6)
-        mazemap_render_tile(pdf,game_view,x-1,y+1,7)
-        mazemap_render_tile(pdf,game_view,x-1,y-1,8)
-        mazemap_render_tile(pdf,game_view,x-1,y,9)
-        # front row
-        mazemap_render_tile(pdf,game_view,x,y+1,10)
-        mazemap_render_tile(pdf,game_view,x,y-1,11)
-        mazemap_render_tile(pdf,game_view,x,y,12)
-    elif facing == "east":
-        # back row
-        mazemap_render_tile(pdf,game_view,x+2,y-2,0)
-        mazemap_render_tile(pdf,game_view,x+2,y+2,1)
-        mazemap_render_tile(pdf,game_view,x+2,y-1,2)
-        mazemap_render_tile(pdf,game_view,x+2,y+1,3)
-        mazemap_render_tile(pdf,game_view,x+2,y,4)
-        # middle row
-        mazemap_render_tile(pdf,game_view,x+1,y-2,5)
-        mazemap_render_tile(pdf,game_view,x+1,y+2,6)
-        mazemap_render_tile(pdf,game_view,x+1,y-1,7)
-        mazemap_render_tile(pdf,game_view,x+1,y+1,8)
-        mazemap_render_tile(pdf,game_view,x+1,y,9)
-        # front row
-        mazemap_render_tile(pdf,game_view,x,y-1,10)
-        mazemap_render_tile(pdf,game_view,x,y+1,11)
-        mazemap_render_tile(pdf,game_view,x,y,12)
-
-
-def mazemap_render_tile(pdf, game_view, x, y, render_pos):
-    map_id = game_view.state.map_id
+    portal_in_sight = warp_portal_in_sight(map_id, (x, y), game_view.state.facing, render_pos)
+    if portal_in_sight:
+        warp_portal, edge = portal_in_sight
+        x, y = warp_portal.translate(edge, x, y)
+        # print(f'WARP! {game_view.state.coords} -> {(x, y)} (render_pos={render_pos})')
+    else:
+        map_id, x, y = game_view.state.coords
+    x += dx
+    y += dy
     _map = atlas().maps[map_id]
     if not mazemap_bounds_check(_map, x, y):
         return
     tile_id = mazemap_get_tile(game_view, map_id, x, y)
-    if render_pos in (7, 2, 4, 3, 8):
-    # We do not handle 9 because we expected warp tiles to be of same type,
-    # and the other render_pos because we are lazy :D
-        front_pos = mazemap_next_pos_facing(*game_view.state.coords[1:], game_view.state.facing)
-        warped_coords = mapscript_get_warped_coords((map_id, *front_pos))
-        if warped_coords:  # we display the tile seen through the warp
-            seen_pos = mazemap_next_pos_facing(*warped_coords[1:], game_view.state.facing, render_pos=render_pos)
-            tile_id = mazemap_get_tile(game_view, warped_coords[0], *seen_pos)
-            # print(f'warped_coords! {(map_id, *front_pos)} -> {warped_coords} >BACK(render_pos={render_pos}): {seen_pos} ({tile_id})')
     tile = TILES[tile_id]
     if not tile:
         return
@@ -232,6 +163,7 @@ def mazemap_render_tile(pdf, game_view, x, y, render_pos):
             pdf.image('assets/boulder_small.png', x=68, y=48)
     if render_pos == 9:  # center of midle row
         _enemy = mapscript_get_enemy_at((map_id, x, y), game_view.state)
+        # Rendering enemy on map:
         if _enemy and _enemy.show_on_map and not game_view.enemy_vanquished((map_id, x, y)):
             enemy_render_small(pdf, _enemy)
 
@@ -258,7 +190,7 @@ def combat_render(pdf, game_state):
     _enemy = combat.enemy
     enemy_has_frames = get_image_info(pdf, _enemy_img_filepath(_enemy))['w'] > config().VIEW_WIDTH
     if _enemy.hp > 0 or enemy_has_frames:  # if the enemy visual is made of several frames, assume there is one for its death
-        enemy_render(pdf, combat)
+        enemy_render(pdf, combat, game_state.sfx)
         if combat.boneshield_up:
             pdf.image('assets/enemies/bone_shield.png', x=0, y=0)  # Replicates boss_boneshield_render
     if _enemy.hp <= 0 and combat.enemy.gold:
@@ -288,7 +220,7 @@ def combat_render_log(pdf, prefix, log, start_y):
         bitfont_render(pdf, log.result, 2, start_y+20)
 
 
-def enemy_render(pdf, combat):
+def enemy_render(pdf, combat, sfx=None):
     _enemy, _round = combat.enemy, combat.round
     combat_round, img_filepath = combat.combat_round, _enemy_img_filepath(_enemy)
     # If the image is larger than the VIEW_WIDTH, it is sliced in frames:
@@ -302,8 +234,12 @@ def enemy_render(pdf, combat):
         else:
             frame = (_round + 1) % frame_count
     pdf.image(img_filepath, x=-frame*config().VIEW_WIDTH, y=0)
+    # Rendering SFX *after* enemy sprite (e.g. for BURN spell) but *before* CombatLogs (to improve readability):
     if _round >= 0 and combat_round and combat_round.sfx:
-        sfx_render(pdf, combat_round.sfx)
+        assert not sfx, f'SFX are defined at both GameState & CombatRound levels for {_enemy.name} at round={_round}'
+        sfx = combat_round.sfx
+    if sfx:
+        sfx_render(pdf, sfx)
 
 
 def enemy_render_small(pdf, _enemy, scale=2/3):
@@ -347,7 +283,8 @@ def arrow_button_render(pdf, direction, page_id=None, shift_x=0, shift_y=0):
         flipped = direction in ('MOVE-FORWARD', 'MOVE-BACKWARD')
         link_width = ARROW_LINK_WIDTH if flipped else ARROW_LINK_HEIGHT
         link_height = ARROW_LINK_HEIGHT if flipped else ARROW_LINK_WIDTH
-        return add_link(pdf, link_pos.x, link_pos.y, link_width, link_height, page_id=page_id, link_alt=direction)
+        return add_link(pdf, link_pos.x, link_pos.y, link_width, link_height, page_id=page_id,
+                        link_alt=direction.replace('-', ' '))
     return None
 
 
@@ -372,7 +309,7 @@ def render_book(pdf, book, page_id, treasure_id):
             link = link_from_page_id(pdf, page_id)
             x, y = 80, 60
             with pdf.rect_clip(x=x, y=y, w=45, h=47):
-                pdf.image('assets/black_bird.png', x=x - book.bird_index*45, y=y, link=link)
+                pdf.image('assets/black_bird.png', x=x - book.bird_index*45, y=y, link=link, alt_text='NEXT')
     bitfont_render(pdf, book.text, 80, y, Justify.CENTER, page_id=page_id)
     if book.next:
         white_arrow_render(pdf, 'NEXT', x=120, y=100, page_id=page_id)
