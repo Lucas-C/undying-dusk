@@ -27,6 +27,7 @@ def seamus(fpdf, text, controller=False):
     img, pdf_img = init_pdf_img(fpdf)
     _seamus_speaks(text)(pdf_img)
     if controller:
+        # FROM: https://opengameart.org/content/xbox-360-controller-and-dualshock-4-blackwhite-icons
         pdf_img.image(f'{PARENT_DIR}/PongMan-Xbox360.png', x=54, y=74)
     return [img]
 

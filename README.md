@@ -80,7 +80,7 @@ To my knowledge, this is the very first video game in a PDF format.
 [Dedicated SubReddit](https://www.reddit.com/r/UndyingDuskPdfGame)
 
 
-## Trailers
+## Trailer GIFs
 
 ![GIF trailer #1](trailer/undying-dusk-trailer1.gif)
 
@@ -219,18 +219,18 @@ Songs used in the game :
 
 They have all been collected in [this collection on OGA](https://opengameart.org/content/music-for-undying-dusk-pdf-game).
 
-Also, this game was mostly coded while listening to _Lance's Dark Mood Party Mixes (Trip Hop / Downtempo / Electronica / Chill Out):
-* [Vol 36](https://www.youtube.com/watch?v=AwFpRxjt_BA)
-* [Vol 42](https://www.youtube.com/watch?v=B2Q9Bgpwses)
-* [Vol 166](https://www.youtube.com/watch?v=8NNyV_WJ-kI)
-* [Vol 190](https://www.youtube.com/watch?v=e07ALvjj78o)
-* [Vol 196](https://www.youtube.com/watch?v=CGhyaVAHtx4)
-* [Vol 219](https://www.youtube.com/watch?v=ZSmCcRjjUiA)
+Also, this game was mostly coded while listening to _Lance's Dark Mood Party Mixes (Trip Hop / Downtempo / Electronica / Chill Out)_:
+[Vol 36](https://www.youtube.com/watch?v=AwFpRxjt_BA) -
+[Vol 42](https://www.youtube.com/watch?v=B2Q9Bgpwses) -
+[Vol 166](https://www.youtube.com/watch?v=8NNyV_WJ-kI) -
+[Vol 190](https://www.youtube.com/watch?v=e07ALvjj78o) -
+[Vol 196](https://www.youtube.com/watch?v=CGhyaVAHtx4) -
+[Vol 219](https://www.youtube.com/watch?v=ZSmCcRjjUiA).
 
 As well as _Beat Therapy_:
-* [10 - A Trip Hop Mix](https://www.youtube.com/watch?v=vJXWH55q51Y)
-* [13 - Jazzy_Trip Hop / Breakbeat & World Culture Mix](https://www.youtube.com/watch?v=N8dxkXAUUso)
-* [30 - A Trip Hop Mix](https://www.youtube.com/watch?v=4MDau6q2dPs)
+[#10 - A Trip Hop Mix](https://www.youtube.com/watch?v=vJXWH55q51Y) -
+[#13 - Jazzy_Trip Hop / Breakbeat & World Culture Mix](https://www.youtube.com/watch?v=N8dxkXAUUso) -
+[#30 - A Trip Hop Mix](https://www.youtube.com/watch?v=4MDau6q2dPs).
 
 ### Playtesters
 A huge THANK YOU to Henri Crouzet & Maxime Lemanach for their precious feedbacks!
