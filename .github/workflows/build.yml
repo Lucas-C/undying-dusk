@@ -33,5 +33,6 @@ jobs:
         run: NO_TQDM=1 PYTHONUNBUFFERED=1 ./gen_pdf.py
       - name: Build trailer GIFs
         run: |
-          PYTHONPATH=. trailer/build_gif_trailer.py --gif-id=1
-          PYTHONPATH=. trailer/build_gif_trailer.py --gif-id=2
+          PYTHONPATH=. trailer/gen_promo_images.py 1
+          PYTHONPATH=. trailer/gen_promo_images.py 2
+          PYTHONPATH=. trailer/gen_promo_images.py 3
