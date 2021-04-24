@@ -57,7 +57,7 @@
 
 ![Title](title.png)
 
-**Undying Dusk** is a video game in a PDF format,
+**Undying Dusk** is a video game in PDF format,
 with a gameplay based on exploration and logic puzzles,
 in the tradition of [dungeon crawlers](https://en.wikipedia.org/wiki/Dungeon_crawl#Video_games).
 
@@ -65,9 +65,9 @@ The game is set in a fantasy realm where a curse set by the Empress keeps the wo
 You play a woman who recently found shelter in an eerie monastery.
 
 It features:
-- 200 000 PDF pages
-- a retrogaming aesthetic: 160x120 pixels resolution and a 16 colors palette
-- a grid-based world with 50 different tiles and 10 maps to explore
+- ~ 200 000 PDF pages
+- retro aesthetics: 160x120 resolution & a 16 colors palette
+- a grid-based world with 50+ distinct tiles & 10 maps to explore
 - more than 30 treasure items, weapons & spells to pick up in order to face 15 enemy monsters
 - 20 music tracks
 - thousands of "Game Over" pages, and a single path to victory
