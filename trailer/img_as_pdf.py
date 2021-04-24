@@ -20,7 +20,8 @@ class ImageAsPdf:
     def set_link(self, link, page=-1): pass
     def link(self, x, y, w, h, link, alt_text=''): pass
 
-    def image(self, img_filepath, x=None, y=None, w=0, h=0):
+    # pylint: disable=unused-argument
+    def image(self, img_filepath, x=None, y=None, w=0, h=0, link="", title=None, alt_text=None):
         is_bitfont = 'boxy_bold' in img_filepath
         with Image.open(img_filepath) as img_added:
             if self._rect_clip:
@@ -32,12 +33,10 @@ class ImageAsPdf:
                 x, y = rc_x, rc_y
                 if x < 0:  # PIL requires x & y to be positive:
                     if x < -rc_width: return  # out of screen, no need to render
-                    assert scale == 1, 'Not implemented yet'
                     crop_x -= x
                     x = 0
                 if y < 0:  # PIL requires x & y to be positive:
                     if y < -rc_height: return  # out of screen, no need to render
-                    assert scale == 1, 'Not implemented yet'
                     crop_y -= y
                     y = 0
                 rc_width, rc_height = map(int, (rc_width, rc_height))  # .resize box arg must be an int tuple

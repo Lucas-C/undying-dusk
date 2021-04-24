@@ -10,7 +10,7 @@ from .deadends import detect_deadends
 from .explore import disable_burn_and_push
 from .entities import CutScene, GameMilestone, GameMode, GameState, GameView
 from .js import avatar
-from .logs import log, log_paths_diff, diff_game_states
+from .logs import log, log_victorious_combats, log_paths_diff, diff_game_states
 from .mapscript import mapscript_exec
 from .perfs import trace_time
 from .reducer import reduce_views
@@ -114,6 +114,10 @@ def visit_game_views(args):
             print(f'Checkpoint {i + 1}: #visited_states={len(game_views_until_checkpoint)} #checkpoint_GVs={len(checkpoint_game_views)}')
             if checkpoint_game_views:
                 print(map_as_string(checkpoint_game_views[0]))
+                # Extra logging when a checkpoint happens just after a combat:
+                if checkpoint_game_views[0].src_view.state.mode == GameMode.COMBAT:
+                    print('Combat choices leading to victory:')
+                    log_victorious_combats(checkpoint_game_views[0].src_view)
                 initial_views = checkpoint_game_views
             else:
                 break

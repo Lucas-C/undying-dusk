@@ -236,8 +236,8 @@ def enemy_render(pdf, combat, sfx=None):
     pdf.image(img_filepath, x=-frame*config().VIEW_WIDTH, y=0)
     # Rendering SFX *after* enemy sprite (e.g. for BURN spell) but *before* CombatLogs (to improve readability):
     if _round >= 0 and combat_round and combat_round.sfx:
-        assert not sfx, f'SFX are defined at both GameState & CombatRound levels for {_enemy.name} at round={_round}'
-        sfx = combat_round.sfx
+        sfx_render(pdf, combat_round.sfx)
+    # Note that during boss fight phase 2, both SFX are sometimes rendered: HEAL/BURN/UNLOCK + enemy attack:
     if sfx:
         sfx_render(pdf, sfx)
 

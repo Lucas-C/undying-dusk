@@ -31,3 +31,7 @@ jobs:
         run: ./check_dawnbringer.py $(git ls-files | grep .png | grep -v yellow-star.png)
       - name: Build PDF
         run: NO_TQDM=1 PYTHONUNBUFFERED=1 ./gen_pdf.py
+      - name: Build trailer GIFs
+        run: |
+          PYTHONPATH=. trailer/build_gif_trailer.py --gif-id=1
+          PYTHONPATH=. trailer/build_gif_trailer.py --gif-id=2

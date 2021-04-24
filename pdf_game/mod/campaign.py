@@ -17,7 +17,7 @@ EMPRESS_INTERPHASE_LINES = (
     'Come back to help me\nDominik!',
 )
 
-VICTORY_POS = Checkpoint((9, 11, 5), 'ending after beating the Empress')
+VICTORY_POS = Checkpoint((9, 11, 5), 'ending after beating the Empress', mode=GameMode.DIALOG)
 CHECKPOINTS = (  # intermediate positions that should be reachable through a unique path only
     # Checkpoint((1, 6, 6), 'Entering Monastery after Scriptorium'),
     Checkpoint((1, 4, 9),   'After beating the imp, still in Monastery'),
@@ -258,7 +258,7 @@ def script_it():
         game_view.state = gs._replace(message=msg)
     mapscript_add_trigger((6, 4, 3), _village_door_hint, facing='north', permanent=True)
     mapscript_add_message((6, 8, 14), 'No need to go back anymore', facing='south',
-                                      condition=is_instinct_preventing_to_enter_templar_academy )
+                                      condition=is_instinct_preventing_to_enter_templar_academy)
 
     # Entrance to Canal Boneyard is blocked by a skeleton; required to win: full HP + 3 MP (1 BURN & 2 HEAL) + great sword (13 dmg)
     mapscript_add_enemy((6, 12, 7), 'skeleton',
@@ -871,7 +871,7 @@ def script_it():
         return game_state, log_result
     def phase2_attack_logic(combat):
         dominik_dazed = 'UNLOCK_DOMINIK' not in combat.enemy.custom_actions_names
-        if combat.enemy.hp < 20 and not dominik_dazed:
+        if combat.enemy.hp < 14 and not dominik_dazed:
             return CR('Dominik heal her', heal=combat.enemy.max_hp, sfx=SFX(id=9, pos=Position(75, 14)))
         return CR('Death voice!', atk=22, sfx=SFX(id=8, pos=Position(98, 6)))
     def phase2_enemy_frame(combat):

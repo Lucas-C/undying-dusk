@@ -1,7 +1,4 @@
 <!-- NEXT STEPS:
-- l'envoyer à Jerome
-- create itch.io page
-- more GIFs for com'
 - reduce the 1324x16 & 1598x16 states of the final fight 2 phases ?
 - Androïd & Linux PDF readers?
 - post-release: publish assets
@@ -12,7 +9,8 @@
   * skeleton fight : too hard ? hint at critical ?
 - code clean-up:
   * rename CutScene -> Dialog + (scene_id/shop_id -> dialog_id) + get rid for old Proxy(item=[...]) struct in build_dialog_options + rm ShopMessageItem
-  * make "mod" a class instance, so that customization no more relies on imports, and make mapscript.SCRIPTS_PER_TILE a class property
+  * make the "mod" submodule a class instance, so that customization no more relies on imports,
+    and turn mapscript.SCRIPTS_PER_TILE & warp_portals.WARP_PORTALS_PER_MAP into properties of this class
 - VF?
 - size improvements:
   * 34M music/AlexandrZhelanov-ADarknessOpus.ogg
@@ -82,8 +80,11 @@ To my knowledge, this is the very first video game in a PDF format.
 [Dedicated SubReddit](https://www.reddit.com/r/UndyingDuskPdfGame)
 
 
-## Trailer
-![GIF trailer](trailer/undying-dusk-trailer.gif)
+## Trailers
+
+![GIF trailer #1](trailer/undying-dusk-trailer1.gif)
+
+![GIF trailer #2](trailer/undying-dusk-trailer2.gif)
 
 
 ## Download
@@ -218,7 +219,18 @@ Songs used in the game :
 
 They have all been collected in [this collection on OGA](https://opengameart.org/content/music-for-undying-dusk-pdf-game).
 
-Also, this game was mostly coded while listening to _Lance's Dark Mood Party Mixes_!
+Also, this game was mostly coded while listening to _Lance's Dark Mood Party Mixes (Trip Hop / Downtempo / Electronica / Chill Out):
+* [Vol 36](https://www.youtube.com/watch?v=AwFpRxjt_BA)
+* [Vol 42](https://www.youtube.com/watch?v=B2Q9Bgpwses)
+* [Vol 166](https://www.youtube.com/watch?v=8NNyV_WJ-kI)
+* [Vol 190](https://www.youtube.com/watch?v=e07ALvjj78o)
+* [Vol 196](https://www.youtube.com/watch?v=CGhyaVAHtx4)
+* [Vol 219](https://www.youtube.com/watch?v=ZSmCcRjjUiA)
+
+As well as _Beat Therapy_:
+* [10 - A Trip Hop Mix](https://www.youtube.com/watch?v=vJXWH55q51Y)
+* [13 - Jazzy_Trip Hop / Breakbeat & World Culture Mix](https://www.youtube.com/watch?v=N8dxkXAUUso)
+* [30 - A Trip Hop Mix](https://www.youtube.com/watch?v=4MDau6q2dPs)
 
 ### Playtesters
 A huge THANK YOU to Henri Crouzet & Maxime Lemanach for their precious feedbacks!

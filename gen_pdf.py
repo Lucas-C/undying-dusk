@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.8
 
 import argparse, json, logging, os
+from contextlib import contextmanager
 
 import fpdf
 
@@ -44,15 +45,12 @@ def main():
     if args.no_pdf:
         return
     print('Starting PDF pages rendering')
-    pdf, links_to_credits = init_pdf(start_view.page_id)
+    pdf, links_to_credits = init_pdf(args, start_view.page_id)
     with trace_time() as trace:
         for game_view in tqdm(game_views, disable='NO_TQDM' in os.environ):
             render_page(pdf, game_view, lambda pdf, gs: render_victory(pdf, gs, links_to_credits))
     render_credit_pages(pdf, links_to_credits)
     print(f'Rendering of {len(pdf.pages)} pages took: {trace.time:.2f}s')
-    if args.no_marked_content:
-        # pylint: disable=protected-access
-        pdf._marked_contents = None
     with trace_time() as trace:
         pdf.output('undying-dusk.pdf', 'F')
     print(f'Output generation took: {trace.time:.2f}s')
@@ -76,9 +74,18 @@ def parse_args():
     return parser.parse_args()
 
 
-def init_pdf(start_page_id):
+def init_pdf(args, start_page_id):
+    if args.no_marked_content:
+        class PdfClass(fpdf.FPDF):
+            @contextmanager
+            def _marked_sequence(self, **kwargs):
+                yield
+            def _add_marked_content(self, *_, **__):
+                pass
+    else:
+        PdfClass = fpdf.FPDF
     dimensions = [config().VIEW_WIDTH, config().VIEW_HEIGHT]
-    pdf = fpdf.FPDF(format=dimensions, unit='pt')
+    pdf = PdfClass(format=dimensions, unit='pt')
     pdf.alias_nb_pages(None)  # disabling this feature for performance reasons
     pdf.set_auto_page_break(False)
     pdf.set_title(METADATA['dc:title'])

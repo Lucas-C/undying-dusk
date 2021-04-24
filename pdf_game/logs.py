@@ -1,6 +1,7 @@
 from collections import defaultdict
+from queue import LifoQueue
 
-from .entities import GameMode
+from .entities import GameMilestone, GameMode
 from .js import shop
 from .optional_deps import ansi_wrap
 
@@ -58,12 +59,13 @@ def log_path_to(game_view, actions_only=False, map_as_string=None, stop_at=None,
         else:
             print(repr(gv.state))
 
-def log_combat(start_gv):
+def log_combat(start_gv, skip_rounds=0):
     if not start_gv.state.combat:
         print('GameView is not a combat view: looking for latest combat')
-    while not start_gv.state.combat:
-        start_gv = start_gv.src_view
-    for gv, prev_gv in reversed(list(_iter_path_view_logs(start_gv, stop_at_cond=lambda gv: not gv.state.combat))):
+        while not start_gv.state.combat:
+            start_gv = start_gv.src_view
+    gv_pairs = list(reversed(list(_iter_path_view_logs(start_gv, stop_at_cond=lambda gv: not gv.state.combat or gv.state.milestone))))
+    for gv, prev_gv in gv_pairs[skip_rounds:]:
         try:
             action_name = next(name for name, next_gv in prev_gv.actions.items() if next_gv == gv)
         except StopIteration:  # depending on where this utility function is called, not all .actions may be filled:
@@ -71,6 +73,7 @@ def log_combat(start_gv):
         _print_action(gv, action_name)
 
 def _print_action(gv, action_name):
+    action_name = action_name or '<NONE>'
     if gv.state.mode == GameMode.EXPLORE:
         if action_name in ('BURN', 'UNLOCK'):
             print(f'{action_name:>6} @ {gv.state.coords}')
@@ -80,23 +83,48 @@ def _print_action(gv, action_name):
         else:
             print(action_name)
     elif gv.state.mode == GameMode.COMBAT:
-        print(f'{action_name:>12} / {gv.state.combat.enemy.name} @ {gv.state.coords}: ' + _combat_line(gv.state))
+        print(f'{action_name:>14} / {gv.state.combat.enemy.name} @ {gv.state.coords}: ' + _combat_line(gv.state))
     else:
         print(f'{action_name} @ shop {gv.state.shop_id}')
 
 def _combat_line(gs):
     combat = gs.combat
-    line = f'Round {combat.round}: eHP={combat.enemy.hp:>2}/{combat.enemy.max_hp} aHP={gs.hp:>2}/{gs.max_hp} aMP={gs.mp:>2}'
+    line = f'Round {combat.round:>2}: eHP={combat.enemy.hp:>2}/{combat.enemy.max_hp} aHP={gs.hp:>2}/{gs.max_hp} aMP={gs.mp:>1}'
     if combat.avatar_log:
-        line += f' | Hero: {combat.avatar_log.action:<12} {combat.avatar_log.result:<9}'
+        line += f' | Hero: {combat.avatar_log.action:<17} {combat.avatar_log.result:<16}'
     if combat.enemy_log:
         line += f' | Enemy: {combat.enemy_log.action} {combat.enemy_log.result}'
+    if gs.message:
+        line += ' | ' + gs.message.replace('\n', ' / ')
     return line
 
 def _iter_path_view_logs(game_view, stop_at_gv=None, stop_at_cond=None):
     while game_view != stop_at_gv and not (stop_at_cond and stop_at_cond(game_view)):
         yield game_view, game_view.src_view
         game_view = game_view.src_view
+
+
+def log_victorious_combats(combat_end_gv):
+    start_combat_gv = combat_end_gv
+    while start_combat_gv.src_view.state.combat:
+        start_combat_gv = start_combat_gv.src_view
+        if start_combat_gv.state.milestone:
+            break
+    states_logged = set()
+    gvs = LifoQueue()
+    gvs.put(start_combat_gv)
+    while not gvs.empty():
+        gv = gvs.get()
+        is_final = False
+        for child_gv in gv.actions.values():
+            if child_gv:
+                if not child_gv.state.combat or child_gv.state.milestone in (GameMilestone.CHECKPOINT, GameMilestone.VICTORY):
+                    is_final = True
+                else:
+                    gvs.put(child_gv)
+        if is_final and gv.state not in states_logged:
+            log_combat(gv)
+            states_logged.add(gv.state)
 
 
 def log_paths_diff(gv1, gv2, actions_only=False, map_as_string=None):
