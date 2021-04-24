@@ -88,7 +88,7 @@ To my knowledge, this is the very first video game in a PDF format.
 
 
 ## Download
-Download links for all versions can be found here: [GitHub Releases](https://github.com/Lucas-C/undying-dusk/releases)
+Download the game [on itch.io](https://lucas-c.itch.io/undying-dusk).
 
 Release notes: [CHANGELOG.md](CHANGELOG.md)
 
