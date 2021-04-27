@@ -105,7 +105,6 @@ def gen_cover(fpdf):
     img = scale(4, [img])[0]
     img.save(f'{PARENT_DIR}/undying-dusk-cover.png')
 
-
 def gen_card(fpdf):
     img, pdf_img = init_pdf_img(fpdf, 'nightsky')
     bitfont_render(pdf_img, 'UNDYDING DUSK', 80, 8, Justify.CENTER, size=16)
@@ -114,13 +113,11 @@ def gen_card(fpdf):
     bitfont_render(pdf_img, 'by\nLucas\nCIMON', 2, 45)
     qrcode = QRCode(box_size=1)
     qrcode.add_data("https://lucas-c.itch.io/undying-dusk")
-    black, white = "#140c1c", "#deeed6"
-    qr_img = qrcode.make_image(fill_color=black, back_color=white).get_image().convert('RGBA')
+    qr_img = qrcode.make_image(fill_color="#140c1c", back_color="#deeed6").get_image().convert('RGBA')
     pdf_img.image(qr_img, x=120, y=49)
-    bitfont_render(pdf_img, 'A free adventure game\nin PDF format!', 80, 90, Justify.CENTER)
+    bitfont_render(pdf_img, 'A free adventure game\nin PDF format!', 80, 94, Justify.CENTER)
     img = scale(4, [img])[0]
     img.save(f'{PARENT_DIR}/undying-dusk-card.png')
-
 
 def scale(factor, images):
     return [img.resize((factor * config().VIEW_WIDTH, factor * config().VIEW_HEIGHT),

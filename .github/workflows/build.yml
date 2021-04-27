@@ -21,7 +21,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-          pip install flask livereload pylint pytest -r requirements.txt
+          pip install -r requirements.txt -r extra-requirements.txt
           git clone https://github.com/clintbellanger/heroine-dusk
       - name: Linter
         run: pylint pdf_game/ gen_pdf.py hall_of_fame/hof_app.py trailer/*.py
@@ -32,6 +32,4 @@ jobs:
       - name: Build PDF
         run: NO_TQDM=1 PYTHONUNBUFFERED=1 ./gen_pdf.py
       - name: Build trailer GIFs
-        run: |
-          pip install qrcode
-          PYTHONPATH=. trailer/gen_promo_images.py
+        run: PYTHONPATH=. trailer/gen_promo_images.py

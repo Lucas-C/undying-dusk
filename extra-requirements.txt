@@ -1,0 +1,7 @@
+pylint
+pytest
+# for hall of fame:
+flask
+# for gen_promo_images.py:
+livereload
+qrcode
