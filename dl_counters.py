@@ -13,6 +13,7 @@ def main():
             print('  Views:', game['views_count'])
             print('  Downloads:', game['downloads_count'])
             print('  Purchases:', game['purchases_count'])
+            print('  Earnings:', game['earnings'][0]['amount_formatted'])
     print()
 
     print('GitHub:')

@@ -1,7 +1,8 @@
 <!-- NEXT STEPS:
+- easter eggs: add a text mentioning they are easter eggs!
 - reduce the 1324x16 & 1598x16 states of the final fight 2 phases ?
 - Androïd & Linux PDF readers?
-- post-release: publish assets
+- post-release: publish assets sur OGA
 - a11y? questions to Sandra Bruel: + quels lecteurs PDF vos amis emploient ?
 - feedback Maxime:
   * MUSIC: certaines sont trop rapprochées
@@ -79,6 +80,27 @@ To my knowledge, this is the very first video game in a PDF format.
 
 [Dedicated SubReddit](https://www.reddit.com/r/UndyingDuskPdfGame)
 
+Table of contents:
+
+<!-- To update: markdown-toc -i README.md -->
+
+<!-- toc -->
+
+- [Trailer GIFs](#trailer-gifs)
+- [Download](#download)
+  * [For Windows gamers](#for-windows-gamers)
+- [Compatible PDF readers](#compatible-pdf-readers)
+- [Credits & attribution](#credits--attribution)
+  * [Heroine Dusk](#heroine-dusk)
+  * [Graphical assets](#graphical-assets)
+  * [Fonts](#fonts)
+  * [Music](#music)
+  * [Playtesters](#playtesters)
+- [Tools used](#tools-used)
+- [Build steps](#build-steps)
+- [License](#license)
+
+<!-- tocstop -->
 
 ## Trailer GIFs
 
