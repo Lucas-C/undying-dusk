@@ -55,6 +55,8 @@ def custom_can_move_to(_map, x, y, game_state):
         if (x, y) == (9, 11):  # south exit
             assert not game_state.tile_override_at(VILLAGE_PORTAL_COORDS), f'No going back to Zuruth Plains once portal is open!\n{game_state}'
     if _map.name == 'Zuruth Plains':
+        if (x, y) == (3, 15):
+            return True  # dungeon_wall_with_ivy
         if (x, y) == (13, 14) and 'BOOTS' in game_state.items:
             return True  # can enter shallow waters to access the chest
         if (x, y) == (4, 2):
@@ -139,7 +141,7 @@ def patch_tileset(tileset):
         True,   # 44 = seamus_on_grass
         True,   # 45 = seamus_on_floor
         True,   # 46 = cauldron
-        True,   # 47 = dungeon_wall_with_ivy
+        False,  # 47 = dungeon_wall_with_ivy
         False,  # 48 = dungeon_wall_lever_slot
         False,  # 49 = dungeon_wall_lever_down
         False,  # 50 = dungeon_wall_lever_up
@@ -250,6 +252,7 @@ def _patch_tiles(_map):
         x, y = 4, 2;   tiles[y][x] = 6   # grass instead of grave, so that sign/water can be reached
         x, y = 2, 2;   tiles[y][x] = 23  # sign in the water
         x, y = 4, 9;   tiles[y][x] = 6   # grass instead of tree, so that glimpse can be seen
+        x, y = 12, 5;  tiles[y][x] = 47  # dungeon_wall_with_ivy
         x, y = 13, 5;  tiles[y][x] = 46  # chest_interior -> cauldron
         x, y = 14, 4;  tiles[y][x] = 32  # torch on wall, on left side of chest
         x, y = 14, 6;  tiles[y][x] = 32  # torch on wall, on right side of chest

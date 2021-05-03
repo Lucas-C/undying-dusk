@@ -1,3 +1,4 @@
+from ..bitfont import bitfont_color_red, bitfont_render
 from ..entities import Book, Position, SFX
 from ..logs import log
 
@@ -43,7 +44,7 @@ BOOKS = {
     (8, 14, 4): Book('An old parchment mentions\nhow the Mausoleum stairs\nleading to the castle above\nwere condamned long ago.', next=Book('A secret mechanism still\nallows to open the iron gate:\nthe key is a sequence of\nthree directions, hidden\nin the lyrics of a folk song.')),
     (8, 14, 10): Book('Of gods & men\nChapt. 4\nGorgons', img='assets/gorgon-head.png', next=Book('Never look a gorgon\nin the eye! Their gaze can\nturn people into stone.\n\nNote: watching their own\nreflection is fatal for them.')),
     # Mausoleum: bookshelf in north-west alcove, behind 2 mimics:
-    (8, 2, 2): Book('The ballad of the first king\n\nIn the plains\nthe journey started.\nOff he went\nto the monks temple.', music=BASE_MUSIC_URL + 'AlexandrZhelanov-JourneyToTheEastRocks.ogg', next=Book('All the books he read\nas wisdom was his goal.\nThen back he came,\nup to the knights college.\nTo become the bravest,\nwas is new ambition.\n', next=Book('Finally, he crossed the river\nand there established\nthe foundations\nof the newborn realm.\n\n', treasure_id=28))),
+    (8, 2, 2): Book('The ballad of the first king\n\nIn the plains\nthe journey started.\nSouth he went\nto the monks temple.', music=BASE_MUSIC_URL + 'AlexandrZhelanov-JourneyToTheEastRocks.ogg', next=Book('All the books he read,\nas wisdom was his goal.\nThen north he traveled,\nto the knights college.\nTo become the bravest,\nwas is new ambition.\n', next=Book("Finally, to the west\nhe crossed a river,\nand there established\nthe realm's foundations.\n\n", treasure_id=28))),
 }
 
 
@@ -58,7 +59,7 @@ def examine_bookshelf(gs, bookshelf_pos, actions, _GameView):
             ritual_words, fixed_id = 'Mido Sesame', 51064
             if 'ABYSS_BOTTOM' in gs.secrets_found:
                 ritual_words, fixed_id = 'Klaatu Barada Nikto', 18297
-            actions['EXAMINE'] = _GameView(gs._replace(book=Book(f'Ancient portals\nused to be activated\nwith an incantation:\n"{ritual_words}"')))
+            actions['EXAMINE'] = _GameView(gs._replace(book=Book(f'Ancient portals\nused to be controlled\nwith a magic incantation:\n"{ritual_words}"'), extra_render=ctrl_g_hint_extra_render))
             if gs.spellbook < 3:  # creating a hidden GameView with the portal open and a fixed page ID:
                 new_gv = _GameView(gs._replace(message=f'You utter out loud\nthe ritual words:\n\n"{ritual_words}"',
                                                fixed_id=fixed_id, facing='west'))
@@ -77,3 +78,11 @@ def examine_bookshelf(gs, bookshelf_pos, actions, _GameView):
                                                        treasure_id=11, spellbook=1, shop_id=tuto_spells().id))
     elif book is None:
         raise NotImplementedError(f'No book associated yet with bookshelf @{bookshelf_pos} from coords {gs.coords}')
+
+
+def ctrl_g_hint_extra_render(pdf):
+    with bitfont_color_red():
+        bitfont_render(pdf, 'c', 77, 62)
+        bitfont_render(pdf, 'tr', 97, 62)
+        bitfont_render(pdf, 'l', 121, 62)
+        bitfont_render(pdf, 'g', 62, 72)

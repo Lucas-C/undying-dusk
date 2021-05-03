@@ -5,7 +5,7 @@ from fpdf.image_parsing import get_img_info
 
 
 BACKGROUNDS = 'black,nightsky,tempest,interior'.split(',')
-ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE,FISH_ON_A_STICK,COMBINE_WITH_TWIG,SMOKED_FISH_ON_A_STICK,ATK_BOOST,PUT_STICK_IN_LEVER,STAFF,HAND_MIRROR,SCEPTER'.split(',')  # order matches position in .png
+ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE,FISH_ON_A_STICK,COMBINE_WITH_TWIG,SMOKED_FISH_ON_A_STICK,ATK_BOOST,PUT_STICK_IN_LEVER,STAFF,HAND_MIRROR,SCEPTER,BEHIND_IVY'.split(',')  # order matches position in .png
 INFO_SCREEN_ITEM_SLOT_POS = (
     Position(x=100, y=88),
     Position(x=120, y=88),
@@ -30,6 +30,7 @@ ACTION_BUTTON_POS = {
     'NO_PUSH': Position(x=72, y=60),  # aligned with box sprite
     'EXAMINE': Position(x=66, y=72),  # aligned with bookshelf & well sprites
     'GLIMPSE': Position(x=76, y=79),  # aligned with Canal Boneyard water
+    'BEHIND_IVY': Position(x=66, y=20),  # aligned with ivy next to cauldron over fire
     'BUCKLER': Position(x=140, y=20),
     'SCEPTER': Position(x=107, y=101),
     # Explore mode contextual actions:

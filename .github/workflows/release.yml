@@ -54,3 +54,7 @@ jobs:
           asset_path: ./zip/undying-dusk-with-sumatra-windows.zip
           asset_name: undying-dusk-with-sumatra-windows.zip
           asset_content_type: application/zip
+      - name: Publish on itch.io
+        run: ./publish-on-itch.io.sh ${{ github.ref }}
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}

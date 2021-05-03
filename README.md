@@ -1,8 +1,7 @@
 <!-- NEXT STEPS:
-- easter eggs: add a text mentioning they are easter eggs!
 - reduce the 1324x16 & 1598x16 states of the final fight 2 phases ?
 - Androïd & Linux PDF readers?
-- post-release: publish assets sur OGA
+- publish the assets I made on OGA
 - a11y? questions to Sandra Bruel: + quels lecteurs PDF vos amis emploient ?
 - feedback Maxime:
   * MUSIC: certaines sont trop rapprochées

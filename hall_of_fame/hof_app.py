@@ -19,7 +19,7 @@ def index():
     query = dict(parse_qsl(request.query_string.decode()))
     secrets_found = extract_secrets(query)
     version = query.get('v', '')
-    display_form = secrets_found is not None and version
+    display_form = bool(secrets_found is not None and version)
     if display_form and request.method == 'POST' and params_are_safe(request.form, secrets_found, version):
         upsert_score(request.form['name'], request.form['pdf_reader'], secrets_found, version)
         display_form = False
@@ -38,7 +38,7 @@ def params_are_safe(form, secrets_found, version):
         return False
     if any(len(secret) > 13 for secret in secrets_found):
         return False
-    return len(version) < 10
+    return len(version) < 20
 
 def upsert_score(player_name, pdf_reader, secrets_found, version):
     submission_date = datetime.now()

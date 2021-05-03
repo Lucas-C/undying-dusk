@@ -102,6 +102,8 @@ def render_page(pdf, game_view, render_victory):
             elif action_name == 'CLOSING-BOOK':
                 assert game_state.book
                 render_book(pdf, game_state.book, next_game_view.page_id, game_state.treasure_id)
+                if game_state.extra_render:  # specific case for book containing portal magic incantation:
+                    game_state.extra_render(pdf)
             elif action_name in CLICK_ZONES:
                 click_zone = CLICK_ZONES[action_name]
                 rotation = click_zone.pop('rotation', 0)
