@@ -8,7 +8,7 @@ mv ../undying-dusk.pdf .
 
 zip undying-dusk-pdf-only.zip undying-dusk.pdf
 
-wget https://www.sumatrapdfreader.org/dl/SumatraPDF-3.1.2.zip
+wget https://kjkpub.nyc3.digitaloceanspaces.com/software/sumatrapdf/rel/SumatraPDF-3.1.2.zip
 unzip SumatraPDF-3.1.2.zip
 
 zip undying-dusk-with-sumatra-windows.zip LAUNCH_UNDYING_DUSK_IN_SUMATRA.bat HOW_TO_PLAY.txt SumatraPDF.exe undying-dusk.pdf

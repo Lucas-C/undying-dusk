@@ -286,6 +286,7 @@ def _patch_tiles(_map):
         x, y = 4, 2;   tiles[y][x] = 3   # door (mimic) blocking access to north-west alcove
         x, y = 8, 11;  tiles[y][x] = 37  # adding hay pile in southern corridor alcove, behind water
         x, y = 2, 2;   tiles[y][x] = 34  # bookshelf
+        x, y = 3, 1;   tiles[y][x] = 34  # bookshelf
         x, y = 3, 3;   tiles[y][x] = 30  # dungeon_wall_tagged with FOUNTAIN_HINT
         x, y = 7, 11;  tiles[y][x] = 2   # wall after warp south-west in central room
         x, y = 10, 3;  tiles[y][x] = 2   # wall after warp north-east in central room

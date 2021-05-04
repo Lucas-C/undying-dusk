@@ -201,7 +201,9 @@ DawnLike 16x16 Universal Rogue-like tileset
 - explosion from [Lots of free 2d tiles and sprites by Hyptosis](https://opengameart.org/content/lots-of-free-2d-tiles-and-sprites-by-hyptosis) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 - [SNES JRPG Background: Snowy Village by Inkerrio](https://www.deviantart.com/inkerrio/art/SNES-JRPG-Background-Snowy-Village-794916075)
 - attacks SFXs from [Dungeon Crawl Stone Soup](http://crawl.develz.org/wordpress/) - CC0
-- gorgon's staff downscaled from [Staff by LordNeo](https://opengameart.org/content/staff-64-x64)
+- gorgon's staff downscaled from [Staff by LordNeo](https://opengameart.org/content/staff-64-x64) - CC0
+- castle & tree on historical map from [Karto tileset](https://opengameart.org/content/karto-tileset) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- small house on historical map from [Micro Tileset - Overworld and Dungeon](https://opengameart.org/content/micro-tileset-overworld-and-dungeon) - [OGA-BY 3.0](https://opengameart.org/content/oga-by-30-faq)
 <!--
 * griffon: Lanea Zimmerman (AKA Sharm) https://forums.rpgmakerweb.com/index.php?threads/sharms-stuff.26278/
 * scene_cave: https://opengameart.org/content/parallax-halloween-2d-game-backgrounds

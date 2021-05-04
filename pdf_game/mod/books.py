@@ -41,10 +41,11 @@ BOOKS = {
     (8, 3, 13): Book('A treatise on\nDruidic linguistics.\nThe first chapter teaches\nthe names of numbers.',
                      next=Book('1 : Klaatu  2 : Da\n3 : Fer  4 : Me\n5 : Mi  6 : Sesa\n7 : To  8 : Bara\n9 : Nik  10 : Do')),
     # Mausoleum: 2 bookshelves in east corridor
-    (8, 14, 4): Book('An old parchment mentions\nhow the Mausoleum stairs\nleading to the castle above\nwere condamned long ago.', next=Book('A secret mechanism still\nallows to open the iron gate:\nthe key is a sequence of\nthree directions, hidden\nin the lyrics of a folk song.')),
+    (8, 14, 4): Book('An old parchment mentions\nhow the Mausoleum stairs\nleading to the castle above\nwere condamned long ago.', next=Book('A secret mechanism\nallows to open the iron gate:\nthe key is a sequence\nof directions, hidden in\nthe lyrics of a folk song.')),
     (8, 14, 10): Book('Of gods & men\nChapt. 4\nGorgons', img='assets/gorgon-head.png', next=Book('Never look a gorgon\nin the eye! Their gaze can\nturn people into stone.\n\nNote: watching their own\nreflection is fatal for them.')),
     # Mausoleum: bookshelf in north-west alcove, behind 2 mimics:
-    (8, 2, 2): Book('The ballad of the first king\n\nIn the plains\nthe journey started.\nSouth he went\nto the monks temple.', music=BASE_MUSIC_URL + 'AlexandrZhelanov-JourneyToTheEastRocks.ogg', next=Book('All the books he read,\nas wisdom was his goal.\nThen north he traveled,\nto the knights college.\nTo become the bravest,\nwas is new ambition.\n', next=Book("Finally, to the west\nhe crossed a river,\nand there established\nthe realm's foundations.\n\n", treasure_id=28))),
+    (8, 2, 2): Book('The ballad of the first king\n\nIn the plains\nthe journey started.\nTo become the bravest,\noff he went to the\nknights academy.', music=BASE_MUSIC_URL + 'AlexandrZhelanov-JourneyToTheEastRocks.ogg', next=Book('He then traveled,\nto the monks haven.\nAll the books he read,\nas wisdom was\nis new ambition.', next=Book("Finally, he crossed a river,\nand there established\nthe realm's foundations.\n\n", treasure_id=28))),
+    (8, 3, 1): Book('\n\n\nHistorical map', img='assets/compass.png', next=Book((' ' * 36 + '\n') * 9, img='assets/map.png')),
 }
 
 
@@ -59,7 +60,7 @@ def examine_bookshelf(gs, bookshelf_pos, actions, _GameView):
             ritual_words, fixed_id = 'Mido Sesame', 51064
             if 'ABYSS_BOTTOM' in gs.secrets_found:
                 ritual_words, fixed_id = 'Klaatu Barada Nikto', 18297
-            actions['EXAMINE'] = _GameView(gs._replace(book=Book(f'Ancient portals\nused to be controlled\nwith a magic incantation:\n"{ritual_words}"'), extra_render=ctrl_g_hint_extra_render))
+            actions['EXAMINE'] = _GameView(gs._replace(book=Book(f'Ancient portals\nused to be controlled\nwith a magic incantation:\n"{ritual_words}"', extra_render=ctrl_g_hint_extra_render)))
             if gs.spellbook < 3:  # creating a hidden GameView with the portal open and a fixed page ID:
                 new_gv = _GameView(gs._replace(message=f'You utter out loud\nthe ritual words:\n\n"{ritual_words}"',
                                                fixed_id=fixed_id, facing='west'))

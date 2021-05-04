@@ -58,7 +58,7 @@ CHECKPOINTS = (  # intermediate positions that should be reachable through a uni
 
 ENEMY_CATEGORY_BEAST = 4  # new category, 1s unused integer among original ENEMY_CATEGORY_* constants
 PORTCULLIS_MUSIC_BTN_POS = Position(x=72, y=55)
-ROTATING_LEVER_CORRECT_SEQUENCE = 406  # south-north-west
+ROTATING_LEVER_CORRECT_SEQUENCE = 402  # south-north-east
 
 
 def script_it():

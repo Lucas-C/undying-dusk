@@ -5,11 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [1.0.1] - 2021-05-03
+## [1.0.1] - 2021-05-04
 ### Added
 - extra visual puzzles hints for _portal-activation_ & _shortcut-to-Mausoleum-entrance_ enigmas
+- historical map in a book, to help with ballad enigma
 ### Changed
-- text of the _The ballad of the first king_, to better hint at the directions
+- text of the _The ballad of the first king_, to better hint at the directions, that have changed
 
 ## [1.0.0] - 2021-04-24
 ### Added

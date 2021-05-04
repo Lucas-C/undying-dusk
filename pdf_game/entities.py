@@ -222,6 +222,7 @@ class Book(NamedTuple):
     music : Optional[str] = None
     hidden_trigger : Optional[str] = None
     sfx : Optional[SFX] = None
+    extra_render: Optional[Callable[['FPDF'], None]] = None
 
 
 class GameState(NamedTuple):
