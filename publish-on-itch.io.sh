@@ -18,8 +18,8 @@ chmod +x butler
 
 cd zip/
 echo 'Checking ZIPs:'
-./butler auditzip undying-dusk-pdf-only.zip
-./butler auditzip undying-dusk-with-sumatra-windows.zip
+../butler auditzip undying-dusk-pdf-only.zip
+../butler auditzip undying-dusk-with-sumatra-windows.zip
 echo "Now publishing $GAME_ID @ $VERSION ZIPs on itch.io:"
-./butler push undying-dusk-pdf-only.zip             Lucas-C/$GAME_ID:book --userversion $VERSION
-./butler push undying-dusk-with-sumatra-windows.zip Lucas-C/$GAME_ID:book --userversion $VERSION
+../butler push undying-dusk-pdf-only.zip             Lucas-C/$GAME_ID:book --userversion $VERSION
+../butler push undying-dusk-with-sumatra-windows.zip Lucas-C/$GAME_ID:book --userversion $VERSION
