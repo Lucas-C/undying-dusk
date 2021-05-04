@@ -1,0 +1,11 @@
+This is a video game in PDF format.
+
+It cannot be played using Adobe Acrobat Reader,
+that renders pages too slowly.
+
+Use instead another PDF reader, like Sumatra PDF: https://www.sumatrapdfreader.org
+Full list of compatible PDF readers: https://github.com/Lucas-C/undying-dusk#compatible-pdf-readers
+
+Game web page: https://lucas-c.itch.io/undying-dusk
+
+Feeling stuck in the game? Ask for advice on Reddit: https://www.reddit.com/r/UndyingDuskPdfGame

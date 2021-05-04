@@ -1,6 +1,8 @@
 Simply double click on the LAUNCH_UNDYING_DUSK_IN_SUMATRA.bat file:
 Sumatra PDF should start and open undying-dusk.pdf
 
-More information at https://github.com/Lucas-C/undying-dusk
+Game web page: https://lucas-c.itch.io/undying-dusk
+
+Feeling stuck in the game? Ask for advice on Reddit: https://www.reddit.com/r/UndyingDuskPdfGame
 
 Sumatra PDF website: https://www.sumatrapdfreader.org
