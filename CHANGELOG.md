@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.0.2] - not released yet
+### Fixed
+- wrong message about portal when first visiting sage Therel
+
 ## [1.0.1] - 2021-05-04
 ### Added
 - extra visual puzzles hints for _portal-activation_ & _shortcut-to-Mausoleum-entrance_ enigmas

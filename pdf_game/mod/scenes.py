@@ -506,7 +506,7 @@ class SimmonsSellableArmor:
 class SageTherelAdvice:
     @staticmethod
     def dialog_option(game_state):
-        if game_state.spellbook <= 2 and 'SCROLL' not in game_state.items:
+        if game_state.spellbook <= 2:
             return DialogOption.only_msg('Fire magic is effective\nagainst undead and bone.')
         return DialogOption.only_msg("You opened a magic\nportal, I'm impressed!")
 
