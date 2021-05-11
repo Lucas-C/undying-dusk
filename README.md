@@ -128,13 +128,13 @@ You will find below a comparison table of how well several PDF readers wil let y
 Notably, Adobe Acrobat Reader does **not** perform well to render the game.
 
 PDF reader: /Criteria | Sumatra PDF \* | MuPDF | Xpdf | FoxIt | Adobe Acrobat | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia | Okular
--|-|-|-|-|-|-|-|-|-|-
-can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ❌ | ✔️
-no visual artifact             | ✔️ | 🤔 | ✔️ | ✔️ | ☹️ | ✔️ | ❌ | ✔️ | ❌ | ❌ | ✔️
-follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️
-fast nav / ok page render time | ✔️ | ✔️ | 🤔 | ✔️ | ☹️ | ☹️ | -  | -  | -  | -  | 🤔
-ALT+🡄 "back" key binding       | ✔️<br><em>backspace</em> also works | `t` must be used instead | ✔️ | ❌ | ✔️ | ❌ | ✔️ | ?  | ?  | ?  | `Alt+Shift+🡄` instead; remappable
-"back" history size            | 50 | 256 | 49 | ❌ | 31 | ❌ | 49 | ?  | ?  | ?  | 99
+-|-|-|-|-|-|-|-|-|-|-|-
+can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ❌ | ✔️ |
+no visual artifact             | ✔️ | 🤔 | ✔️ | ✔️ | ☹️ | ✔️ | ❌ | ✔️ | ❌ | ❌ | ✔️ |
+follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ |
+fast nav / ok page render time | ✔️ | ✔️ | 🤔 | ✔️ | ☹️ | ☹️ | -  | -  | -  | -  | 🤔 |
+ALT+🡄 "back" key binding       | ✔️<br><em>backspace</em> also works | `t` must be used instead | ✔️ | ❌ | ✔️ | ❌ | ✔️ | ?  | ?  | ?  | `Alt+Shift+🡄` instead; remappable |
+"back" history size            | 50 | 256 | 49 | ❌ | 31 | ❌ | 49 | ?  | ?  | ?  | 99 |
 
 \* Please use Sumatra PDF version 3.1.2, that can be download on [this page](https://www.sumatrapdfreader.org/download-prev.html). The latest 3.2 version [has difficulties opening Undying Dusk](https://github.com/Lucas-C/undying-dusk/issues/3). This should be solved in the next release of Sumatra PDF.
 
