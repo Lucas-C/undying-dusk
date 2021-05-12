@@ -400,7 +400,8 @@ def script_it():
                 extra_render=lambda pdf: pdf.image('assets/page-up-hint.png', x=61, y=22)))
         trick = Trick('You climb on the roof\nand run to the\nMausoleum entrance!',
                       music=BASE_MUSIC_URL + 'JohanJansen-OrchestralLoomingBattle.ogg')
-        game_view.actions[None] = _GameView(game_view.state._replace(x=9, y=5, facing='east', trick=trick, treasure_id=0))
+        game_view.actions[None] = _GameView(game_view.state._replace(x=9, y=5, facing='east', trick=trick,
+                                                                     treasure_id=0, extra_render=None))
         game_view.prev_page_trick_game_view = game_view.actions[None]
     mapscript_remove_chest(cauldron_pos)  # used to be: Magic Diamond (Def Up)
     mapscript_add_trigger(cauldron_pos, _shortcut_above_fire_and_cauldron, permanent=True)

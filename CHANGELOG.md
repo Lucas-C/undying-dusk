@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.2] - not released yet
 ### Fixed
+- abyss secret could not be reached due to a page ID assignement bug
 - wrong message about portal when first visiting sage Therel
+- visual residual glitch (PAGE UP hint) after taking shortcut over the fire
 
 ## [1.0.1] - 2021-05-04
 ### Added

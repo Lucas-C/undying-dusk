@@ -13,6 +13,7 @@ from .mod.easteregg import insert_eegggv
 
 
 START_PAGE_ID = 8  # skipping title & 6 pages of disclaimer/tutorial
+MAX_FILLER_PAGE = 5
 
 
 def assign_page_ids(game_views, assign_special_pages=True):
@@ -31,6 +32,10 @@ def assign_page_ids(game_views, assign_special_pages=True):
             # reverse ID assignation is valid ! => exiting "while" loop
             if is_first_assignment:
                 check_all_reachable_views_have_a_page_id(assigner.out_game_views)
+            if assign_special_pages:  # Double-check reverse-ID assignement is OK:
+                page_id1 = assigner.reversed_id_gv.src_view.page_id
+                page_id2 = assigner.reversed_id_gv.page_id
+                assert _reverse_number(page_id2) in range(page_id1 - MAX_FILLER_PAGE, page_id1 + MAX_FILLER_PAGE), f'Wrong reverse IDs: {page_id1} / {page_id2}'
             return assigner.out_game_views
 
 class Assigner:
@@ -40,6 +45,15 @@ class Assigner:
         self.next_page_id, self.out_game_views, self.reversed_id_gv = START_PAGE_ID, [], None
 
     def attempt(self, game_views):
+        for gv in game_views:
+            if gv.state and gv.state.reverse_id:
+                assert not self.reversed_id_gv, f'Current algorithm cannot handle several GameView asking for a .reverse_id:\n{self.reversed_id_gv}\n{gv}'
+                self.reversed_id_gv = gv
+                # We need to reset the page ID of the "mirror" GameViews,
+                # as some page IDs may have been assign in a previous attempt:
+                self.reversed_id_gv.set_page_id(None)
+                self.reversed_id_gv.src_view.set_page_id(None)
+                break
         try:
             for game_view in game_views:
                 if game_view.state and game_view.state.fixed_id:
@@ -62,26 +76,25 @@ class Assigner:
                     trick_game_view.set_page_id(self.next_page_id)
                     self.out_game_views.append(trick_game_view)
                     self._increment_next_page_id()
+                    assert trick.filler_pages < MAX_FILLER_PAGE
                     for _ in range(trick.filler_pages):
                         filler_game_view = GameView(renderer=_render_filler_page(trick, i))
                         filler_game_view.set_page_id(self.next_page_id)
                         self.out_game_views.append(filler_game_view)
                         self._increment_next_page_id()
                 if game_view.state and game_view.state.reverse_id and self.assign_special_pages:
-                    assert not self.reversed_id_gv, f'Current algorithm cannot handle several GameView asking for a .reverse_id:\n{self.reversed_id_gv}\n{game_view}'
                     src_page_id = game_view.src_view.page_id
                     if not src_page_id or src_page_id >= self.next_page_id or src_page_id < 100:
-                        print(f'Reverse ID assignation ABORT - src_page_id={src_page_id} next_page_id={self.next_page_id}')
+                        print(f'Reverse ID assignation ABORT - src_page_id={src_page_id} (next_page_id={self.next_page_id})')
                         raise StopIteration  # attempting another reverse ID assignation
                     if game_view.src_view.next_page_trick_game_view:
                         src_page_id += 1 + game_view.src_view.next_page_trick_game_view.state.trick.filler_pages
                     reversed_id = _reverse_number(src_page_id)
                     if reversed_id == src_page_id or reversed_id >= len(game_views) or src_page_id % 10 == 0 or reversed_id < self.next_page_id:
-                        print(f'Reverse ID assignation ABORT - reversed_id={reversed_id}')
+                        print(f'Reverse ID assignation ABORT - reversed_id={reversed_id} (next_page_id={self.next_page_id})')
                         raise StopIteration  # attempting another reverse ID assignation
-                    print(f'ID reversal: {src_page_id} -> {reversed_id}')
+                    print(f'ID reversal: {src_page_id} -> {reversed_id} (next_page_id={self.next_page_id})')
                     assert game_view.set_page_id(reversed_id)
-                    self.reversed_id_gv = game_view
                 else:
                     if game_view.set_page_id(self.next_page_id):
                         self.out_game_views.append(game_view)
@@ -93,6 +106,7 @@ class Assigner:
                 if game_view.next_page_trick_game_view:
                     trick = game_view.next_page_trick_game_view.state.trick
                     assert trick
+                    assert trick.filler_pages < MAX_FILLER_PAGE
                     for i in range(trick.filler_pages):
                         filler_game_view = GameView(renderer=_render_filler_page(trick, i))
                         filler_game_view.set_page_id(self.next_page_id)
@@ -111,7 +125,6 @@ class Assigner:
         if self.reversed_id_gv and self.next_page_id == self.reversed_id_gv.page_id:
             assert self.next_page_id not in self.gv_per_fixed_id, 'Conflicting need to use this page ID :('
             self.out_game_views.append(self.reversed_id_gv)
-            self.reversed_id_gv = None
             self._increment_next_page_id()
         gv = self.gv_per_fixed_id.get(self.next_page_id)
         if gv:
