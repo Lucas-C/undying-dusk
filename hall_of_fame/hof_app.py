@@ -59,6 +59,7 @@ def get_db():
     # "g" is a per-request generic context. It is needed to retrieve the connection in "close_connection" below
     db = getattr(g, '_database', None)
     if db is None:
+        # pylint: disable=assigning-non-slot
         db = g._database = sqlite3.connect(DB_FILEPATH, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         db.isolation_level = None  # autocommit mode
         db.row_factory = sqlite3.Row
