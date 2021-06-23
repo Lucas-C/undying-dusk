@@ -1,4 +1,10 @@
 <!-- NEXT STEPS:
+- feedbacks https://www.indiemag.fr/forum/lactu-inde-reagissez/t16874-undying-dusk-jeu-video-au-format-pdf :
+  * pdf_game/mod/campaign.py:249 'The whispering wind\nadvises you to look behind\nthe ivy before returning'
+  => peut apparaître plus tard alors que ce n'est plus pertinent ! (page 138369 v1.0.1)
+  * IVY in Zuruth Plains: densifier le feuillage pour qu'il masque entièrement une part importante du mur (de sorte qu'il devienne crédible qu'il cache une ouverture). Et puis garder ce mur spécial visible quand on est de l'autre côté.
+  * book bird animation: avoir l'anim qui boucle, plutôt que le livre se ferme après une poignée de frames ? Et donc avoir un bouton de fermeture, à côté du bouton qui fait défiler les pages qui lui pourrait renvoyé sur la première frame quand on arrive à la dernière
+  * un peu / beaucoup abusé la bible posée devant la tombe alors qu'on ne la voit pas sur les autres vues ! (Même la vue 34944 !) Là c'est vraiment un truc bêtement retors pas du tout cohérent avec la logique du jeu, ça perd le joueur de façon juste "bête et méchante", à éviter. En plus l'indice sensé nous inciter à chercher est lui aussi incohérent (outre la façon dont il est donné ... un panneau au milieu d'un plan d'eau, vraiment ??) puisqu'il parle de la tombe du "Saint Knight" ... or (si j'ai bien suivi ...) on est devant son mausolée, donc la tombe est sensée être à l'intérieur ! Ca m'a perdu aussi ça, pour là encore de mauvaises raisons. Bref, toute cette énigme mériterait d'être repensée.
 - reduce the 1324x16 & 1598x16 states of the final fight 2 phases ?
 - Androïd & Linux PDF readers?
 - publish the assets I made on OGA
@@ -35,9 +41,6 @@
   * perso conscient d'être dans un PDF
   * ACTIONS from dawnlike-level-16x16.png: bed, skull, rope, glove, diamond, snake, crown
                  dawnlike-npcs-16x16.png: interrogation mark, shadow form
-  * try other PDF features: PrevPage ? sub-page navigation ?
-  * implement monster arrival animations & attacks & delayed log msgs using PDF `Transitions` or as a GIF (_cf._ [Patrick Gallot article](https://www.datalogics.com/blog/corporate/the-making-of-a-pdf-presentation/))
-  * use navigation node `Dur` to implement QTEs / real-time game mechanics ?
   * enemies: griffon, allacrost daemarbora, demonic_essence & skeleton_with_axe, Cethiel-Dragon
   * great illustrations: fortuneteller, animated_torch, knight, lylfDW-wizard, TheSamta-Crusader
 - secrets: ABYSS_BOTTOM, DEAD_TREE, FOUNTAIN_WISH, KONAMI_CODE

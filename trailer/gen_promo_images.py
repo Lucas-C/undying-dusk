@@ -107,7 +107,7 @@ def gen_cover(fpdf):
 
 def gen_card(fpdf):
     img, pdf_img = init_pdf_img(fpdf, 'nightsky')
-    bitfont_render(pdf_img, 'UNDYDING DUSK', 80, 8, Justify.CENTER, size=16)
+    bitfont_render(pdf_img, 'UNDYING DUSK', 80, 8, Justify.CENTER, size=16)
     info_render_equiplayer(pdf_img, 0, info().TYPE_ARMOR)
     info_render_equiplayer(pdf_img, 1, info().TYPE_ARMOR)
     bitfont_render(pdf_img, 'by\nLucas\nCIMON', 2, 45)
