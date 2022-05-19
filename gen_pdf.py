@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.8
 
-import argparse, json, logging, os
+import argparse, json, logging, os, warnings
 from contextlib import contextmanager
 
 import fpdf
@@ -20,6 +20,7 @@ from pdf_game.mod.pages import render_credit_pages, render_intro_pages, render_v
 
 
 def main():
+    warnings.simplefilter('default', DeprecationWarning)
     args = parse_args()
     if args.list_checkpoints:
         for i, checkpoint in enumerate(campaign.CHECKPOINTS):
@@ -38,7 +39,7 @@ def main():
         start_view, game_views = visit_game_views(args)
     print(f'States exploration took: {trace.time:.2f}s')
     if args.json:
-        with trace_time() as trace, open('game_states.json', 'w') as json_file:
+        with trace_time() as trace, open('game_states.json', 'w', encoding='utf8') as json_file:
             json.dump({gv.page_id: gv.as_dict() for gv in game_views},
                       json_file, indent=4, sort_keys=True)
         print(f'JSON export took: {trace.time:.2f}s')
@@ -51,7 +52,9 @@ def main():
             render_page(pdf, game_view, lambda pdf, gs: render_victory(pdf, gs, links_to_credits))
     render_credit_pages(pdf, links_to_credits)
     print(f'Rendering of {len(pdf.pages)} pages took: {trace.time:.2f}s')
+    assert not pdf._drawing_graphics_state_registry, "No /ExtGState are needed in Undying Dusk"  # pylint: disable=protected-access
     with trace_time() as trace:
+        pdf.pdf_version = "1.3"  # Optimization: avoids 55bytes/page due to the transparency group
         pdf.output('undying-dusk.pdf', 'F')
     print(f'Output generation took: {trace.time:.2f}s')
     print_perf_stats()

@@ -104,7 +104,7 @@ def _get_icon_images():
 
 
 def parse_gpl_file(gpl_filepath):
-    with open(gpl_filepath) as gpl_file:
+    with open(gpl_filepath, encoding='utf8') as gpl_file:
         lines = [line.strip() for line in gpl_file.readlines()]
     assert lines[0] == 'GIMP Palette'
     name = lines[1][len('Name: '):]

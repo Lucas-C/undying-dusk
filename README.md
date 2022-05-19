@@ -1,11 +1,17 @@
 <!-- NEXT STEPS:
+- provide a smaller .rar compressed PDF
+- size optims:
+  * 10 bytes could be removed from the uncompressed stream of every page without text: "2 J\n0.57 w"
+  * get rid of the /MediaBox on every page
+  * s/.00 //g : no need for float precisions for round numbers!
+- test llpp reader
 - feedbacks https://www.indiemag.fr/forum/lactu-inde-reagissez/t16874-undying-dusk-jeu-video-au-format-pdf :
   * pdf_game/mod/campaign.py:249 'The whispering wind\nadvises you to look behind\nthe ivy before returning'
   => peut apparaître plus tard alors que ce n'est plus pertinent ! (page 138369 v1.0.1)
   * IVY in Zuruth Plains: densifier le feuillage pour qu'il masque entièrement une part importante du mur (de sorte qu'il devienne crédible qu'il cache une ouverture). Et puis garder ce mur spécial visible quand on est de l'autre côté.
   * book bird animation: avoir l'anim qui boucle, plutôt que le livre se ferme après une poignée de frames ? Et donc avoir un bouton de fermeture, à côté du bouton qui fait défiler les pages qui lui pourrait renvoyé sur la première frame quand on arrive à la dernière
   * un peu / beaucoup abusé la bible posée devant la tombe alors qu'on ne la voit pas sur les autres vues ! (Même la vue 34944 !) Là c'est vraiment un truc bêtement retors pas du tout cohérent avec la logique du jeu, ça perd le joueur de façon juste "bête et méchante", à éviter. En plus l'indice sensé nous inciter à chercher est lui aussi incohérent (outre la façon dont il est donné ... un panneau au milieu d'un plan d'eau, vraiment ??) puisqu'il parle de la tombe du "Saint Knight" ... or (si j'ai bien suivi ...) on est devant son mausolée, donc la tombe est sensée être à l'intérieur ! Ca m'a perdu aussi ça, pour là encore de mauvaises raisons. Bref, toute cette énigme mériterait d'être repensée.
-- reduce the 1324x16 & 1598x16 states of the final fight 2 phases ?
+  Aurélien : s'attendait à ce qu'il y ait un bouton pour chaque interaction, et donc qu'il ne faille jamais cliquer sur le décor si on ne voit aucun bouton
 - Androïd & Linux PDF readers?
 - publish the assets I made on OGA
 - a11y? questions to Sandra Bruel: + quels lecteurs PDF vos amis emploient ?
@@ -19,8 +25,11 @@
     and turn mapscript.SCRIPTS_PER_TILE & warp_portals.WARP_PORTALS_PER_MAP into properties of this class
 - VF?
 - size improvements:
+  * reduce the 1324x16 & 1598x16 states of the final fight 2 phases ?
   * 34M music/AlexandrZhelanov-ADarknessOpus.ogg
   * stats on what fights / tiles get the most rendered
+  * figure the biggest page size, en deep dive on the PDF directives it contains:
+      can optimizations on floating precision / useless operators?
   * MARGINAL EXPECTED EFFECT: pngoptimizer / optimize tilesets : many have redundant sections, a pre-rendering pass could extract tiles from tilesets and put them in a unique PNG, with mappings for the rendering step
 - ideas for another time:
   * ajouter un journal rappelant tous les indices trouvés, à apparition unique (idée Henri)
@@ -130,18 +139,18 @@ This will allow you to play with the PDF reader that is best compatible with the
 You will find below a comparison table of how well several PDF readers wil let you play to Undying Dusk.
 Notably, Adobe Acrobat Reader does **not** perform well to render the game.
 
-PDF reader: /Criteria | Sumatra PDF | MuPDF | Xpdf | FoxIt | Adobe Acrobat | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia | Okular
+PDF reader: /Criteria | Sumatra PDF | MuPDF | Xpdf | FoxIt | Adobe Acrobat | llpp | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia | Okular
 -|-|-|-|-|-|-|-|-|-|-|-
-can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ❌ | ✔️ |
-no visual artifact             | ✔️ | 🤔 | ✔️ | ✔️ | ☹️ | ✔️ | ❌ | ✔️ | ❌ | ❌ | ✔️ |
-follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ |
-fast nav / ok page render time | ✔️ | ✔️ | 🤔 | ✔️ | ☹️ | ☹️ | -  | -  | -  | -  | 🤔 |
-ALT+🡄 "back" key binding       | ✔️<br><em>backspace</em> also works | `t` must be used instead | ✔️ | ❌ | ✔️ | ❌ | ✔️ | ?  | ?  | ?  | `Alt+Shift+🡄` instead; remappable |
-"back" history size            | 50 | 256 | 49 | ❌ | 31 | ❌ | 49 | ?  | ?  | ?  | 99 |
+can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ❌ | ✔️ |
+no visual artifact             | ✔️ | 🤔 | ✔️ | ✔️ | ☹️ | ✔️ | ✔️ | ❌ | ✔️ | ❌ | ❌ | ✔️ |
+follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ |
+fast nav / ok page render time | ✔️ | ✔️ | 🤔 | ✔️ | ☹️ | ✔️ | ☹️ | -  | -  | -  | -  | 🤔 |
+ALT+🡄 "back" key binding       | ✔️<br><em>backspace</em> also works | `t` must be used instead | ✔️ | ❌ | ✔️ | ✔️ | ❌ | ✔️ | ?  | ?  | ?  | `Alt+Shift+🡄` instead; remappable |
+"back" history size            | 50 | 256 | 49 | ❌ | 31 | ❌ | unlimited | 49 | ?  | ?  | ?  | 99 |
 
 We only recommend PDF readers that meet all of the above criteria.
 
-Questions & edits on this table are welcome through _issues_ & _PRs_.
+Questions & edits on this table are welcome through [issues](https://github.com/Lucas-C/undying-dusk/issues) & [Pull Requests](https://github.com/Lucas-C/undying-dusk/pulls).
 
 
 ## Credits & attribution
@@ -161,7 +170,7 @@ Thank you Clint!
 First of all, this game uses the great 16 color palette made by [DawnBringer at PixelJoint](http://www.pixeljoint.com/forum/forum_posts.asp?TID=12795). 
 
 This game also makes use of the following assets, some of which I ported to the DawnBringer palette:
-- all [the original art](https://opengameart.org/content/first-person-dungeon-crawl-art-pack) was made by Clint Bellanger for the original Heroine Dusk game - [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+- all [the original art](https://opengameart.org/content/first-person-dungeon-crawl-art-pack) was made by [Clint Bellanger](http://clintbellanger.net) for the original [Heroine Dusk](http://heroinedusk.com) game - [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 - enemies come from [Redshrike remix of Heroine Dusk original ones](https://opengameart.org/content/first-person-dungeon-crawl-enemies-remixed).
 Seamus wizard, demon & gorgon portraits from his [6 More RPG Enemies spritesheet](https://opengameart.org/content/6-more-rpg-enemies), black bird from his [Tower Defense Prototyping Assets]( https://opengameart.org/content/tower-defense-prototyping-assets-4-monsters-some-tiles-a-background-image) and blowfish from his [3 RPG enemy remixes](https://opengameart.org/content/3-rpg-enemy-remixes) - all [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 Shadow soul extra frames come from [Bosses and monsters spritesheets (Ars Notoria) by Balmer](https://opengameart.org/content/bosses-and-monsters-spritesheets-ars-notoria) - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)

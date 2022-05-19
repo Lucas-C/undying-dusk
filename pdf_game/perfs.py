@@ -74,7 +74,7 @@ def print_memory_stats(detailed=False):
         stats = snapshot.statistics('traceback')
         for i in range(3):
             stat = stats[i]
-            print("%s memory blocks: %.1f MiB" % (stat.count, stat.size / 1024 / 1024))
+            print(f"{stat.count} memory blocks: {stat.size / 1024 / 1024:.1f} MiB")
             for line in stat.traceback.format():
                 print(line)
     else:

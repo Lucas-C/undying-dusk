@@ -1,4 +1,5 @@
 #!/bin/bash
+# INSTALL: ln -s $PWD/git-hooks-pre-commit .git/hooks/pre-commit
 set -o pipefail -o errexit -o nounset
 ./check_dawnbringer.py $(git diff --cached --name-only --diff-filter=ACM | grep .png | grep -v yellow-star.png)
 modified_py_files=$(git diff --cached --name-only --diff-filter=ACM | grep '.py$')

@@ -7,4 +7,4 @@ except ImportError:
 try:
     from tqdm import tqdm
 except ImportError:
-    tqdm = lambda _: _
+    tqdm = lambda _, **__: _

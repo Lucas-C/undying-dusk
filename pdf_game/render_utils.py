@@ -97,7 +97,6 @@ def render_button(pdf, btn_pos, img_filepath, img_index=0, page_id=None, url='',
     btn_size, btn_offset = action().BUTTON_SIZE, action().BUTTON_OFFSET
     x = btn_pos.x + btn_offset
     y = btn_pos.y + btn_offset
-    # relies on: https://github.com/reingart/pyfpdf/pull/158
     with pdf.rect_clip(x=x, y=y, w=btn_size, h=btn_size):
         pdf.image(img_filepath, x=x - img_index*btn_size, y=y)  # DEBUG NOTE: passing link= here creates a bug with RUN button
     if page_id or url:

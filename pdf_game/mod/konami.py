@@ -55,4 +55,4 @@ def custom_explore_logic(action_name, gs, new_gs):
 
 
 def gs_with_msg(gs, step):
-    return gs._replace(puzzle_step=step, message='The wind whispers:\n"{}"'.format(MSGS[step - 1]))
+    return gs._replace(puzzle_step=step, message=f'The wind whispers:\n"{MSGS[step - 1]}"')

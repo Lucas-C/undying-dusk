@@ -146,7 +146,7 @@ def trailer_end(fpdf):
     return images
 
 def sed(filepath, pattern, value):
-    with open(filepath, 'r+') as text_file:
+    with open(filepath, 'r+', encoding='utf8') as text_file:
         data = text_file.read()
         text_file.seek(0)
         text_file.write(re.sub(pattern, value, data))

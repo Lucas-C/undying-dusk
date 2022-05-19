@@ -937,4 +937,6 @@ def render_scepter(pdf, page_id):
 
 
 def clear_hidden_triggers(gs):
-    return gs._replace(hidden_triggers=tuple(ht for ht in gs.hidden_triggers if ht in ('BEEN_TO_VILLAGE', 'FIRST_NIGHT_OF_REST')))  # Those are the only ones that need to be preserved until 2nd visit to village
+    return gs._replace(hidden_triggers=tuple(ht for ht in gs.hidden_triggers
+    # Those are the only ones that need to be preserved until 2nd visit to village:
+                                             if ht in ('BEEN_TO_VILLAGE', 'FIRST_NIGHT_OF_REST')))
