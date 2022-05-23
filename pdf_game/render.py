@@ -2,6 +2,11 @@ from os import makedirs
 from os.path import dirname, exists, join, realpath
 
 from PIL import Image
+try:
+    from PIL.Image import Resampling
+    NEAREST = Resampling.NEAREST
+except ImportError:  # for older versions of Pillow:
+    NEAREST = Image.NEAREST
 
 from .bitfont import bitfont_set_color_red, bitfont_render, Justify
 from .entities import GameMilestone, GameMode, Position
@@ -252,7 +257,7 @@ def enemy_render_small(pdf, _enemy, scale=2/3):
             with Image.open(_enemy_img_filepath(_enemy)) as img:
                 # Cropping 1st, in case image contains multiple frames:
                 img.crop((0, 0, width, height))\
-                   .resize((round(width*scale), round(height*scale)), resample=Image.NEAREST)\
+                   .resize((round(width*scale), round(height*scale)), resample=NEAREST)\
                    .save(small_img_filepath)
             MINIATURES_ALREADY_GENERATED.add(small_img_filepath)
     pdf.image(small_img_filepath, x=25, y=18)

@@ -32,7 +32,7 @@ def assign_page_ids(game_views, assign_special_pages=True):
             # reverse ID assignation is valid ! => exiting "while" loop
             if is_first_assignment:
                 check_all_reachable_views_have_a_page_id(assigner.out_game_views)
-            if assign_special_pages:  # Double-check reverse-ID assignement is OK:
+            if assign_special_pages and assigner.reversed_id_gv:  # Double-check reverse-ID assignement is OK:
                 page_id1 = assigner.reversed_id_gv.src_view.page_id
                 page_id2 = assigner.reversed_id_gv.page_id
                 assert _reverse_number(page_id2) in range(page_id1 - MAX_FILLER_PAGE, page_id1 + MAX_FILLER_PAGE), f'Wrong reverse IDs: {page_id1} / {page_id2}'

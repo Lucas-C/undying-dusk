@@ -50,8 +50,13 @@ class PerfsMonitorWrapper:
         self.timings_in_ms_per_method = defaultdict(list)
 
     def __getattr__(self, name):
-        with trace_time(timings_in_ms=self.timings_in_ms_per_method[name]):
-            return getattr(self.instance, name)
+        attr = getattr(self.instance, name)
+        if not callable(attr):
+            return attr
+        def wrapper(*args, **kwargs):
+            with trace_time(timings_in_ms=self.timings_in_ms_per_method[name]):
+                return attr(*args, **kwargs)
+        return wrapper
 
     def print_perf_stats(self):
         print(f'Perf stats of all calls made to {self.instance.__class__.__name__} methods:')
