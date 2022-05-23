@@ -140,7 +140,7 @@ You will find below a comparison table of how well several PDF readers wil let y
 Notably, Adobe Acrobat Reader does **not** perform well to render the game.
 
 PDF reader: /Criteria | Sumatra PDF | MuPDF | Xpdf | FoxIt | Adobe Acrobat | llpp | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia | Okular
--|-|-|-|-|-|-|-|-|-|-|-
+-|-|-|-|-|-|-|-|-|-|-|-|-
 can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ❌ | ✔️ |
 no visual artifact             | ✔️ | 🤔 | ✔️ | ✔️ | ☹️ | ✔️ | ✔️ | ❌ | ✔️ | ❌ | ❌ | ✔️ |
 follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ |
