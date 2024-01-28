@@ -144,10 +144,10 @@ Notably, Adobe Acrobat Reader does **not** perform well to render the game.
 
 PDF reader: /Criteria | Sumatra PDF | MuPDF | Xpdf | FoxIt | Adobe Acrobat | llpp | Chrome native | Firefox native (PDF.js) | Javelin3 | Slim | Utopia | Okular
 -|-|-|-|-|-|-|-|-|-|-|-|-
-can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ❌ | ✔️ |
+can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ✔️ |
 no visual artifact             | ✔️ | 🤔 | ✔️ | ✔️ | ☹️ | ✔️ | ✔️ | ❌ | ✔️ | ❌ | ❌ | ✔️ |
 follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ |
-fast nav / ok page render time | ✔️ | ✔️ | 🤔 | ✔️ | ☹️ | ✔️ | ☹️ | -  | -  | -  | -  | 🤔 |
+fast nav / ok page render time | ✔️ | ✔️ | 🤔 | ✔️ | ☹️ | ✔️ | ☹️ | mostly &lt;3s | -  | -  | -  | 🤔 |
 ALT+🡄 "back" key binding       | ✔️<br><em>backspace</em> also works | `t` must be used instead | ✔️ | ❌ | ✔️ | ✔️ | ❌ | ✔️ | ?  | ?  | ?  | `Alt+Shift+🡄` instead; remappable |
 "back" history size            | 50 | 256 | 49 | ❌ | 31 | ❌ | unlimited | 49 | ?  | ?  | ?  | 99 |
 
