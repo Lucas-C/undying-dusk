@@ -78,7 +78,7 @@ def parse_args():
 
 
 def init_pdf(args, start_page_id):
-    if args.no_marked_content:  # only adds ~4MB
+    if args.no_marked_content:  # currently adds ~66MB
         class PdfClass(fpdf.FPDF):
             @contextmanager
             def _marked_sequence(self, **kwargs):
