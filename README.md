@@ -147,7 +147,7 @@ PDF reader: /Criteria | Sumatra PDF | MuPDF | Xpdf | FoxIt | Adobe Acrobat | llp
 can load the game              | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ❌ | ✔️ |
 no visual artifact             | ✔️ | 🤔 | ✔️ | ✔️ | ☹️ | ✔️ | ✔️ | ❌ | ✔️ | ❌ | ❌ | ✔️ |
 follow links                   | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ✔️ | ✔️ |
-fast nav / ok page render time | ✔️ | ✔️ | 🤔 | ✔️ | ☹️ | ✔️ | ☹️ | mostly &lt;3s | -  | -  | -  | 🤔 |
+fast nav / ok page render time | ✔️ | ✔️ | 🤔 | ✔️ | ☹️ | ✔️ | ☹️ | - | -  | -  | -  | 🤔 |
 ALT+🡄 "back" key binding       | ✔️<br><em>backspace</em> also works | `t` must be used instead | ✔️ | ❌ | ✔️ | ✔️ | ❌ | ✔️ | ?  | ?  | ?  | `Alt+Shift+🡄` instead; remappable |
 "back" history size            | 50 | 256 | 49 | ❌ | 31 | ❌ | unlimited | 49 | ?  | ?  | ?  | 99 |
 
