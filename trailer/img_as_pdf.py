@@ -1,13 +1,19 @@
 from contextlib import contextmanager
 
 from PIL import Image
+try:
+    from PIL.Image import Resampling
+    NEAREST = Resampling.NEAREST
+except ImportError:  # for older versions of Pillow:
+    # pylint: disable=no-member
+    NEAREST = Image.NEAREST
 
 
 class ImageAsPdf:
     'Wrap a PIL.Image in an object with an API similar to FPDF'
     def __init__(self, fpdf, img):
         self.pdf = fpdf
-        self.images = self.pdf.images
+        self.image_cache = self.pdf.image_cache
         self.img = img
         self._rect_clip = None
 
@@ -46,7 +52,7 @@ class ImageAsPdf:
                 y = 0
             rc_width, rc_height = map(int, (rc_width, rc_height))  # .resize box arg must be an int tuple
             img_added = img_added.crop((crop_x, crop_y, crop_x + rc_width / scale, crop_y + rc_height / scale))\
-                                 .resize((rc_width, rc_height), resample=Image.NEAREST)
+                                 .resize((rc_width, rc_height), resample=NEAREST)
         else:
             assert not (w or h), 'Not implemented yet'
         x, y = map(int, (x, y))  # .paste box arg must be an int tuple

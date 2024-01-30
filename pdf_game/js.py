@@ -1,7 +1,7 @@
 from functools import lru_cache as cached
 
 # pylint: disable=no-name-in-module, redefined-outer-name
-from pyduktape import DuktapeContext
+from pyduktape2 import DuktapeContext
 
 from .mod import Proxy
 from .mod.hero import patch_avatar, patch_info

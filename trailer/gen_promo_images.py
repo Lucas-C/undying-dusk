@@ -17,6 +17,12 @@ from trailer.scenes import (chest, combat, druid, druidic_linguistics, goblin, g
 from fpdf import FPDF
 from livereload import Server
 from PIL import Image
+try:
+    from PIL.Image import Resampling
+    NEAREST = Resampling.NEAREST
+except ImportError:  # for older versions of Pillow:
+    # pylint: disable=no-member
+    NEAREST = Image.NEAREST
 from qrcode import QRCode
 
 
@@ -121,7 +127,7 @@ def gen_card(fpdf):
 
 def scale(factor, images):
     return [img.resize((factor * config().VIEW_WIDTH, factor * config().VIEW_HEIGHT),
-                       resample=Image.NEAREST) for img in images]
+                       resample=NEAREST) for img in images]
 
 def title_screen(fpdf, text, sizes=(8,)):
     assert sizes

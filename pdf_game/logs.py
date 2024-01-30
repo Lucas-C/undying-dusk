@@ -158,6 +158,7 @@ def _common_gv_ancestor(gv1, gv2):
         if id(gv2) in gv1_ancestor_ids:
             return gv2
         gv2 = gv2.src_view
+    return None
 
 
 def diff_game_states(gs1, gs2):
