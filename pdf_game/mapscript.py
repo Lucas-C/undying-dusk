@@ -49,7 +49,6 @@ def mapscript_add_enemy(coords, name, **kwargs):
     condition = kwargs.pop('condition', None)
     new_enemy = _make_enemy(name, **kwargs)
     # cf. https://github.com/PyCQA/pylint/issues/3877
-    # pylint: disable=undefined-variable
     encounter_func = lambda gv, _: _mapscript_encounter_enemy(gv, new_enemy, condition)
     encounter_func.enemy = new_enemy
     encounter_func.condition = condition
