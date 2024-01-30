@@ -21,6 +21,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
+          pip install Cython==0.29.36  # required for pyduktape: cf. https://github.com/stefano/pyduktape/issues/13
           pip install -r requirements.txt -r extra-requirements.txt
           git clone https://github.com/clintbellanger/heroine-dusk
       - name: Linter
