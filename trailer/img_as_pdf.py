@@ -13,7 +13,7 @@ class ImageAsPdf:
     'Wrap a PIL.Image in an object with an API similar to FPDF'
     def __init__(self, fpdf, img):
         self.pdf = fpdf
-        self.images = self.pdf.images
+        self.image_cache = self.pdf.image_cache
         self.img = img
         self._rect_clip = None
 
