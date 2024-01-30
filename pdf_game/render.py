@@ -6,6 +6,7 @@ try:
     from PIL.Image import Resampling
     NEAREST = Resampling.NEAREST
 except ImportError:  # for older versions of Pillow:
+    # pylint: disable=no-member
     NEAREST = Image.NEAREST
 
 from .bitfont import bitfont_set_color_red, bitfont_render, Justify

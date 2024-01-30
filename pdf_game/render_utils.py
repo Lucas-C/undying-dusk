@@ -1,7 +1,7 @@
 from .entities import Position
 from .js import action, REL_RELEASE_DIR
 
-from fpdf.image_parsing import get_img_info
+from fpdf.image_parsing import preload_image
 
 
 BACKGROUNDS = 'black,nightsky,tempest,interior'.split(',')
@@ -126,12 +126,5 @@ def link_from_page_id(pdf, page_id):
 
 
 def get_image_info(pdf, img_filepath):
-    # Replicates some logic from FPDF.image().
-    # Could be exposed as a FPDF method with a minor refactor.
-    info = pdf.images.get(img_filepath)
-    if not info:
-        info = get_img_info(img_filepath)
-        pdf.images[img_filepath] = info
-        info['i'] = len(pdf.images)
-        info['usages'] = 1
+    _, _, info = preload_image(pdf.image_cache, img_filepath)
     return info

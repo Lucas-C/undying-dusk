@@ -1,5 +1,5 @@
 fpdf2
 humanfriendly  # purely optional
 pillow
-pyduktape
+pyduktape2
 tqdm  # purely optional

@@ -1,4 +1,4 @@
 [MESSAGES CONTROL]
-disable = bad-continuation, bad-whitespace, cyclic-import, duplicate-code, fixme, global-statement, line-too-long, missing-docstring, multiple-imports, multiple-statements, too-few-public-methods, too-many-arguments, too-many-branches, too-many-instance-attributes, too-many-locals, too-many-nested-blocks, too-many-statements, too-many-return-statements, unused-wildcard-import, wildcard-import, wrong-import-order, wrong-import-position
+disable = cyclic-import, duplicate-code, fixme, global-statement, line-too-long, missing-docstring, multiple-imports, multiple-statements, too-few-public-methods, too-many-arguments, too-many-branches, too-many-instance-attributes, too-many-locals, too-many-nested-blocks, too-many-statements, too-many-return-statements, unnecessary-lambda-assignment, unused-wildcard-import, use-dict-literal, wildcard-import, wrong-import-order, wrong-import-position
 
 good-names=db,dx,dy,gs,gv,h,i,j,mz,w,x,x1,x2,y,y1,y2,r,g,b,_GameView
