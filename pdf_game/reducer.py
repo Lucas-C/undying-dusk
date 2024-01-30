@@ -7,6 +7,8 @@ import os
 from contextlib import contextmanager
 from textwrap import indent
 
+from fpdf.image_datastructures import ImageCache
+
 from .assigner import assign_page_ids
 from .entities import GameMilestone
 from .optional_deps import tqdm
@@ -87,7 +89,7 @@ def render_victory_noop(*_): pass
 class FakePdfRecorder:
     'Fake fpdf.FPDF class that must implement all the methods used during the pages rendering'
     def __init__(self):
-        self.images = {}  # images cache used by get_image_info
+        self.image_cache = ImageCache()
         self._calls = []
         self._links = {}
 
