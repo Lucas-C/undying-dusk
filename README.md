@@ -1,4 +1,5 @@
 <!-- NEXT STEPS:
+- also publish a .7z compressed version
 - submit on https://www.dungeoncrawlers.org
 - make online MP3s to loop forever
 - map bug on cedar village : a door appears initially at the portal position, when it's not open

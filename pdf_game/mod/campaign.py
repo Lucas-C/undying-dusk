@@ -17,7 +17,7 @@ EMPRESS_INTERPHASE_LINES = (
     'Come back to help me\nDominik!',
 )
 
-VICTORY_POS = Checkpoint((9, 11, 5), 'ending after beating the Empress', mode=GameMode.DIALOG)
+VICTORY_POS = Checkpoint((9, 11, 5), 'Victory screen after beating the Empress & final ending scene')
 CHECKPOINTS = (  # intermediate positions that should be reachable through a unique path only
     # Checkpoint((1, 6, 6), 'Entering Monastery after Scriptorium'),
     Checkpoint((1, 4, 9),   'After beating the imp, still in Monastery'),
@@ -49,6 +49,7 @@ CHECKPOINTS = (  # intermediate positions that should be reachable through a uni
     Checkpoint((9, 9, 3),   'after flying demon fight, about to face Empress'),
     Checkpoint((9, 11, 5),  'start of phase 2 of Empress boss fight', mode=GameMode.COMBAT,
                             condition=lambda gs: gs.message == EMPRESS_INTERPHASE_LINES[-1]),
+    Checkpoint((9, 11, 5), 'Ending scene after beating the Empress', mode=GameMode.DIALOG),
     VICTORY_POS,
 )
 # VICTORY_POS = Checkpoint((0, 1, 1), ''); CHECKPOINTS = (VICTORY_POS,)  # stop after intro
