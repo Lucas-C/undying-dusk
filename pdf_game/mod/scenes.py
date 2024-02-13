@@ -381,7 +381,8 @@ def seamus_transformation():
 def the_end():
     scene_9 = CutScene.new(
         background='bloodsplat',
-        text='At least, one last time,\nyou met your only love.\n\nDominik.',
+        text='At least, one last time,\nyou met your only love.',
+        exit_msg='Dominik.',
     )
     scene_8 = CutScene.new(
         background='bloodsplat',
