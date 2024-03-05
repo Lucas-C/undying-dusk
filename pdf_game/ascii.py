@@ -7,6 +7,7 @@ from .optional_deps import ansi_wrap
 def map_as_string(game_view):
     rows = []
     _map = atlas().maps[game_view.state.map_id]
+    print(_map.name + ":")
     for y, row in enumerate(_map.tiles):
         rows.append(''.join(_tile_as_char(game_view, _map, x, y, content)
                             for x, content in enumerate(row)))
@@ -30,9 +31,9 @@ def _tile_as_char(game_view, _map, x, y, content):
     out_chars = _TILE_AS_EMOJI[tile_id]
     if script_type == 'enemy' and not game_view.enemy_vanquished((game_state.map_id, x, y)):
         chars = 'EE'
-        if tile_id in (8, 9): chars = 'CE'
-        if tile_id in (33, 36): chars = 'BE'
-        if tile_id == 3: chars = 'DE'
+        if tile_id in (8, 9): chars = 'CE'  # chest monster
+        if tile_id in (33, 36): chars = 'BE'  # box monster
+        if tile_id == 3: chars = 'DE'  # door monster
         return ansi_wrap(chars, color='red')
     if script_type == 'chest' and not tile_override:
         return ansi_wrap(out_chars if out_chars != '  ' else '$$', color='yellow')

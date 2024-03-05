@@ -310,7 +310,7 @@ def render_book(pdf, book, page_id, treasure_id):
         if book.treasure_id:
             treasure_render_item(pdf, book.treasure_id, Position(x=86, y=76))
         if book.music:
-            action_button_render(pdf, 'MUSIC', url=book.music, btn_pos=Position(24, 46))
+            action_button_render(pdf, 'MUSIC', url=book.music, btn_pos=Position(65, 14))
         if book.bird_index is not None:
             link = link_from_page_id(pdf, page_id)
             x, y = 80, 60
