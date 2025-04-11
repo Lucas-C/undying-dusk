@@ -86,7 +86,7 @@ def is_instinct_preventing_to_enter_village(game_state):
     # Cedar Village must be accessed from Zuruth Plains 3 times:
     # - when avatar has 2 MP and the scroll, to go see Sage Therel
     # - when avatar has 20 gold, to buy the boots
-    # - when avatar has 60 gold, to repair the sword & get a nigth of rest
+    # - when avatar has 60 gold, to repair the sword & get a night of rest
     return (game_state.mp < 2 or 'SCROLL' not in game_state.items) and game_state.gold < 10
 
 
@@ -145,7 +145,7 @@ def patch_tileset(tileset):
         False,  # 48 = dungeon_wall_lever_slot
         False,  # 49 = dungeon_wall_lever_down
         False,  # 50 = dungeon_wall_lever_up
-        False,  # 51 = dungeon_wall_lever_up_wth_fish
+        False,  # 51 = dungeon_wall_lever_up_with_fish
         True,   # 52 = dungeon_black_passage
         False,  # 53 = petrified_gorgon_with_staff
         False,  # 54 = petrified_gorgon
@@ -298,7 +298,7 @@ def _patch_tiles(_map):
         x, y = 15, 7;  tiles[y][x] = 26  # portcullis blocking exit
     if _map.name == 'Dead Walkways':
         x, y = 1, 5;   tiles[y][x] = 0   # no going back
-        x, y = 4, 8;   tiles[y][x] = 4   # pillar, for symetry
+        x, y = 4, 8;   tiles[y][x] = 4   # pillar, for symmetry
         x, y = 5, 7;   tiles[y][x] = 4   # pillar, for sokoban puzzle
         x, y = 4, 5;   tiles[y][x] = 18  # locked door
         x, y = 5, 4;   tiles[y][x] = 7   # interior pillar

@@ -59,7 +59,7 @@ def _edges_in_sight(pos, facing, render_pos):
         yield TileEdge.from_positions(pos1, pos2)
 
 
-# "render_pos" that consitute the field of view (from mazemap.js):
+# "render_pos" that constitute the field of view (from mazemap.js):
 # +--+--+--+--+--+
 # | 0| 2| 4| 3| 1|
 # +--+--+--+--+--+

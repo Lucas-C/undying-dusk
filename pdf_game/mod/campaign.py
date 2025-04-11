@@ -1,4 +1,4 @@
-# pylint: disable=inconsistent-return-statements
+# pylint: disable=chained-comparison,inconsistent-return-statements
 from ..ascii import map_as_string
 from ..bitfont import bitfont_color_red, bitfont_render, bitfont_set_color_red, Justify
 from ..entities import Bribe, CustomCombatAction as CCA, Checkpoint, CombatRound as CR, MessagePlacement, Position, RewardItem, RewardTreasure, SFX, Trick
@@ -96,7 +96,7 @@ def script_it():
 
     mapscript_remove_chest((2, 1, 1))  # Wood stick is now in the well
     def _examine_well(game_view, _GameView):
-        game_view.actions['EXAMINE'] = _GameView(game_view.state._replace(message='You find a wood stick\ndown in the well', msg_place=MessagePlacement.UP, treasure_id=10, weapon=1))
+        game_view.actions['EXAMINE'] = _GameView(game_view.state._replace(message='You find a wooden stick\ndown in the well', msg_place=MessagePlacement.UP, treasure_id=10, weapon=1))
     mapscript_add_trigger((1, 2, 6), _examine_well, facing='west', condition=lambda gs: gs.weapon == 0, permanent=True)
     mapscript_add_trigger((1, 1, 5), _examine_well, facing='south', condition=lambda gs: gs.weapon == 0, permanent=True)
     mapscript_add_trigger((1, 1, 7), _examine_well, facing='north', condition=lambda gs: gs.weapon == 0, permanent=True)
@@ -129,7 +129,7 @@ def script_it():
     # It can however be bypassed through the forest to access the chest behind it.
     # The imp can be beaten, but only once the holy water has been crafter at the well.
 
-    mapscript_add_message((4, 6, 2), 'The Monastery doors\nare closed', facing='north')
+    mapscript_add_message((4, 6, 2), 'The Monastery doors\nare locked', facing='north')
     # The door is closed by mod.world:patched_can_move_to
     mapscript_add_message((4, 9, 3), 'The whispering wind\ntells you of hidden\npassages in the forest', facing='east')
     mapscript_add_message((4, 3, 9), 'The whispering wind\ntells you that demons\nfear blessed liquids', facing='west')
@@ -138,7 +138,7 @@ def script_it():
         gs = game_view.state
         if 'CRUCIFIX' in gs.items:
             game_view.actions['CRUCIFIX'] = _GameView(gs.with_hidden_trigger('HOLY_WELL')
-                                                        ._replace(message='SPLASH !',
+                                                        ._replace(message='SPLASH!',
                                                                   items=tuple(i for i in gs.items if i != 'CRUCIFIX')))
         if 'EMPTY_BOTTLE' in gs.items:
             if 'HOLY_WELL' in gs.hidden_triggers:
@@ -246,15 +246,15 @@ def script_it():
         if not is_instinct_preventing_to_enter_village(gs): return
         if not gs.tile_override_at((6, 1, 9)):
             msg = 'The whispering wind\ntells you to look for Seamus\nbefore returning'
-        elif gs.mp >= 2:
+        elif gs.mp >= 2 and gs.spellbook < 2:
             msg = 'The whispering wind\nadvises you to look behind\nthe ivy before returning'
         elif 'SCROLL' in gs.items:
             if 'AMULET' in gs.items:
                 msg = 'The whispering wind\nrecommends you to use this\namulet before returning'
             else:
-                msg = 'The whispering wind\ntells you to search the canal\namulet before returning'
+                msg = 'The whispering wind\ntells you to search the canal\nfor an amulet before returning'
         else:
-            msg = "The whispering wind\ntells you to follow Seamus'\nadvice before returning"
+            msg = "The whispering wind\ntells you to follow\nSeamus's advice\nbefore returning"
         assert msg, 'A hint should be given if the path is blocked'
         game_view.state = gs._replace(message=msg)
     mapscript_add_trigger((6, 4, 3), _village_door_hint, facing='north', permanent=True)
@@ -273,7 +273,7 @@ def script_it():
         ), music=BASE_MUSIC_URL + 'MatthewPablo-DarkDescent.mp3',
         post_victory=lambda gs, _: gs._replace(mode=GameMode.DIALOG, shop_id=risking_it_all().id))
 
-    # An invisible chest is hidden behind a wall, behind a pillar:
+    # An invisible chest is hidden behind a wall with ivy, behind a pillar:
     def _grant_scroll(game_view, _):
         if 'SCROLL' in game_view.state.items or game_view.state.spellbook >= 2:
             return False
@@ -301,7 +301,7 @@ def script_it():
     def _place_amulet_on_statue(game_view, _GameView):
         game_view.actions['AMULET'] = _GameView(game_view.state
                 .with_tile_override(39, coords=(6, 9, 4))
-                ._replace(message='You feel an inner warmth\nas you receive\nthe templars blessing\n(MP & max MP up!)',
+                ._replace(message='You feel an inner warmth\nas you receive\nthe templars\'s blessing\n(MP & max MP up!)',
                           mp=game_view.state.mp + 2, max_mp=game_view.state.max_mp + 2,
                           items=tuple(i for i in game_view.state.items if i != 'AMULET'),
                           music=BASE_MUSIC_URL + 'AlexandrZhelanov-ADarknessOpus.ogg',
@@ -345,9 +345,9 @@ def script_it():
     mapscript_remove_chest((10, 13, 2))  # used to be: 100 gold
     # The treasure at the end of the maze:
     def _grant_rusty_sword(game_view, _):
-        game_view.state = game_view.state._replace(message="You found\nthe Saint Knight\nrusty sword!", weapon=4,
+        game_view.state = game_view.state._replace(message="You found\nthe Saint Knight sword,\nall rusty", weapon=4,
                                                    music=BASE_MUSIC_URL + 'AlexandrZhelanov-FullOfMemories.ogg',
-                                                   music_btn_pos=Position(x=20, y=20))
+                                                   music_btn_pos=Position(x=20, y=18))
     mapscript_add_chest((10, 9, 3), 18, _grant_rusty_sword)
 
     # The hero now does 8 damage with their sword, and can beat the druid
@@ -427,7 +427,7 @@ def script_it():
     # The heroine has 4/30 HP, 0/3 MP, 14 gold, boots, the HEAL & BURN spells and does 13 damages with their great sword
     def _edge_of_the_abyss(game_view, _GameView):
         assert game_view.state.hp == 4, game_view
-        gs = game_view.state._replace(message='The path ends abrutly.\nA bottomless abyss\nopens at your feet')
+        gs = game_view.state._replace(message='The path ends abruptly.\nA bottomless abyss\nopens at your feet')
         game_view.state = gs
         if 'ABYSS_BOTTOM' in gs.secrets_found:
             return
@@ -435,10 +435,10 @@ def script_it():
         # The secret comes in the form of a shop, whose page ID is the reflection of the hint page one:
         # Because of this reverse_id enigma, this secret MUST be the first than can be found,
         # otherwise the current reverse ID attribution algorithm will burn
-        trick = Trick('You hear a faint echo:\n"a secret lays,\nin the reflection\nof this place"',
+        trick = Trick('You hear a faint echo:\n"a secret lies\nin the reflection\nof this place"',
                       filler_renderer=render_abyss_filler_page,
                       link=False, filler_pages=3, background='depths')
-        secret_view = _GameView(gs.without_hidden_trigger('SHORTCUT_HINT')  # deduping as it is optionnal
+        secret_view = _GameView(gs.without_hidden_trigger('SHORTCUT_HINT')  # deduping as it is optional
                                   .with_secret('ABYSS_BOTTOM')
                                   ._replace(message='', trick=trick, reverse_id=True,
                                             mode=GameMode.DIALOG, shop_id=abyss_bottom().id))
@@ -516,7 +516,7 @@ def script_it():
                     .with_tile_override(5, coords=(8, 7, 4))
                     .with_tile_override(5, coords=(8, 10, 10))
                     # (cheap) Moving player 1 step back so that it does not immediately sees the FISH action
-                    ._replace(message='You raise the lever\nand hear a metalic noise', x=10))
+                    ._replace(message='You raise the lever\nand hear a metallic noise', x=10))
         elif lever_tile_id == 50:  # lever waiting to be raised
             log(game_view.state, 'put-fish-on-lever-stick')
             game_view.actions['FISH'] = _GameView(game_view.state
@@ -605,6 +605,7 @@ def script_it():
     def _mausoleum_portal_hint(game_view, _):
         gs = game_view.state
         if not is_instinct_preventing_to_pass_mausoleum_portal(gs): return
+        msg = None
         if gs.items.count('ARMOR_PART') < 4:
             msg = 'No need to go back until\nyou have all the armor parts'
         elif not gs.tile_override_at(MAUSOLEUM_EXIT_COORDS):
@@ -615,8 +616,9 @@ def script_it():
     def _village_portal_hint(game_view, _):
         gs = game_view.state
         if not is_instinct_preventing_to_pass_village_portal(gs): return
+        msg = None
         if gs.spellbook < 3:
-            msg = 'The whispering wind\nadvises you to bring the scroll\nto the sage before returning'
+            msg = 'The whispering wind\nadvises you to bring\nthe scroll to the sage\nbefore returning'
         elif gs.gold >= 10:
             msg = 'The whispering wind\nadvises you to rest before\nreturning to that dungeon'
         elif gorgon_pos not in gs.vanquished_enemies:
@@ -734,7 +736,7 @@ def script_it():
 
     goblin_bribe = Bribe(gold=3, result_msg='He runs away with your gold')
     mapscript_add_enemy((9, 3, 3), 'goblin',  # deal is a red-herring, run away if fought
-        intro_msg="I'll give you the door key\nfor 3 gold, mylady.",
+        intro_msg="I'll give you the door key\nfor 3 gold, milady.",
         category=ENEMY_CATEGORY_BEAST, bribes=(goblin_bribe,), hp=10, rounds=(CR('', run_away=True),))
 
     mapscript_add_enemy((9, 3, 7), 'druid',   # ask for mercy if fought -> restore hero HP/MP
@@ -752,7 +754,7 @@ def script_it():
         gs = game_view.state
         assert gs.hp == gs.max_hp, f'Hero should have full HP on 1st arch passing, but has: {gs.hp} HP'
         assert gs.mp == 2, f'Hero should have 2 MP on 1st arch passing, but has: {gs.mp} MP'
-        msg = 'The Empress voice echoes:\n'
+        msg = 'The Empress\'s voice echoes:\n'
         msg += '\n"Go away, impostor!\nYou have nothing of a knight!"\n'
         # Doing a bit of unnecessary state cleanup:
         game_view.state = gs._replace(tile_overrides=(((9, 4, 5), 26),),  # portcullis block the way back
@@ -768,8 +770,8 @@ def script_it():
     mapscript_add_chest((9, 6, 9), 33, _grant_buckler)
 
     def _pass_arch2(game_view, _):
-        msg = '\n\n\n\nThe Empress voice echoes:\n'
-        msg += '\n"My love, the champion knight,\ndied a hero to save this\ndamn realm. You\'re a joke\ncompared to him!"'
+        msg = '\n\n\n\nThe Empress\'s voice echoes:\n'
+        msg += '\n"My love, the saint knight,\ndied a hero to save this\ndamn realm. You\'re a joke\ncompared to him!"'
         # Doing some tile_overrides cleanup to avoid #states branching due to boxes:
         game_view.state = game_view.state._replace(tile_overrides=(((9, 7, 2), 26),),  # portcullis block the way back
                                                    message=msg)
@@ -802,7 +804,7 @@ def script_it():
     )
 
     def _last_empress_words(game_view, _):
-        msg = '\nThe Empress voice echoes:\n\n"You\'re an insult\nto his memory,\nprepare to die!"\n'
+        msg = '\nThe Empress\'s voice echoes:\n\n"You\'re an insult\nto his memory,\nprepare to die!"\n'
         game_view.state = game_view.state._replace(message=msg)
     mapscript_add_trigger((9, 9, 5), _last_empress_words)  # one-time message
 
@@ -896,7 +898,7 @@ def render_monastery_post_defeat_hint(pdf):
     bitfont_render(pdf, 'Tip', 80, 5, Justify.CENTER)
     render_bar(pdf, 10, 20)
     white_arrow_render(pdf, 'BACK', 16, 16)
-    bitfont_render(pdf, 'If you cannot bring an enemy\nlifebar to zero before\nloosing your last HP,\nmaybe an item somewhere\ncan help you.', 80, 40, Justify.CENTER, page_id=1)
+    bitfont_render(pdf, 'If you cannot bring an enemy\nlifebar to zero before\nlosing your last HP,\nmaybe an item somewhere\ncan help you.', 80, 40, Justify.CENTER, page_id=1)
     with bitfont_color_red():
         bitfont_render(pdf, 'Start over', 80, 100, Justify.CENTER, page_id=1)
 

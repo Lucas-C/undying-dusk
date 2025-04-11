@@ -226,7 +226,7 @@ def iterate_game_views(checkpoint, checkpoint_id, start_views, _GameView):
                     log(new_game_view.state, log_msg)
                 elif milestone not in (GameMilestone.CHECKPOINT, GameMilestone.VICTORY) or new_game_view.state.last_checkpoint == start_views[0].state.last_checkpoint:
                     processing.put(new_game_view)
-            if not action_name:  # means it is a "secret" action witout any link on the page
+            if not action_name:  # means it is a "secret" action without any link on the page
                 del actions[action_name]  # no link will be rendered
     return game_views, checkpoint_game_views
 

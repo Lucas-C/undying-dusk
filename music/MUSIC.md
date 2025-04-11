@@ -46,7 +46,7 @@
     Usage: Cedar Town
 
 - 2:32 - The Fall of Arcana - Matthew Pablo - https://opengameart.org/content/the-fall-of-arcana-epic-game-theme-music - CC-BY 3.0
-    Keywords: peaceful, intro, memories, sligthly epic progression, flute, quiet guitar ending
+    Keywords: peaceful, intro, memories, slightly epic progression, flute, quiet guitar ending
     Usage: entering Zuruth Plains, post-zombie battle
 
 - 10:36 - A Darkness Opus - Alexandr Zhelanov - https://opengameart.org/content/a-darkness-opus - CC-BY 4.0

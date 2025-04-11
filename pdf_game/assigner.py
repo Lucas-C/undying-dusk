@@ -32,7 +32,7 @@ def assign_page_ids(game_views, assign_special_pages=True):
             # reverse ID assignation is valid ! => exiting "while" loop
             if is_first_assignment:
                 check_all_reachable_views_have_a_page_id(assigner.out_game_views)
-            if assign_special_pages and assigner.reversed_id_gv:  # Double-check reverse-ID assignement is OK:
+            if assign_special_pages and assigner.reversed_id_gv:  # Double-check reverse-ID assignment is OK:
                 page_id1 = assigner.reversed_id_gv.src_view.page_id
                 page_id2 = assigner.reversed_id_gv.page_id
                 assert _reverse_number(page_id2) in range(page_id1 - MAX_FILLER_PAGE, page_id1 + MAX_FILLER_PAGE), f'Wrong reverse IDs: {page_id1} / {page_id2}'
@@ -77,7 +77,7 @@ class Assigner:
                     self.out_game_views.append(trick_game_view)
                     self._increment_next_page_id()
                     assert trick.filler_pages < MAX_FILLER_PAGE
-                    for _ in range(trick.filler_pages):
+                    for i in range(trick.filler_pages):
                         filler_game_view = GameView(renderer=_render_filler_page(trick, i))
                         filler_game_view.set_page_id(self.next_page_id)
                         self.out_game_views.append(filler_game_view)

@@ -12,8 +12,8 @@ def custom_info_logic(game_view, actions, _GameView):
         if mazemap_get_tile(game_view, gs.map_id, *next_pos_facing) == 24:  # facing a fountain
             next_state = gs.with_secret('FOUNTAIN_WISH')\
                            ._replace(gold=gs.gold - 1,
-                                     message='You throw a coin in the water.\nDeep down under your feet\nsomething rumbles in the dark.\n(you found a SECRET)',
+                                     message='You throw a coin\nin the water.\nDeep down under your feet,\nsomething rumbles\nin the dark.\n(you found a SECRET)',
                                      mode=GameMode.EXPLORE,
                                      music=BASE_MUSIC_URL + 'AlexandrZhelanov-Insight.mp3',
-                                     music_btn_pos=Position(x=72, y=15))
+                                     music_btn_pos=Position(x=72, y=90))
             actions['THROW-COIN'] = _GameView(next_state)

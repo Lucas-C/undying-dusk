@@ -30,7 +30,7 @@ def reduce_views(game_views, print_reduced_views=False):
         for fp_page in tqdm(fingerprinted_pages, disable='NO_TQDM' in os.environ):
             existing_matching_gv = gv_per_page_fingerprint.get(fp_page.fingerprint)
             # 2nd condition ensures checkpoints are preserved: removing it would break nothing though.
-            # 3rd condition ensures we don't alter secrets_cound in the process.
+            # 3rd condition ensures we don't alter secrets_found in the process.
             if existing_matching_gv and (not fp_page.game_view.state or fp_page.game_view.state.milestone != GameMilestone.CHECKPOINT) and (not fp_page.game_view.state or fp_page.game_view.state.secrets_found == existing_matching_gv.state.secrets_found):
                 assert fp_page.game_view.page_id != existing_matching_gv.page_id, f'Infinite loop detected in reducer!\n{fp_page.game_view}\n{existing_matching_gv}'
                 if print_reduced_views:

@@ -4,10 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.3] - Not released yet
+### Fixed
+- display final end cut-scene - _cf._ [PR #15](https://github.com/Lucas-C/undying-dusk/pull/15)
+- more than 45 typos, thanks to @Phoenyx65535 - _cf._ [issue #20](https://github.com/Lucas-C/undying-dusk/issues/20)
+- overlapping link to [JourneyToTheEastRocks.ogg](https://chezsoi.org/lucas/undying-dusk/music/AlexandrZhelanov-JourneyToTheEastRocks.ogg) - _cf._ [issue #17](https://github.com/Lucas-C/undying-dusk/issues/17)
 
 ## [1.0.2] - 2021-05-12
 ### Fixed
-- abyss secret could not be reached due to a page ID assignement bug
+- abyss secret could not be reached due to a page ID assignment bug
 - wrong message about portal when first visiting sage Therel
 - visual residual glitch (PAGE UP hint) after taking shortcut over the fire
 
