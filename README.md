@@ -1,5 +1,6 @@
 <!-- NEXT STEPS:
-- also publish a .7z compressed version
+- make an executable PDF with sumatra PDF, cf. https://github.com/mwenge/iatheory/releases/tag/0.1
+- also publish a .7z compressed version - cf. https://itch.io/post/9281947
 - submit on https://www.dungeoncrawlers.org
 - make online MP3s to loop forever
 - map bug on cedar village : a door appears initially at the portal position, when it's not open
@@ -221,6 +222,7 @@ DawnLike 16x16 Universal Rogue-like tileset
 <!--
 * griffon: Lanea Zimmerman (AKA Sharm) https://forums.rpgmakerweb.com/index.php?threads/sharms-stuff.26278/
 * scene_cave: https://opengameart.org/content/parallax-halloween-2d-game-backgrounds
+* forest: https://www.deviantart.com/pazuah/art/Forest-Scenery-1017344688
 -->
 
 All the OpenGameAssets have been gathered in [this collection](https://opengameart.org/content/art-for-undying-dusk-pdf-game).

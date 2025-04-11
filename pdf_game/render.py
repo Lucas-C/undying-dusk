@@ -167,7 +167,7 @@ def mazemap_render_tile(pdf, game_view, dx, dy, render_pos):
         # Extra rendering in case of a boulder one tile further:
         if game_view.tile_override((map_id, *next_pos_facing)) in (20, 21, 22):
             pdf.image('assets/boulder_small.png', x=68, y=48)
-    if render_pos == 9:  # center of midle row
+    if render_pos == 9:  # center of middle row
         _enemy = mapscript_get_enemy_at((map_id, x, y), game_view.state)
         # Rendering enemy on map:
         if _enemy and _enemy.show_on_map and not game_view.enemy_vanquished((map_id, x, y)):
@@ -231,7 +231,7 @@ def enemy_render(pdf, combat, sfx=None):
     combat_round, img_filepath = combat.combat_round, _enemy_img_filepath(_enemy)
     # If the image is larger than the VIEW_WIDTH, it is sliced in frames:
     frame_count = get_image_info(pdf, img_filepath)['w'] / config().VIEW_WIDTH
-    # Some enemies explicitely state the frame to display:
+    # Some enemies explicitly state the frame to display:
     frame = _enemy.enemy_frame and _enemy.enemy_frame(combat)
     if frame is None:
         # Else, the frame corresponding to the current round is used:

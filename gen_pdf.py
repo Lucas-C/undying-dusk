@@ -69,7 +69,7 @@ def parse_args():
     parser.add_argument("--json", action="store_true", help="Dump all generated game states in a JSON file")
     parser.add_argument("--iter-logs", action="store_true", help=" ")
     parser.add_argument("--no-script", action="store_true", help=" ")
-    parser.add_argument("--no-marked-content", action="store_true", help="Reduce PDF size by omiting links alternate descriptions")
+    parser.add_argument("--no-marked-content", action="store_true", help="Reduce PDF size by omitting links alternate descriptions")
     parser.add_argument("--no-reducer", action="store_true", help=" ")
     parser.add_argument("--no-pdf", action="store_true", help=" ")
     parser.add_argument("--detect-deadends", action="store_true", help="Sanity check")

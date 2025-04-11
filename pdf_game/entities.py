@@ -262,7 +262,7 @@ class GameState(NamedTuple):
     extra_render: Optional[Callable[['FPDF'], None]] = None
     trick: Optional[Trick] = None
     fixed_id: int = 0  # sets a fixed page ID for this GameView
-    reverse_id: bool = False  # indicates this GameView ID must be the symetrical of its src_view
+    reverse_id: bool = False  # indicates this GameView ID must be the symmetrical of its src_view
     milestone: GameMilestone = GameMilestone.NONE
     last_checkpoint: int = 0
     tile_overrides: Tuple[tuple] = ()  # pairs: ((map_id, x, y), tile_id)

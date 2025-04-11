@@ -59,7 +59,7 @@ def explore_logic(game_view, actions, _GameView):
             and mapscript_tile_script_type(*new_coords) == 'enemy'
             and not game_view.enemy_vanquished(new_coords)):  # importand to allow escaping the boulder
             # We forbid the player to fight an enemy by moving backward,
-            # as it allows them to "pass throught" by simply running away.
+            # as it allows them to "pass through" by simply running away.
             # It can be troubling, as the backward arrow won't be displayed.
             continue
         # Shop have priority over map exits, but they can now be temporary, allowing for one-time cut-scenes:

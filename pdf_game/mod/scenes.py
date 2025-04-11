@@ -52,7 +52,7 @@ def intro(scene_id):
     # pylint: disable=import-outside-toplevel
     from ..bitfont import bitfont_render, Justify
     intro_8 = CutScene.new(
-        text='In fact,\nappart from\nthat peculiar detail,\nyou have lost\nall memory.',
+        text='In fact,\napart from\nthat peculiar detail,\nyou have lost\nall memory.',
         justify=Justify.CENTER,
         exit_msg='Wake up',
     )

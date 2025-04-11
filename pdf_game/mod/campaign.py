@@ -438,7 +438,7 @@ def script_it():
         trick = Trick('You hear a faint echo:\n"a secret lays,\nin the reflection\nof this place"',
                       filler_renderer=render_abyss_filler_page,
                       link=False, filler_pages=3, background='depths')
-        secret_view = _GameView(gs.without_hidden_trigger('SHORTCUT_HINT')  # deduping as it is optionnal
+        secret_view = _GameView(gs.without_hidden_trigger('SHORTCUT_HINT')  # deduping as it is optional
                                   .with_secret('ABYSS_BOTTOM')
                                   ._replace(message='', trick=trick, reverse_id=True,
                                             mode=GameMode.DIALOG, shop_id=abyss_bottom().id))
@@ -516,7 +516,7 @@ def script_it():
                     .with_tile_override(5, coords=(8, 7, 4))
                     .with_tile_override(5, coords=(8, 10, 10))
                     # (cheap) Moving player 1 step back so that it does not immediately sees the FISH action
-                    ._replace(message='You raise the lever\nand hear a metalic noise', x=10))
+                    ._replace(message='You raise the lever\nand hear a metallic noise', x=10))
         elif lever_tile_id == 50:  # lever waiting to be raised
             log(game_view.state, 'put-fish-on-lever-stick')
             game_view.actions['FISH'] = _GameView(game_view.state
@@ -605,6 +605,7 @@ def script_it():
     def _mausoleum_portal_hint(game_view, _):
         gs = game_view.state
         if not is_instinct_preventing_to_pass_mausoleum_portal(gs): return
+        msg = None
         if gs.items.count('ARMOR_PART') < 4:
             msg = 'No need to go back until\nyou have all the armor parts'
         elif not gs.tile_override_at(MAUSOLEUM_EXIT_COORDS):
@@ -615,6 +616,7 @@ def script_it():
     def _village_portal_hint(game_view, _):
         gs = game_view.state
         if not is_instinct_preventing_to_pass_village_portal(gs): return
+        msg = None
         if gs.spellbook < 3:
             msg = 'The whispering wind\nadvises you to bring the scroll\nto the sage before returning'
         elif gs.gold >= 10:

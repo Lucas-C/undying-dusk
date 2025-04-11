@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # USAGE: PYTHONPATH=. trailer/maze_rand_gen.py
-# NEXT: add stuff (optionnal enemy / treasure / sfx...) + make it a cron + use it on a promo page
+# NEXT: add stuff (optional enemy / treasure / sfx...) + make it a cron + use it on a promo page
 
 import os
 from random import randrange
