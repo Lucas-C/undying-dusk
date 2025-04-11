@@ -65,7 +65,7 @@ def gen_trailer1(fpdf):
     images = tfc * seamus(fpdf, 'My respects, my lady.') \
            + tfc * seamus(fpdf, 'Time has frozen\n in an aeternal dusk.') \
            + tfc * seamus(fpdf, 'And people are turning\ninto strange monsters.') \
-           + tfc * seamus(fpdf, "It's time to face\nthe Empress curse.") \
+           + tfc * seamus(fpdf, "It's time to face\nthe Empress\'s curse.") \
            + tfc * seamus(fpdf, 'You are needed.')
     # Phase 2: WHAT TO EXPECT
     images += explore(fpdf, 'A dungeon crawler\nwith 10 maps to explore') \

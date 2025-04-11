@@ -204,14 +204,15 @@ def power_unlock(game_state, next_pos_facing=None):
 
 
 def item_crucifix(game_state):
-    result = f'{game_state.combat.enemy.name} dodged it'
-    combat = game_state.combat._replace(avatar_log=CombatLog(action="throw crucifix", result=result))
+    combat = game_state.combat._replace(avatar_log=CombatLog(action="throw crucifix", result="enemy dodged it"))
     new_items = tuple(item for item in game_state.items if item != 'CRUCIFIX')
     return game_state._replace(combat=combat, items=new_items)
 
 
 def item_empty_bottle(game_state):
-    return game_state._replace(combat=game_state.combat._replace(avatar_log=CombatLog(action="throw bottle", result="no effect")))
+    combat = game_state.combat._replace(avatar_log=CombatLog(action="throw bottle", result="no effect"))
+    new_items = tuple(item for item in game_state.items if item != 'BOTTLE')
+    return game_state._replace(combat=combat, items=new_items)
 
 
 def take_scepter(game_state):

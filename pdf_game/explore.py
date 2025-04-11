@@ -125,7 +125,7 @@ def _push_box(game_state, next_pos_facing, next_next_pos_facing, next_tile_facin
         game_state = game_state.without_tile_override(next_next_coords_facing)
     new_tile_id = {1: 36, 5: 33}[next_next_tile_facing]
     return game_state.with_tile_override(new_tile_id, next_next_coords_facing)\
-                     ._replace(message='You pushed forward\nthe box in front of you')
+                     ._replace(message='You pushed the box forward')
 
 
 def _show_info(game_view, game_state, _GameView):

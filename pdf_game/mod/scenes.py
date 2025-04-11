@@ -90,7 +90,7 @@ def intro(scene_id):
         next_scene_id=intro_4.id,
     )
     intro_2 = CutScene.new(
-        extra_render=seamus_speaks('I found what you asked for.\n\nTime has come\nto make a decision.'),
+        extra_render=seamus_speaks('I found what you asked for.\n\nThe time has come\nto make a decision.'),
         next_scene_id=intro_3.id,
     )
     return CutScene.new(id=scene_id,
@@ -110,7 +110,7 @@ def seamus_through_small_window():
         next_scene_id=dialog_5.id,
     )
     dialog_3 = CutScene.new(
-        extra_render=seamus_speaks("For your safety I brought\nyou inside this Monastery.\nBut I can't come back inside,\nas monks turned into demons!", behind_bars=True),
+        extra_render=seamus_speaks("For your safety I brought\nyou inside this Monastery.\nBut I can't come back inside,\nas the monks have turned\ninto demons!", behind_bars=True),
         next_scene_id=dialog_4.id,
     )
     dialog_2 = CutScene.new(
@@ -133,7 +133,7 @@ def entering_monastery_courtyard():
     )
     return CutScene.new(
         background=1,
-        text='\n' * 15 + 'As you step outside,\nyou notice\na strange phenomenon\non the horizon:\nthe sun is stuck\nin a never ending dusk.',
+        text='\n' * 15 + 'As you step outside,\nyou notice\na strange phenomenon\non the horizon:\nthe sun is stuck\nin a never-ending dusk.',
         music=BASE_MUSIC_URL + 'Yubatake-M31.ogg',
         next_scene_id=minimap_tip.id,
     )
@@ -142,7 +142,7 @@ def entering_monastery_courtyard():
 @cached()
 def tuto_spells():
     return CutScene.new(
-        text = '\n' * 10 + 'Casting a spell cost 1 MP.\n\nThe "HEAL" spell\ncan only be used\nduring battles.\n\nAn icon will show up\nwhen you can use\nother spells elsweshere.',
+        text = '\n' * 10 + 'Spell casting costs 1 MP.\n\nThe "HEAL" spell\ncan only be used\nduring battles.\n\nAn icon will show up\nwhen you can use\nother spells elsewhere.',
         sfx=SFX(id=9, pos=Position(120, 34))
     )
 
@@ -167,14 +167,14 @@ def looking_for_hope():
     )
     dialog_2 = CutScene.new(
         background='valley_village_with_seamus',
-        extra_render=seamus_speaks2("Despite your shattered\nmemory, you even managed\nto learn a spell!\n\nI do not have\nmuch more magic myself,\nbut let me try something..."),
+        extra_render=seamus_speaks2("Despite your shattered\nmemory, you even managed\nto learn a spell!\n\n\nI do not have\nmuch more magic myself,\nbut let me try something..."),
         next_scene_id=dialog_3.id,
     )
     return CutScene.new(
         background='valley_village_with_seamus',
         name='Chapter 1 : Looking for hope',
         music=BASE_MUSIC_URL + 'AlexandrZhelanov-MysteryForest.mp3',
-        extra_render=seamus_speaks2('\nWell done!\n\nThese demons got\nwhat they deserved!\nYou had no choice,\nno one touched\nby the Empress curse\ncan be saved...'),
+        extra_render=seamus_speaks2('\nWell done!\n\nThese demons got\nwhat they deserved!\nYou had no choice;\nno one touched\nby the Empress\' curse\ncan be saved...'),
         next_scene_id=dialog_2.id,
     )
 
@@ -191,7 +191,7 @@ def chapel_in_the_woods(scene_id):
     crucifix_taken = CutScene.new(
         name='Chapel In The Woods',
         background='chapel_with_monk',
-        text='\n' * 7 + 'What have you done ?\n\n\nNow the Empress curse\nwill befall us!\n\nFool!',
+        text='\n' * 7 + 'What have you done?\n\n\nNow the Empress\'s curse\nwill befall us!\n\nFool!',
         treasure_id=36,
         exit_msg='Leave',
     )
@@ -214,7 +214,7 @@ def a_safe_haven():
     return CutScene.new(
         name='A safe haven',
         background='cloudy_town',
-        text='\n' * 5 + 'A village seems to\nhave been spared.\n\nPeople welcome you,\nand ask for your help\nagainst the monsters.',
+        text='\n' * 5 + 'A village seems to\nhave been spared.\n\nPeople welcome you\nand ask for your help\nagainst the monsters.',
         music=BASE_MUSIC_URL + 'AngusMacnaughton-FantasyMusic-NightTown.mp3',
         exit_msg='Enter town',
     )
@@ -266,7 +266,7 @@ def the_inn_evening_tale():
 def seamus_in_zuruth_plains():
     dialog_3 = CutScene.new(
         background='forest_trees_with_seamus',
-        extra_render=seamus_speaks2('And secrets may be hiding\nin its pillars shadow...\n\nThe Empress castle stands\nfurther behind the canal.\n\nGo look if you can see it\ndespite the darkness.'),
+        extra_render=seamus_speaks2('And secrets may be hiding\nin its pillars shadow...\n\nThe Empress\'s castle stands\nfurther behind the canal.\n\nGo look if you can see it\ndespite the darkness.'),
         # Using a custom DialogOption to be able to alter GameState:
         dialog_options=(DialogOption.exit('Leave', lambda gs: gs.with_tile_override(6, (6, 1, 9))),),
     )
@@ -339,7 +339,7 @@ def risking_it_all():
 def abyss_bottom():  # Did the Empress made a pact with the Deep Ones?
     return CutScene.new(
         name='Abyss bottom',
-        text='The empress soul\nrests in the dark\n(you found a SECRET)',
+        text='The empress soul\'s\nrests in the dark\n(you found a SECRET)',
         sfx=SFX(id=6, pos=Position(64, 78)),
         exit_msg='Climb back up',
         music=BASE_MUSIC_URL + 'AlexandrZhelanov-MysticalTheme.mp3',
@@ -351,13 +351,13 @@ def the_final_leap():
     scene_2 = CutScene.new(
         background=1,
         name='The final leap',
-        text='\n' * 8 + "You reach the Empress's\nquarters: there is only\ndarnkess and ruins.\n\nAs you climb your way\namong floating debris,\na huge creature falls\nfrom the sky onto you!",
+        text='\n' * 8 + "You reach the Empress's\nquarters: there is only\ndarkness and ruins.\n\nAs you climb your way\namong floating debris,\na huge creature falls\nfrom the sky onto you!",
         exit_msg="Engage the fight",
     )
     return CutScene.new(
         background='palace_hall',
         name='The final leap',
-        text='\n' * 3 + 'You leave the catacombs\nto enter prudently\nthe castle above.\n\nThe palace is empty.\nThere is no living soul.',
+        text='\n' * 3 + 'You leave the mausoleum\nto prudently enter\nthe castle above.\n\nThe palace is empty.\nThere is no living soul.',
         music=BASE_MUSIC_URL + 'JohanJansen-DarkWinds.ogg',
         next_scene_id=scene_2.id,
     )
@@ -391,7 +391,7 @@ def the_end():
     )
     scene_7 = CutScene.new(
         background='bloodsplat',
-        text='\n\n\nWith your talent\nto alter time,\ncould you have caused\nall this?\n\nDid Seamus knew?',
+        text='\n\n\nWith your talent\nto alter time,\ncould you have caused\nall this?\n\nDid Seamus know?',
         next_scene_id=scene_8.id,
     )
     scene_6 = CutScene.new(
@@ -425,7 +425,7 @@ def the_end():
         next_scene_id=scene_2.id,
     )
     return CutScene.new(
-        text='\n\nThe Empress finally\ndefeated,\nyou look over her.\n\nA cheval mirror\nis standing behind.',
+        text='\n\nThe Empress finally\ndefeated,\nyou look over her.\n\nA cheval mirror\nis standing behind her.',
         music=BASE_MUSIC_URL + 'MatthewPablo-Soliloquy.mp3',
         next_scene_id=scene_1.id,
     )
@@ -498,10 +498,10 @@ class SimmonsSellableArmor:
         if 1 <= game_state.items.count('ARMOR_PART') < 4:
             return DialogOption.only_msg('I need more material\nto craft you an armor')
         return DialogOption(btn_type=DialogButtonType.BUY, can_buy=game_state.items.count('ARMOR_PART') == 4,
-                            msg="I can repair an armor\nfrom broken parts",
+                            msg="I can repair\na suit of armor\nfrom broken parts,\nfor free",
                             buy=lambda gs: gs._replace(treasure_id=29, armor=7,
                                                        items=tuple(i for i in gs.items if i != 'ARMOR_PART'),
-                                                       message="Acquired St Knight armor"))
+                                                       message="Acquired\nSaint Knight armor"))
 
 
 class SageTherelAdvice:
@@ -529,7 +529,7 @@ class SageTherelSellableSpell:
                                                                spellbook=3, message='New spell learned: UNLOCK'))
             assert False, 'Sage There has no more spell to teach'
         if game_state.spellbook < 2:
-            return DialogOption(btn_type=DialogButtonType.BUY, can_buy=False, msg="I will teach it to you\nif you bring me a scroll.")
+            return DialogOption(btn_type=DialogButtonType.BUY, can_buy=False, msg="I can teach it to you\nif you bring me a scroll.")
         return DialogOption.only_msg('Use your new power\nwisely, young apprentice')
 
 
@@ -540,7 +540,7 @@ class RoomForTheNight:
         disable_reason, room_cost = '', 10
         if game_state.hp == game_state.max_hp and game_state.mp == game_state.max_mp:
             disable_reason = "(You are well rested)"
-        msg = "Buy Room for the night"
+        msg = "Buy a room for the night"
         # show the gold cost or the reason you can't
         msg += f'\n{disable_reason}' if disable_reason else f'\nfor {room_cost} gold'
         # display the dialog button if the item can be purchased

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.8
+#!/usr/bin/env python3
 
 import argparse, json, logging, os, warnings
 from contextlib import contextmanager

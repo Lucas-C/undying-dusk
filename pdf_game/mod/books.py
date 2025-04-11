@@ -18,8 +18,8 @@ BOOKS = {
     (3, 4, 3): Book('...demons hide in hesitations,\nin fractions of seconds\nwhere our moral compass\nis adjusting,', img='assets/demons-of-time.png', next=Book('...and there is still\na potentiality that we\ncommit something horrible.\nIf time froze\nin those instants,\nour flesh would open up\nto terrible monsters...')),  # right row, bottom bookshelf
 
     # Templar Academy: first 2 bookshelves
-    (10, 0, 1): Book('The guarding lady,\nis a famous mythical figure.\nTemplar apprentices took\ntheir vow by kneeing\nbefore her statue and\nplacing their trainee\namulet in her hand.'),
-    (10, 0, 3): Book('During all their\nformation, young templars\nwear a sapphire amulet,\nsymbolizing the moral purity\nthey are trying to acquire.\n\n', treasure_id=12),
+    (10, 0, 1): Book('The guarding lady\nis a famous mythical figure.\nTemplar apprentices would\ntake their vow by kneeling\nbefore her statue and\nplacing their trainee\namulet in her hand.'),
+    (10, 0, 3): Book('Ever since the founding of\ntheir order, young templars\nwould wear a sapphire amulet\nsymbolizing the moral purity\nthey are trying to acquire.\n\n', treasure_id=12),
     # Templar Academy: next 4 bookshelves
     (10, 0, 5): Book('The Saint Knight was\nmurdered in his sleep\nby a cabal of druids\njealous of his influence.\n',
                     img='assets/tomb-stone.png', next=Book('Following a grand funeral,\nhis body and armor were\nburied in the Mausoleum,\nwhile his sword was hidden\nin the Templar Academy maze.')),
@@ -33,18 +33,18 @@ BOOKS = {
     (10, 0, 11): Book('A trap mechanism is detailed,\ninvolving a giant boulder.\nIt appears to protect\na secret part of the library\nand the Templars treasure.\n\n', treasure_id=9),
     # Templar Academy: final 4 bookshelves
     (10, 0, 13): Book('Mimics are\nmagical creatures\nthat take the shape\nof mundane objects,\nlike chests.\n', img='assets/mimics.png', next=Book('They are as strong\nas the furniture item\nthey imitate,\nbut they also\nshare the same\nvulnerabilities.')),
-    (10, 0, 14): Book('\n' * 4 + 'Seamus Mc Lornan is\na powerful wizard,\nand a renown advisor\nof the late Emperor.', portrait=0),
+    (10, 0, 14): Book('\n' * 4 + 'Seamus McLornan is\na powerful wizard,\nand a renown advisor\nof the late Emperor.', portrait=0),
     (10, 1, 15): Book('An encyclopedia mentions\na sorcerer thief that\nmastered a spell to unlock\nall doors & chests...', img='assets/open-chest-and-treasure.png'),
-    (10, 2, 15): Book('The secret of the Saint\nKnight victory over the\nStorm Dragon was\nhis armor : it was made\nof electric-proof steel.\n\n', sfx=SFX(id=5, pos=Position(64, 88))),
+    (10, 2, 15): Book('The secret of the Saint\nKnight\'s victory over the\nStorm Dragon was\nhis armor: it was made\nof electric-proof steel.\n\n', sfx=SFX(id=5, pos=Position(64, 88))),
 
     # Mausoleum: 2 bookshelves next to portal
     (8, 3, 13): Book('A treatise on\nDruidic linguistics.\nThe first chapter teaches\nthe names of numbers.',
                      next=Book('1 : Klaatu  2 : Da\n3 : Fer  4 : Me\n5 : Mi  6 : Sesa\n7 : To  8 : Bara\n9 : Nik  10 : Do')),
     # Mausoleum: 2 bookshelves in east corridor
-    (8, 14, 4): Book('An old parchment mentions\nhow the Mausoleum stairs\nleading to the castle above\nwere condemned long ago.', next=Book('A secret mechanism\nallows to open the iron gate:\nthe key is a sequence\nof directions, hidden in\nthe lyrics of a folk song.')),
+    (8, 14, 4): Book('An old parchment mentions\nhow the Mausoleum stairs\nleading to the castle above\nwere condemned long ago.', next=Book('A secret mechanism\ncan open the iron gate:\nthe key is a sequence\nof directions, hidden in\nthe lyrics of a folk song.')),
     (8, 14, 10): Book('Of gods & men\nChapt. 4\nGorgons', img='assets/gorgon-head.png', next=Book('Never look a gorgon\nin the eye! Their gaze can\nturn people into stone.\n\nNote: watching their own\nreflection is fatal for them.')),
     # Mausoleum: bookshelf in north-west alcove, behind 2 mimics:
-    (8, 2, 2): Book('The ballad of the first king\n\nIn the plains\nthe journey started.\nTo become the bravest,\noff he went to the\nknights academy.', music=BASE_MUSIC_URL + 'AlexandrZhelanov-JourneyToTheEastRocks.ogg', next=Book('He then traveled,\nto the monks haven.\nAll the books he read,\nas wisdom was\nis new ambition.', next=Book("Finally, he crossed a river,\nand there established\nthe realm's foundations.\n\n", treasure_id=28))),
+    (8, 2, 2): Book('The ballad of the first king\n\nIn the plains\nthe journey started.\nTo become the bravest,\noff he went to the\nknights academy.', music=BASE_MUSIC_URL + 'AlexandrZhelanov-JourneyToTheEastRocks.ogg', next=Book('He then traveled,\nto the monks haven.\nAll the books he read,\nas wisdom was\nhis new ambition.', next=Book("Finally, he crossed a river,\nand there established\nthe realm's foundations.\n\n", treasure_id=28))),
     (8, 3, 1): Book('\n\n\nHistorical map', img='assets/compass.png', next=Book((' ' * 36 + '\n') * 9, img='assets/map.png')),
 }
 
