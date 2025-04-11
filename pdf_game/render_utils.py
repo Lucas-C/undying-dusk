@@ -1,7 +1,15 @@
+# pylint: disable=unused-import
+import importlib
 from .entities import Position
 from .js import action, REL_RELEASE_DIR
 
 from fpdf.image_parsing import preload_image
+try:
+    from fpdf.image_parsing import is_iccp_valid
+    # Hack to disable ICC profile embedding for all images:
+    importlib.import_module('fpdf.image_parsing').is_iccp_valid = lambda iccp, filename: False
+except ImportError:
+    pass  # Older version of fpdf2: skipping
 
 
 BACKGROUNDS = 'black,nightsky,tempest,interior'.split(',')
