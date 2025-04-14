@@ -384,9 +384,8 @@ def script_it():
     mapscript_add_message((7, 2, 2), 'You might want to pray\non the grave\nof the Saint Knight.\nMay he rest in peace.')  # hint on sign in the water
 
     def _examine_glimpse(game_view, _GameView):
-        game_view.actions['GLIMPSE'] = _GameView(game_view.state.with_hidden_trigger('SHORTCUT_HINT')._replace(message='A voice comes from the water:\n\n"There is a shortcut\nto the Mausoleum entrance\nabove the fire."'))
-    mapscript_add_trigger((7, 4, 9), _examine_glimpse, facing='west', permanent=True,
-                                     condition=lambda gs: 'SHORTCUT_HINT' not in gs.hidden_triggers)
+        game_view.actions['GLIMPSE'] = _GameView(game_view.state._replace(message='A voice comes\nfrom the water:\n\n"There is a shortcut\nto the Mausoleum entrance\nabove the fire."'))
+    mapscript_add_trigger((7, 4, 9), _examine_glimpse, facing='west', permanent=True)
 
     cauldron_pos = (7, 13, 5)
     def _shortcut_above_fire_and_cauldron(game_view, _GameView):
@@ -438,8 +437,7 @@ def script_it():
         trick = Trick('You hear a faint echo:\n"a secret lies\nin the reflection\nof this place"',
                       filler_renderer=render_abyss_filler_page,
                       link=False, filler_pages=3, background='depths')
-        secret_view = _GameView(gs.without_hidden_trigger('SHORTCUT_HINT')  # deduping as it is optional
-                                  .with_secret('ABYSS_BOTTOM')
+        secret_view = _GameView(gs.with_secret('ABYSS_BOTTOM')
                                   ._replace(message='', trick=trick, reverse_id=True,
                                             mode=GameMode.DIALOG, shop_id=abyss_bottom().id))
         game_view.actions[None] = secret_view
@@ -448,7 +446,7 @@ def script_it():
 
     def _lower_portcullis(game_view, _):  # block the way back, to avoid exploding #states
         log(game_view.state, 'lowering-portcullis')
-        game_view.state = clear_hidden_triggers(game_view.state) # removes SHORTCUT_HINT & TOMB_HEALED
+        game_view.state = clear_hidden_triggers(game_view.state) # removes TOMB_HEALED
         game_view.add_tile_override(26, coords=(8, 5, 7))
         game_view.state = game_view.state._replace(message='You hear the portcullis\ngoing down behind you',
                                                    music=BASE_MUSIC_URL + 'AlexandrZhelanov-DarkHall.mp3',

@@ -479,9 +479,12 @@ class GameView:
     def as_dict(self):  # JSON-export-friendly
         if not self.state: return self.state
         view_dict = self.state._asdict()
-        combat = self.state.combat
         # removing non-serializable fields:
         view_dict['extra_render'] = bool(view_dict['extra_render'])
+        trick = self.state.trick
+        if trick:
+            view_dict['trick'] = trick._replace(filler_renderer=None)
+        combat = self.state.combat
         if combat:
             view_dict['combat'] = combat._replace(enemy=combat.enemy._replace(
                     post_defeat_condition=None, post_defeat=None, post_victory=None))
