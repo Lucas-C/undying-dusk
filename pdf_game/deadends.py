@@ -8,6 +8,7 @@ from .optional_deps import tqdm
 
 
 def detect_deadends(game_views):
+    print()
     print('Starting dead-end detecter')
     print('- listing all end-game leaf states')
     endgame_gvs = set(gv for gv in game_views if gv.state and gv.state.milestone >= 2)

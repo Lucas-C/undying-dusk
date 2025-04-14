@@ -107,6 +107,7 @@ def render_page(pdf, game_view, render_victory):
                                page_id=next_game_view.page_id)
             elif action_name == 'CLOSING-BOOK':
                 assert game_state.book
+                bitfont_set_color_red(False)
                 render_book(pdf, game_state.book, next_game_view.page_id, game_state.treasure_id)
             elif action_name in CLICK_ZONES:
                 click_zone = CLICK_ZONES[action_name]
@@ -316,9 +317,9 @@ def render_book(pdf, book, page_id, treasure_id):
             x, y = 80, 60
             with pdf.rect_clip(x=x, y=y, w=45, h=47):
                 pdf.image('assets/black_bird.png', x=x - book.bird_index*45, y=y, link=link, alt_text='NEXT')
-        if book.extra_render:
-            book.extra_render(pdf)
     bitfont_render(pdf, book.text, 80, y, Justify.CENTER, page_id=page_id)
+    if book.extra_render:
+        book.extra_render(pdf)
     if book.next:
         white_arrow_render(pdf, 'NEXT', x=120, y=100, page_id=page_id)
 

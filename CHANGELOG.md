@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - display final end cut-scene - _cf._ [PR #15](https://github.com/Lucas-C/undying-dusk/pull/15)
 - more than 45 typos, thanks to @Phoenyx65535 - _cf._ [issue #20](https://github.com/Lucas-C/undying-dusk/issues/20)
 - broken path to abyss secret in a specific case - _cf._ [PR #24](https://github.com/Lucas-C/undying-dusk/pull/24)
-- fixing image assets for some tiles - _cf._ [issue #16](https://github.com/Lucas-C/undying-dusk/issues/16)
+- missing image assets for some tiles - _cf._ [issue #16](https://github.com/Lucas-C/undying-dusk/issues/16)
+- hidden `CTRL G` hint in a book in the Mausoleum - _cf._ [issue #21](https://github.com/Lucas-C/undying-dusk/issues/21)
 - overlapping link to [JourneyToTheEastRocks.ogg](https://chezsoi.org/lucas/undying-dusk/music/AlexandrZhelanov-JourneyToTheEastRocks.ogg) - _cf._ [issue #17](https://github.com/Lucas-C/undying-dusk/issues/17)
 
 ## [1.0.2] - 2021-05-12
