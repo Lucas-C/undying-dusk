@@ -126,7 +126,7 @@ def render_page(pdf, game_view, render_victory):
                     action_button_render(pdf, action_name, page_id=page_id)
                 else:
                     arrow_button_render(pdf, action_name, page_id)
-    if game_view.state.bonus_atk and game_state.mode in (GameMode.EXPLORE, GameMode.INFO):
+    if game_view.state.bonus_atk:
         action_button_render(pdf, 'ATK_BOOST')
         bitfont_render(pdf, f'+{game_view.state.bonus_atk}', 10, 90)
 

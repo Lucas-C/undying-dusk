@@ -140,6 +140,13 @@ def visit_game_views(args):
         game_views = assign_page_ids(game_views)
     assert start_view.page_id
 
+    log_checkpoints_page_ids(game_views)
+    log_scenes_page_ids(game_views)
+
+    return start_view, game_views
+
+
+def log_checkpoints_page_ids(game_views):
     for game_view in game_views:
         game_state = game_view.state
         if game_state and game_state.milestone in (GameMilestone.CHECKPOINT, GameMilestone.VICTORY):
@@ -153,20 +160,19 @@ def visit_game_views(args):
                     game_view = game_view.src_view
                 print(f'(depth / #states from start: {depth})')
 
+def log_scenes_page_ids(game_views):
     scene_game_states = {}
     for game_view in game_views:
         game_state = game_view.state
         # Excluding actual shops (ID <= 4):
         if game_state and game_state.shop_id > 4 and game_view.src_view and game_view.src_view.state.shop_id == -1:
             scene = CutScene.from_id(game_state.shop_id)
-            print(f'ID for scene {game_state.shop_id} first page: {game_view.page_id} ({game_state.facing}/{"+".join(game_state.secrets_found)}) {scene.name}')
             existing_gs = scene_game_states.get((game_state.facing, game_state.secrets_found))
+            print(f'Page ID for scene {game_state.shop_id} {"" if existing_gs else "(first page)"}: {game_view.page_id} ({game_state.facing}/{"+".join(game_state.secrets_found)}) {scene.name}')
             if existing_gs:
                 # print('Diff with other GameState leading to this scene:')
                 print(indent(existing_gs.differing(game_state), '  '), end='')
             scene_game_states[(game_state.facing, game_state.secrets_found)] = game_state
-
-    return start_view, game_views
 
 
 def iterate_game_views(checkpoint, checkpoint_id, start_views, _GameView):

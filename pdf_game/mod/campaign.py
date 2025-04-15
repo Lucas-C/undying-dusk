@@ -398,6 +398,8 @@ def script_it():
         if game_view.state.facing == 'west' and not game_view.state.extra_render:
             game_view.actions['BEHIND_IVY'] = _GameView(game_view.state._replace(
                 extra_render=lambda pdf: pdf.image('assets/page-up-hint.png', x=61, y=22)))
+        # This trick is rendered 60 times,
+        # due to the varying possible values for .hp / .bonus_atk / .facing / .extra_render
         trick = Trick('You climb on the roof\nand run to the\nMausoleum entrance!',
                       music=BASE_MUSIC_URL + 'JohanJansen-OrchestralLoomingBattle.ogg')
         game_view.actions[None] = _GameView(game_view.state._replace(x=9, y=5, facing='east', trick=trick,

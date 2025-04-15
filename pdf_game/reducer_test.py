@@ -13,7 +13,7 @@ def test_reduce_2_identical_views():
         GameView(A_FINAL_STATE),
         GameView(A_FINAL_STATE._replace(hidden_triggers=('X',)))
     ]
-    assert len(reduce_views(game_views)) == 1
+    assert len(reduce_views(game_views, print_reduced_views=True)) == 1
 
     def render(pdf):
         bitfont_render(pdf, 'Online hall of fame', 80, 90, url='https://chezsoi.org/lucas/blog/')
@@ -21,7 +21,7 @@ def test_reduce_2_identical_views():
         GameView(renderer=render),
         GameView(renderer=render),
     ]
-    assert len(reduce_views(game_views)) == 1
+    assert len(reduce_views(game_views, print_reduced_views=True)) == 1
 
 
 def test_reduce_2_identical_views_except_for_secret():
@@ -29,7 +29,7 @@ def test_reduce_2_identical_views_except_for_secret():
         GameView(A_FINAL_STATE),
         GameView(A_FINAL_STATE._replace(secrets_found=('X',)))
     ]
-    assert len(reduce_views(game_views)) == 2
+    assert len(reduce_views(game_views, print_reduced_views=True)) == 2
 
 
 def test_reduce_2_identical_views_except_for_page_id_link():
@@ -41,7 +41,7 @@ def test_reduce_2_identical_views_except_for_page_id_link():
         GameView(renderer=render1),
         GameView(renderer=render2),
     ]
-    assert len(reduce_views(game_views)) == 2
+    assert len(reduce_views(game_views, print_reduced_views=True)) == 2
 
 
 def test_reduce_2_identical_views_except_for_url_link():
@@ -53,7 +53,7 @@ def test_reduce_2_identical_views_except_for_url_link():
         GameView(renderer=render1),
         GameView(renderer=render2),
     ]
-    assert len(reduce_views(game_views)) == 2
+    assert len(reduce_views(game_views, print_reduced_views=True)) == 2
 
 
 def test_reduce_5_views_to_3():
@@ -67,7 +67,7 @@ def test_reduce_5_views_to_3():
     root_view.actions['MOVE-BACKWARD'] = middle_view1
     root_view.actions['MOVE-FORWARD'] = middle_view2
     game_views = [leaf_view1, leaf_view2, middle_view1, middle_view2, root_view]
-    reduced = reduce_views(game_views)
+    reduced = reduce_views(game_views, print_reduced_views=True)
     _print_reduced(reduced)
     assert len(reduced) == 3
 
@@ -84,7 +84,7 @@ def test_no_over_reduce():
     root_view2 = GameView(AN_EXPLORE_STATE._replace(y=3))
     root_view2.actions['MOVE-BACKWARD'] = middle_view2
     game_views = [leaf_view1, leaf_view2, middle_view1, middle_view2, root_view1, root_view2]
-    reduced = reduce_views(game_views)
+    reduced = reduce_views(game_views, print_reduced_views=True)
     _print_reduced(reduced)
     assert len(reduced) == 6
 

@@ -29,11 +29,9 @@ def reduce_views(game_views, print_reduced_views=False):
         print_memory_stats()  # Per safety, this function used to eat up memory
         for fp_page in tqdm(fingerprinted_pages, disable='NO_TQDM' in os.environ):
             existing_matching_gv = gv_per_page_fingerprint.get(fp_page.fingerprint)
-            # 2nd condition ensures checkpoints are preserved: removing it would break nothing though.
-            # 3rd condition ensures we don't alter secrets_found in the process.
-            if existing_matching_gv and (not fp_page.game_view.state or fp_page.game_view.state.milestone != GameMilestone.CHECKPOINT) and (not fp_page.game_view.state or fp_page.game_view.state.secrets_found == existing_matching_gv.state.secrets_found):
+            if existing_matching_gv and is_deduping_ok(fp_page.game_view, existing_matching_gv):
                 assert fp_page.game_view.page_id != existing_matching_gv.page_id, f'Infinite loop detected in reducer!\n{fp_page.game_view}\n{existing_matching_gv}'
-                if print_reduced_views:
+                if print_reduced_views and fp_page.game_view.state:
                     gs = fp_page.game_view.state
                     print('- reducer.removes:', f'{gs.coords}/{gs.facing} HP={gs.hp} round={gs.combat and gs.combat.round}')
                     gs = existing_matching_gv.state
@@ -51,8 +49,26 @@ def reduce_views(game_views, print_reduced_views=False):
         fingerprinted_pages = filtered_fp_pages
         if no_views_removed:
             break
-    print(f'-{100*total_views_removed/len(game_views):.1f}% of views were removed by the reducer')
-    return [fp_page.game_view for fp_page in fingerprinted_pages]
+    print(f'{total_views_removed} views, i.e. ~ -{100*total_views_removed/len(game_views):.1f}% of all views, were removed by the reducer')
+    final_game_views = []
+    for fp_page in fingerprinted_pages:
+        # pylint: disable=protected-access
+        assert fp_page.game_view._page_id_from is None
+        fp_page.game_view._page_id = None
+        final_game_views.append(fp_page.game_view)
+    return final_game_views
+
+
+def is_deduping_ok(fp_game_view, existing_matching_gv):
+    if not fp_game_view.state:
+        return True
+    if fp_game_view.state.milestone == GameMilestone.CHECKPOINT:
+        # ensures checkpoints are preserved: removing it would break nothing though
+        return False
+    if fp_game_view.state.secrets_found != existing_matching_gv.state.secrets_found:
+        # ensures we don't alter secrets_found in the process
+        return False
+    return True
 
 
 def build_fingerprinted_pages(fake_pdf, game_views):
