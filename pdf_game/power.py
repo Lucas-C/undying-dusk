@@ -162,7 +162,7 @@ def power_burn(game_state, next_pos_facing=None, next_tile_facing=None):
         if _map.tiles[next_y][next_x] not in (1, 5):  # initial bone pile/box position, or box over opened chest -> masking it
             empty_tile_id = {16: 5, 33: 5, 36: 1}[next_tile_facing]
             game_state = game_state.with_tile_override(empty_tile_id, next_coords_facing)
-        game_state = game_state._replace(message="Burn!\nCleared Path!", mode=GameMode.EXPLORE)
+        game_state = game_state._replace(message="Burn!\nPath cleared", mode=GameMode.EXPLORE)
         log(game_state, f"BURN tile {next_tile_facing} @ {next_coords_facing}")
     return game_state._replace(mp=game_state.mp - 1, sfx=SFX(id=10, pos=Position(64, 44)))
 

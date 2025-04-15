@@ -73,9 +73,11 @@ class Assigner:
                     trick = game_view.prev_page_trick_game_view.state.trick
                     assert trick
                     trick_game_view = GameView(renderer=_render_trick(game_view.prev_page_trick_game_view))
-                    trick_game_view.set_page_id(self.next_page_id)
+                    assert trick_game_view.set_page_id(self.next_page_id)
                     self.out_game_views.append(trick_game_view)
-                    self._increment_next_page_id()
+                    if self._increment_next_page_id() != 1:
+                        # An easter egg was inserted after trick page
+                        return False
                     assert trick.filler_pages == 0
                 if game_view.state and game_view.state.reverse_id and self.assign_special_pages:
                     src_page_id = game_view.src_view.page_id
@@ -104,36 +106,42 @@ class Assigner:
                     assert trick.filler_pages < MAX_FILLER_PAGE, f"{trick.filler_pages=}"
                     for i in range(trick.filler_pages):
                         filler_game_view = GameView(renderer=_render_filler_page(trick, i))
-                        filler_game_view.set_page_id(self.next_page_id)
+                        assert filler_game_view.set_page_id(self.next_page_id)
                         self.out_game_views.append(filler_game_view)
-                        self._increment_next_page_id()
+                        if self._increment_next_page_id() != 1:
+                            # An easter egg was inserted inbetween trick filler pages
+                            return False
                     trick_game_view = GameView(renderer=_render_trick(game_view.next_page_trick_game_view))
-                    trick_game_view.set_page_id(self.next_page_id)
+                    assert trick_game_view.set_page_id(self.next_page_id)
                     self.out_game_views.append(trick_game_view)
-                    self._increment_next_page_id()
+                    if self._increment_next_page_id() != 1:
+                        # An easter egg was inserted before trick page
+                        return False
         except StopIteration:
             return False
         return True
 
     def _increment_next_page_id(self):
-        self.next_page_id += 1
+        increment = 1
+        self.next_page_id += increment
         if self.reversed_id_gv and self.next_page_id == self.reversed_id_gv.page_id:
             assert self.next_page_id not in self.gv_per_fixed_id, 'Conflicting need to use this page ID :('
             self.out_game_views.append(self.reversed_id_gv)
-            self._increment_next_page_id()
+            increment += self._increment_next_page_id()
         gv = self.gv_per_fixed_id.get(self.next_page_id)
         if gv:
-            gv.set_page_id(self.next_page_id)
+            assert gv.set_page_id(self.next_page_id)
             assert gv.state.fixed_id == gv.page_id
             self.out_game_views.append(gv)
             self.gv_per_fixed_id[self.next_page_id] = None
-            self._increment_next_page_id()
+            increment += self._increment_next_page_id()
         if self.assign_special_pages:
             easteregg_game_view = insert_eegggv(self.next_page_id)
             if easteregg_game_view:
-                easteregg_game_view.set_page_id(self.next_page_id)
+                assert easteregg_game_view.set_page_id(self.next_page_id)
                 self.out_game_views.append(easteregg_game_view)
-                self._increment_next_page_id()
+                increment += self._increment_next_page_id()
+        return increment
 
 
 def check_all_reachable_views_have_a_page_id(game_views):
