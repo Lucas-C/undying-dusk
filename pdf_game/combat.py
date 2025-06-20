@@ -87,7 +87,10 @@ def combat_logic(game_view, actions, _GameView):
             actions[action_name] = combat_round(item_crucifix(game_state.with_combat_action(action_name)), _GameView)
     if 'EMPTY_BOTTLE' in game_state.items:
         for action_name in get_action_names('EMPTY_BOTTLE'):
-            actions[action_name] = combat_round(item_empty_bottle(game_state.with_combat_action(action_name)), _GameView)
+            actions[action_name] = combat_round(item_bottle(game_state.with_combat_action(action_name)), _GameView)
+    if 'FULL_BOTTLE' in game_state.items:
+        for action_name in get_action_names('FULL_BOTTLE'):
+            actions[action_name] = combat_round(item_bottle(game_state.with_combat_action(action_name)), _GameView)
     if 'HOLY_WATER' in game_state.items:
         for action_name in get_action_names('HOLY_WATER'):
             actions[action_name] = combat_round(item_holy_water(game_state.with_combat_action(action_name)), _GameView)
@@ -146,9 +149,15 @@ def combat_determine_reward(game_state):
         assert not _enemy.gold, 'Not implemented yet'
         if isinstance(_enemy.reward, RewardItem):
             assert _enemy.reward.name == 'ARMOR_PART'  # if other values are possible, message must be made dynamic
+            indent="                "
             return game_state._replace(
                 items=game_state.items + (_enemy.reward.name,),
-                message=f"{msg}\nYou get a\npiece of\narmor",
+                message=(
+                    f"{indent}{msg}\n"
+                    f"{indent}You get a\n"
+                    f"{indent}piece of\n"
+                    f"{indent}armor"
+                ),
                 treasure_id=_enemy.reward.treasure_id)
         assert isinstance(_enemy.reward, RewardTreasure)
         return _enemy.reward.grant(game_state._replace(

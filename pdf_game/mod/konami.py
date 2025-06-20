@@ -14,11 +14,11 @@ POS3 = (9, 4)         # POS 2 tiles forward in FACING direction
 MSGS = (
     'KO...',
     'KONA...',
+    'KONAM...',
     'KONAMI...',
-    'KO...',
-    'KONA...',
-    'KONAMI...',
-    'KONAMI CODE!',
+    'KONAMI C...',
+    'KONAMI CO...',
+    'KONAMI COD...',
 )
 
 
@@ -39,7 +39,7 @@ def custom_explore_logic(action_name, gs, new_gs):
             if puzzle_step == 7:
                 return new_gs.with_secret('KONAMI_CODE')\
                              ._replace(sfx=SFX(id=7, pos=Position(64, 88)),
-                                       message='You feel empowered\nby a mystical force!\n(you found a SECRET)',
+                                       message='KONAMI CODE!\nYou feel a mystical force!\n(you found a SECRET)',
                                        music=BASE_MUSIC_URL + 'AlexandrZhelanov-TreasuresOfAncientDungeon2.mp3',
                                        music_btn_pos=Position(x=72, y=25))
             if puzzle_step == 5:

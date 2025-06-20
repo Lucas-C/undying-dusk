@@ -1,7 +1,7 @@
 from .entities import GameMode
 from .js import atlas, shop
 from .logs import log
-from .mapscript import mapscript_tile_script_type
+from .mapscript import mapscript_get_enemy_at
 from .mazemap import avatar_can_move_to, mazemap_is_exit, mazemap_is_shop, mazemap_next_pos_facing, mazemap_get_tile
 from .power import power_burn, power_unlock
 from .warp_portals import warp_portal_teleport
@@ -55,13 +55,13 @@ def explore_logic(game_view, actions, _GameView):
         new_coords = (game_state.map_id, x, y)
         if not avatar_can_move_to(game_view, *new_coords):
             continue
-        if (action_name == 'MOVE-BACKWARD'
-            and mapscript_tile_script_type(*new_coords) == 'enemy'
-            and not game_view.enemy_vanquished(new_coords)):  # importand to allow escaping the boulder
-            # We forbid the player to fight an enemy by moving backward,
-            # as it allows them to "pass through" by simply running away.
-            # It can be troubling, as the backward arrow won't be displayed.
-            continue
+        new_facing = game_state.facing
+        enemy = mapscript_get_enemy_at(new_coords,game_state)
+        if (action_name == 'MOVE-BACKWARD' and enemy and not game_view.enemy_vanquished(new_coords)):
+            # We force the player to face the enemy,
+            # as otherwise they could "pass through" them.
+            turn_around = {"north":"south","south":"north","east":"west","west":"east"}
+            new_facing = turn_around[new_facing]
         # Shop have priority over map exits, but they can now be temporary, allowing for one-time cut-scenes:
         map_shop = mazemap_is_shop(_map, x, y)
         if map_shop and not new_coords in game_state.triggers_activated:
@@ -78,8 +78,13 @@ def explore_logic(game_view, actions, _GameView):
                 message = "Seems like something\nis blocking the door\nfrom behind"
                 actions[action_name] = _GameView(game_state._replace(message=message))
             continue
-        actions[action_name] = _GameView(custom_explore_logic(action_name, game_view.state, game_state._replace(x=x, y=y)))
-    if BURN_AND_PUSH_ALLOWED and next_tile_facing in (33, 36):  # facing a box
+        actions[action_name] = _GameView(custom_explore_logic(action_name, game_view.state,
+                                         game_state._replace(x=x, y=y, facing=new_facing)))
+    rolling_boulder_in_front = False
+    for rolling_boulder in game_state.rolling_boulders:
+        if rolling_boulder.coords == (game_state.map_id, *next_pos_facing):
+            rolling_boulder_in_front = True
+    if BURN_AND_PUSH_ALLOWED and next_tile_facing in (33, 36, 20, 21, 22) and not rolling_boulder_in_front:  # facing a box or a stationary boulder
         custom = custom_can_push(game_state, actions)
         if custom:
             action_name, next_gv = custom
@@ -87,8 +92,8 @@ def explore_logic(game_view, actions, _GameView):
         else:
             next_next_pos_facing = mazemap_next_pos_facing(*next_pos_facing, game_state.facing)
             next_next_tile_facing = mazemap_get_tile(game_view, game_state.map_id, *next_next_pos_facing)
-            if next_next_tile_facing in (5, 1, 0, None):  # empty tile behind
-                actions['PUSH'] = _GameView(_push_box(game_state, next_pos_facing, next_next_pos_facing, next_tile_facing, next_next_tile_facing))
+            if next_next_tile_facing in (6, 5, 1, 0, None):  # empty tile behind
+                actions['PUSH'] = _GameView(_push_object(game_state, next_pos_facing, next_next_pos_facing, next_tile_facing, next_next_tile_facing))
             else:
                 actions['NO_PUSH'] = None
     if BURN_AND_PUSH_ALLOWED and game_state.spellbook >= 2 and next_tile_facing in (16, 33, 36) and custom_can_burn(game_state):  # facing a bone_pile or box with BURN spell
@@ -104,7 +109,7 @@ def explore_logic(game_view, actions, _GameView):
             actions['PASS_BEHIND_IVY'] = actions['MOVE-FORWARD']
 
 
-def _push_box(game_state, next_pos_facing, next_next_pos_facing, next_tile_facing, next_next_tile_facing):
+def _push_object(game_state, next_pos_facing, next_next_pos_facing, next_tile_facing, next_next_tile_facing):
     log(game_state, f'push_box @ {game_state.coords}: {next_pos_facing} -> {next_next_pos_facing}')
     next_coords_facing = (game_state.map_id, *next_pos_facing)
     next_tile_override = game_state.tile_override_at(next_coords_facing)
@@ -113,19 +118,27 @@ def _push_box(game_state, next_pos_facing, next_next_pos_facing, next_tile_facin
         game_state = game_state.without_tile_override(next_coords_facing)
     _map = atlas().maps[game_state.map_id]
     next_x, next_y = next_pos_facing
-    if _map.tiles[next_y][next_x] not in (1, 5):  # initial box position, or opened chest -> masking it
-        empty_tile_id = {33: 5, 36: 1}[next_tile_facing]
+    if _map.tiles[next_y][next_x] not in (1, 5, 6):  # initial box position, or opened chest -> masking it
+        empty_tile_id = {33: 5, 36: 1, 20: 1, 21: 5, 22: 6}[next_tile_facing]
         game_state = game_state.with_tile_override(empty_tile_id, next_coords_facing)
-    if next_next_tile_facing in (0, None):
+    if next_next_tile_facing in (0, None) and next_tile_facing in (33,36):
         return game_state._replace(message='The box falls into the void')
+    if next_next_tile_facing in (0, None) and next_tile_facing in (20,21,22):
+        return game_state._replace(message='The boulder falls to the void')
     next_next_coords_facing = (game_state.map_id, *next_next_pos_facing)
     next_next_tile_override = game_state.tile_override_at(next_next_coords_facing)
     if next_next_tile_override:
-        assert next_next_tile_override in (1, 5)
+        assert next_next_tile_override in (1, 5, 6)
         game_state = game_state.without_tile_override(next_next_coords_facing)
-    new_tile_id = {1: 36, 5: 33}[next_next_tile_facing]
-    return game_state.with_tile_override(new_tile_id, next_next_coords_facing)\
-                     ._replace(message='You pushed the box forward')
+    if next_tile_facing in (33, 36):
+        new_tile_id = {1: 36, 5: 33}[next_next_tile_facing]
+        return game_state.with_tile_override(new_tile_id, next_next_coords_facing)\
+                         ._replace(message='You push the box forward')
+    if next_tile_facing in (20, 21, 22):
+        new_tile_id = {1: 20, 5: 21, 6: 22}[next_next_tile_facing]
+        return game_state.with_tile_override(new_tile_id, next_next_coords_facing)\
+                         ._replace(message='You push the boulder forward')
+    assert False
 
 
 def _show_info(game_view, game_state, _GameView):
@@ -151,6 +164,11 @@ def _show_info(game_view, game_state, _GameView):
                 # Prefer a redirect from the INFO page to a page without extra_render:
                 del info_view.actions['SHOW-INFO']
                 info_view.actions['SHOW-INFO'] = game_view
+        elif info_view.actions['SHOW-INFO'].state.puzzle_step is not None:
+            if game_view.state.puzzle_step is None:
+                # Prefer a redirect from the INFO page to a page without puzzle_step:
+                del info_view.actions['SHOW-INFO']
+                info_view.actions['SHOW-INFO'] = game_view
         else:
             assert info_view.actions['SHOW-INFO'].state == game_state, f"\n{info_view.actions['SHOW-INFO'].state}\n!=\n{game_state}"
     else:
@@ -163,10 +181,15 @@ def enter_map(game_state, map_exit):
     assert map_exit
     message = atlas().maps[map_exit.dest_map].name
     log(game_state, f'entering map: {message}')
+    if map_exit.facing == 'SAME':
+        facing = game_state.facing
+    else:
+        facing = map_exit.facing
+        assert facing in {'north','east','south','west'}
     return game_state._replace(map_id=map_exit.dest_map,
                                x=map_exit.dest_x,
                                y=map_exit.dest_y,
-                               facing=map_exit.facing,
+                               facing=facing,
                                message=message)
 
 

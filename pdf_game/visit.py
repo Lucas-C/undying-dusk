@@ -227,7 +227,7 @@ def iterate_game_views(checkpoint, checkpoint_id, start_views, _GameView):
                             post_defeat.game_view = GameView(src_view=new_game_view, renderer=post_defeat)
                             game_views.add(post_defeat.game_view)
                             processed.add(hash(post_defeat.game_view))
-                    if new_game_view.state.rolling_boulder:
+                    if new_game_view.state.rolling_boulders:
                         log_msg += f' - crushed-by-boulder@{new_game_view.state.coords}/{new_game_view.state.facing}'
                     log(new_game_view.state, log_msg)
                 elif milestone not in (GameMilestone.CHECKPOINT, GameMilestone.VICTORY) or new_game_view.state.last_checkpoint == start_views[0].state.last_checkpoint:

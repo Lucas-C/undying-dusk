@@ -18,8 +18,8 @@ def mapscript_exec(game_view, _GameView):
         game_view.state = game_view.state._replace(bonus_def=game_view.state.bonus_def - 1)
     # Boulder is moved BEFORE triggering scripts,
     # so that it stays still during the state it is added on the map
-    if game_view.state.rolling_boulder:
-        _mapscript_move_boulder(game_view)
+    if game_view.state.rolling_boulders:
+        _mapscript_move_boulders(game_view)
     if game_view.state.coords in SCRIPTS_PER_TILE:
         _, script = SCRIPTS_PER_TILE.get(game_view.state.coords)
         script(game_view, _GameView)
@@ -35,12 +35,12 @@ def mapscript_tile_script_type(*coords):
     return None
 
 
-def mapscript_add_message(coords, message, facing=None, condition=None, msg_place=MessagePlacement.DOWN):
+def mapscript_add_message(coords, message, facing=None, condition=None, msg_place=MessagePlacement.DOWN, extra_render=None):
     assert coords not in SCRIPTS_PER_TILE, f'Tile @ {coords} already scripted, cannot add message'
     def _mapscript_display_message(game_view, _):
         if (facing and game_view.state.facing != facing) or (condition and not condition(game_view.state)):
             return
-        game_view.state = game_view.state._replace(message=message, msg_place=msg_place)
+        game_view.state = game_view.state._replace(message=message, msg_place=msg_place, extra_render=extra_render)
     SCRIPTS_PER_TILE[coords] = ('message', _mapscript_display_message)
 
 
@@ -122,50 +122,53 @@ def _mapscript_open_chest(game_view, _GameView, treasure_id, grant_func=None):
             log(game_view.state, '+' + game_view.state.message.replace('\n', ' '))
 
 
-def mapscript_add_boulder(trigger_pos, start_at, _dir):
+def mapscript_add_boulder(trigger_pos, start_at, _dir, facing=None, condition=None, message="You hear a loud thud.\nSomething is approaching"):
     def _mapscript_trigger_boulder(game_view, _):
         game_state = game_view.state
         if trigger_pos in game_state.triggers_activated:
             return
-        assert not game_state.rolling_boulder, ('NOT IMPLEMENTED: triggering a 2nd boulder while one is active.'
-                                               f'@ {game_state.rolling_boulder.coords} & {game_state.coords}')
+        if (facing and game_view.state.facing != facing) or (condition and not condition(game_view.state)):
+            return
         log(game_state, f'+boulder @ {game_state.coords}')
         rolling_boulder = RollingBoulder(start_at, _dir, game_view.tile_override(start_at))
         if rolling_boulder.shadowed_tile_override:  # Removing previous tile override:
             game_view.remove_tile_override(start_at)
         game_view.add_tile_override(_get_boulder_tile_id(start_at), coords=start_at)
         game_view.state = game_view.state.with_trigger_activated(trigger_pos)\
-                                         ._replace(rolling_boulder=rolling_boulder,
-                                                   message="You hear a loud thud.\nSomething is approaching",
+                                         ._replace(rolling_boulders=game_view.state.rolling_boulders + (rolling_boulder,),
+                                                   message=message,
                                                    msg_place=MessagePlacement.UP)
     SCRIPTS_PER_TILE[trigger_pos] = ('boulder_trigger', _mapscript_trigger_boulder)
 
 
-def _mapscript_move_boulder(game_view):
-    rolling_boulder = game_view.state.rolling_boulder
-    assert rolling_boulder
-    map_id, *boulder_pos = rolling_boulder.coords
-    next_coords = (map_id, *mazemap_next_pos_facing(*boulder_pos, rolling_boulder.dir))
-    if not avatar_can_move_to(game_view, *next_coords) or mazemap_get_tile(game_view, *next_coords) in DOOR_TILE_IDS:
-        log(game_view.state, f'-boulder stopped @ {rolling_boulder.coords}, could not move to {next_coords}')
-        game_view.state = game_view.state._replace(rolling_boulder=None)
-        return
-    game_view.remove_tile_override(rolling_boulder.coords)
-    if rolling_boulder.shadowed_tile_override:  # Restoring previous tile override:
-        game_view.add_tile_override(rolling_boulder.shadowed_tile_override, coords=rolling_boulder.coords)
-    rolling_boulder = rolling_boulder._replace(coords=next_coords,
-                                               shadowed_tile_override=game_view.tile_override(next_coords))
-    game_view.state = game_view.state._replace(rolling_boulder=rolling_boulder)
-    if rolling_boulder.shadowed_tile_override:  # Removing previous tile override:
-        game_view.remove_tile_override(next_coords)
-    boulder_tile_id = _get_boulder_tile_id(next_coords)
-    game_view.add_tile_override(boulder_tile_id, coords=next_coords)
-    if game_view.state.coords == next_coords:
-        game_view.state = game_view.state._replace(hp=0, message='The boulder crushed you', milestone=GameMilestone.GAME_OVER)
+def _mapscript_move_boulders(game_view):
+    rolling_boulders = game_view.state.rolling_boulders
+    assert rolling_boulders!=()
+    next_rolling_boulders = ()
+    for rolling_boulder in rolling_boulders:
+        map_id, *boulder_pos = rolling_boulder.coords
+        next_coords = (map_id, *mazemap_next_pos_facing(*boulder_pos, rolling_boulder.dir))
+        if not avatar_can_move_to(game_view, *next_coords) or mazemap_get_tile(game_view, *next_coords) in DOOR_TILE_IDS:
+            log(game_view.state, f'-boulder stopped @ {rolling_boulder.coords}, could not move to {next_coords}')
+            continue
+        game_view.remove_tile_override(rolling_boulder.coords)
+        if rolling_boulder.shadowed_tile_override:  # Restoring previous tile override:
+            game_view.add_tile_override(rolling_boulder.shadowed_tile_override, coords=rolling_boulder.coords)
+        rolling_boulder = rolling_boulder._replace(coords=next_coords,
+                                                   shadowed_tile_override=game_view.tile_override(next_coords))
+        next_rolling_boulders += (rolling_boulder,)
+        if rolling_boulder.shadowed_tile_override:  # Removing previous tile override:
+            game_view.remove_tile_override(next_coords)
+        boulder_tile_id = _get_boulder_tile_id(next_coords)
+        game_view.add_tile_override(boulder_tile_id, coords=next_coords)
+        if game_view.state.coords == next_coords:
+            game_view.state = game_view.state._replace(hp=0, message='The boulder crushed you', milestone=GameMilestone.GAME_OVER)
+            return
+    game_view.state = game_view.state._replace(rolling_boulders=next_rolling_boulders)
 
 
 def _get_boulder_tile_id(coords):
-    'Return 20, 21 or 22 depending on the base tile at coords'
+    'Return 20, 21, 22, or 64 depending on the base tile at coords'
     map_id, x, y = coords
     _map = atlas().maps[map_id]
     content = _map.tiles[y][x]
@@ -176,6 +179,7 @@ def _get_boulder_tile_id(coords):
         8: 21,  # chest_interior -> boulder_ceiling
         9: 20,  # chest_exterior -> boulder_floor
         16: 21, # bone_pile -> boulder_ceiling
+        63: 64, # dungeon_boulder_hole -> boulder_hole_boulder
     }[content]
 
 

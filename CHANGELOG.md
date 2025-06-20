@@ -5,11 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.3] - Not released yet
+### Added
+- many additions thanks to [@Phoenyx65535](https://github.com/Phoenyx65535) - _cf._ [PR #29](https://github.com/Lucas-C/undying-dusk/pull/29)
 ### Fixed
 - display final end cut-scene - _cf._ [PR #15](https://github.com/Lucas-C/undying-dusk/pull/15)
-- more than 45 typos, thanks to @Phoenyx65535 - _cf._ [issue #20](https://github.com/Lucas-C/undying-dusk/issues/20)
+- more than 45 typos, thanks to [@Phoenyx65535](https://github.com/Phoenyx65535) - _cf._ [issue #20](https://github.com/Lucas-C/undying-dusk/issues/20)
 - broken path to abyss secret in a specific case - _cf._ [PR #24](https://github.com/Lucas-C/undying-dusk/pull/24)
-- missing image assets for some tiles - _cf._ [issue #16](https://github.com/Lucas-C/undying-dusk/issues/16)
+- missing image assets for some tiles - _cf._ [issue #16](https://github.com/Lucas-C/undying-dusk/issues/16). Most new image assets were provided by [@Phoenyx65535](https://www.reddit.com/user/Phoenyx65535/)
 - hidden `CTRL G` hint in a book in the Mausoleum - _cf._ [issue #21](https://github.com/Lucas-C/undying-dusk/issues/21)
 - reducer over-optimization: this broke the trick to climb over the Mausoleum roof, and was due to `.bonus_atk` not being rendered on some pages. - _cf._ [issue #19](https://github.com/Lucas-C/undying-dusk/issues/19)
 - overlapping link to [JourneyToTheEastRocks.ogg](https://chezsoi.org/lucas/undying-dusk/music/AlexandrZhelanov-JourneyToTheEastRocks.ogg) - _cf._ [issue #17](https://github.com/Lucas-C/undying-dusk/issues/17)

@@ -1,8 +1,9 @@
+# pylint: disable=import-outside-toplevel
 from functools import lru_cache as cached
 
 from . import Proxy
 
-from ..entities import CutScene, DialogButtonType, DialogOption, GameMode, Position, SFX, ShopMessageItem
+from ..entities import CutScene, DialogButtonType, DialogOption, GameMode, Position, SFX
 
 
 BASE_MUSIC_URL = 'https://chezsoi.org/lucas/undying-dusk/music/'
@@ -32,7 +33,7 @@ def patch_shop(shop, shop_id):
         ])
     if shop.name == 'The Pilgrim Inn':  # shop 2 at Cedar Village
         return Proxy(background=shop.background, name=shop.name, item=[
-            ShopMessageItem('We saw dead walking\nfrom the Canal Boneyard.'),
+            PilgrimInnAdvice,
             RoomForTheNight,
         ])
     raise NotImplementedError(f'Shop not handled: {shop.name}')
@@ -128,7 +129,7 @@ def entering_monastery_courtyard():
     minimap_tip = CutScene.new(
         name='Tip',
         text='\n' * 7 + 'Use the minimap\non the INFO page\nto help orient\nyourself',
-        extra_render=lambda pdf: pdf.image('minimaps/map_1_.png', x=67, y=15),
+        extra_render=lambda pdf: pdf.image('minimaps/map_1___.png', x=67, y=15),
         exit_msg='Enter courtyard',
     )
     return CutScene.new(
@@ -172,9 +173,9 @@ def looking_for_hope():
     )
     return CutScene.new(
         background='valley_village_with_seamus',
-        name='Chapter 1 : Looking for hope',
+        name='Looking for hope',
         music=BASE_MUSIC_URL + 'AlexandrZhelanov-MysteryForest.mp3',
-        extra_render=seamus_speaks2('\nWell done!\n\nThese demons got\nwhat they deserved!\nYou had no choice;\nno one touched\nby the Empress\' curse\ncan be saved...'),
+        extra_render=seamus_speaks2('\nWell done!\n\nThese demons got\nwhat they deserved!\nYou had no choice;\nno one touched by\nthe Empress\'s curse\ncan be saved...'),
         next_scene_id=dialog_2.id,
     )
 
@@ -196,14 +197,34 @@ def chapel_in_the_woods(scene_id):
         exit_msg='Leave',
     )
     def take_crucifix(gs):
+        is_imp_beaten = (4, 7, 10) in gs.vanquished_enemies
+        if is_imp_beaten or 'HOLY_WATER' in gs.items or 'FULL_BOTTLE' in gs.items:
+            # The monk already blessed your water, or we prevent a case where where the monk won't bless the water,
+            # because we stole the crucifix,  and we could not bless a bottle already full of water from the well:
+            return gs._replace(message='Please leave that be.\nIt wards this chapel.')
         assert 'CRUCIFIX_STOLEN' not in gs.hidden_triggers
         return gs.with_hidden_trigger('CRUCIFIX_STOLEN')._replace(items=gs.items + ('CRUCIFIX',),
                                                                   shop_id=crucifix_taken.id)
-    return CutScene.new(id=scene_id,
+    def talk_with_monk(gs):
+        is_imp_beaten = (4, 7, 10) in gs.vanquished_enemies
+        if is_imp_beaten or 'HOLY_WATER' in gs.items: # the monk already blessed your water
+            return gs._replace(message='I wish you luck\nin your quest.')
+        if 'FULL_BOTTLE' in gs.items:
+            def render_holy_water(pdf):
+                from ..render_treasure import treasure_render_item
+                treasure_render_item(pdf, 22, pos=Position(64,70))
+            return gs._replace(items=tuple(i for i in gs.items if i != 'FULL_BOTTLE') + ('HOLY_WATER',),
+                               message='I bless this water.\nMay it serve you well.', extra_render=render_holy_water)
+        return gs._replace(message='If you bring me water,\nI can bless it for you.')
+    return CutScene.new(
+        id=scene_id,
         name='Chapel In The Woods',
         background='chapel_empty',
-        dialog_options=(DialogOption(btn_type=DialogButtonType.TAKE_CRUCIFIX, msg='', can_buy=True,
-                                     buy=take_crucifix),),
+        dialog_options=(DialogOption(btn_type=DialogButtonType.TAKE_CRUCIFIX, msg='',
+                                     can_buy=True, buy=take_crucifix),
+                        DialogOption(btn_type=DialogButtonType.TALK_WITH_MONK,
+                                     msg='A monk prays silently\non the left side.',
+                                     can_buy=True, buy=talk_with_monk),),
         music= BASE_MUSIC_URL + 'AlexandrZhelanov-CavesOfSorrow.ogg',
         redirect=lambda gs: chapel_closed if 'CRUCIFIX_STOLEN' in gs.hidden_triggers else None,
     )
@@ -250,7 +271,7 @@ def the_inn_evening_tale():
     tale_2 = CutScene.new(
         name='The inn evening tale',
         background='st_knight_tale_2',
-        text='\n' * 18 + 'A storm dragon.\nViolence. Death. Terror.\nA relentless scourge\nupon us.',
+        text='\n' * 18 + 'The storm dragon.\nViolence. Death. Terror.\nA relentless scourge\nupon us.',
         next_scene_id=tale_3.id,
     )
     return CutScene.new(
@@ -304,7 +325,7 @@ def risking_it_all():
     scene_4 = CutScene.new(
         background='distant_castle',
         name='Risking it all',
-        text='\n' * 4 + 'Will you walk in the\nSaint Knight footsteps?\n\nMaybe even restore\nhis shattered armor?',
+        text='\n' * 4 + 'Will you walk in the\nSaint Knight\'s\nfootsteps?\n\nMaybe even restore\nhis shattered armor?',
         next_scene_id=scene_5.id,
     )
     scene_3 = CutScene.new(
@@ -339,7 +360,7 @@ def risking_it_all():
 def abyss_bottom():  # Did the Empress made a pact with the Deep Ones?
     return CutScene.new(
         name='Abyss bottom',
-        text='The empress soul\'s\nrests in the dark\n(you found a SECRET)',
+        text='The soul of the empress\nrests in the dark\n(you found a SECRET)',
         sfx=SFX(id=6, pos=Position(64, 78)),
         exit_msg='Climb back up',
         music=BASE_MUSIC_URL + 'AlexandrZhelanov-MysticalTheme.mp3',
@@ -357,7 +378,7 @@ def the_final_leap():
     return CutScene.new(
         background='palace_hall',
         name='The final leap',
-        text='\n' * 3 + 'You leave the mausoleum\nto prudently enter\nthe castle above.\n\nThe palace is empty.\nThere is no living soul.',
+        text='\n' * 3 + 'You leave the mausoleum\nand warily enter\nthe castle above.\n\nThe palace is empty.\nThere is no living soul.',
         music=BASE_MUSIC_URL + 'JohanJansen-DarkWinds.ogg',
         next_scene_id=scene_2.id,
     )
@@ -386,7 +407,7 @@ def the_end():
     )
     scene_8 = CutScene.new(
         background='bloodsplat',
-        text='As your eyes\nslowly close,\na faint smile raises\non your lisps.',
+        text='As your eyes\nslowly close,\na faint smile raises\non your lips.',
         next_scene_id=scene_9.id,
     )
     scene_7 = CutScene.new(
@@ -468,7 +489,7 @@ class CedarArmsSellableSwordUpgrade:
     def dialog_option(game_state):
         if game_state.weapon == 7:
             if game_state.tile_override_at((5, 9, 3)):  # VILLAGE_PORTAL_COORDS
-                return DialogOption.only_msg('')
+                return DialogOption.only_msg('Take down the empress,\nfor all of our safety.')
             return DialogOption.only_msg('No creature of darkness\ncan match this weapon!')
         return DialogOption(btn_type=DialogButtonType.BUY, can_buy=game_state.weapon == 4 and game_state.gold >= 50,
                             msg="Polish a rusty sword\nfor 50 gold",
@@ -480,6 +501,8 @@ class CedarArmsSellableSwordUpgrade:
 class SimmonsSellableBoots:
     @staticmethod
     def dialog_option(game_state):
+        if 1 <= game_state.items.count('ARMOR_PART'):
+            return DialogOption.only_msg('I recognize that armor!\nIs it The Saint knight\'s?')
         if 'BOOTS' in game_state.items:
             return DialogOption.only_msg('')
         can_buy = game_state.gold >= 20
@@ -489,25 +512,36 @@ class SimmonsSellableBoots:
                                                        treasure_id=24, items=gs.items + ('BOOTS',),
                                                        message="Bought waterproof Boots"))
 
+def render_armor(pdf):
+    from ..render_treasure import treasure_render_item
+    treasure_render_item(pdf, 29, pos=Position(64,46))
 
 class SimmonsSellableArmor:
     @staticmethod
     def dialog_option(game_state):
         if game_state.armor > 1:
-            return DialogOption.only_msg('')
+            return DialogOption.only_msg('Always happy to work\nsuch marvelous metal.')
         if 1 <= game_state.items.count('ARMOR_PART') < 4:
-            return DialogOption.only_msg('I need more material\nto craft you an armor')
-        return DialogOption(btn_type=DialogButtonType.BUY, can_buy=game_state.items.count('ARMOR_PART') == 4,
-                            msg="I can repair\na suit of armor\nfrom broken parts,\nfor free",
-                            buy=lambda gs: gs._replace(treasure_id=29, armor=7,
+            return DialogOption.only_msg('I can repair it, but\nI\'ll need more pieces')
+        if game_state.items.count('ARMOR_PART') == 0:
+            return DialogOption(btn_type=DialogButtonType.BUY, can_buy=game_state.items.count('ARMOR_PART') == 4,
+                            msg="I can repair armor\nfrom broken parts",
+                            buy=lambda gs: gs._replace(armor=7,
                                                        items=tuple(i for i in gs.items if i != 'ARMOR_PART'),
-                                                       message="Acquired\nSaint Knight armor"))
+                                                       message="Acquired\nthe Saint Knight's armor",
+                                                       extra_render=render_armor))
+        return DialogOption(btn_type=DialogButtonType.BUY, can_buy=game_state.items.count('ARMOR_PART') == 4,
+                            msg="Please let me restore\nit to its former glory.",
+                            buy=lambda gs: gs._replace(armor=7,
+                                                       items=tuple(i for i in gs.items if i != 'ARMOR_PART'),
+                                                       message="Acquired\nthe Saint Knight's armor",
+                                                       extra_render=render_armor))
 
 
 class SageTherelAdvice:
     @staticmethod
     def dialog_option(game_state):
-        if game_state.spellbook <= 2:
+        if not game_state.tile_override_at((5, 9, 3)):  # VILLAGE_PORTAL_COORDS
             return DialogOption.only_msg('Fire magic is effective\nagainst undead and bone.')
         return DialogOption.only_msg("You opened a magic\nportal, I'm impressed!")
 
@@ -532,6 +566,12 @@ class SageTherelSellableSpell:
             return DialogOption(btn_type=DialogButtonType.BUY, can_buy=False, msg="I can teach it to you\nif you bring me a scroll.")
         return DialogOption.only_msg('Use your new power\nwisely, young apprentice')
 
+class PilgrimInnAdvice:
+    @staticmethod
+    def dialog_option(game_state):
+        if not game_state.tile_override_at((5, 9, 3)):  # VILLAGE_PORTAL_COORDS
+            return DialogOption.only_msg('We saw dead walking\nfrom the Canal Boneyard.')
+        return DialogOption.only_msg("Thank you for taking\ncare of that Gorgon!")
 
 class RoomForTheNight:
     @staticmethod
@@ -557,22 +597,29 @@ class RoomForTheNight:
 
 def patch_map_shops(_map):
     if _map.name == "Monk Quarters":  # new map: Scriptorium
-        return [Proxy(exit_x=0, exit_y=2, shop_id=entering_monastery_courtyard().id)]
+        return [Proxy(exit_x=0, exit_y=2, shop_id=entering_monastery_courtyard().id, ephemeral=True)]
     if _map.name == "Gar'ashi Monastery":
         return [Proxy(exit_x=4, exit_y=10, shop_id=looking_for_hope().id)]  # cut-scene when leaving the Monastery
     if _map.name == "Monastery Trail":
         return [
-            _map.shops[0],  # Chapel (Woodsman)
+            Proxy(exit_x=5,  exit_y=13, shop_id=4, dest_x=5, dest_y=12, facing='south'),
             Proxy(exit_x=10, exit_y=15, shop_id=a_safe_haven().id, ephemeral=True),  # entering the village the 1st time
+        ]
+    if _map.name == "Cedar Village":
+        return [
+            Proxy(exit_x=6, exit_y=4, shop_id=0, dest_x=6, dest_y=5, facing='north'),
+            Proxy(exit_x=6, exit_y=8, shop_id=1, dest_x=6, dest_y=7, facing='south'),
+            Proxy(exit_x=8, exit_y=8, shop_id=2, dest_x=9, dest_y=8, facing='west'),
+            Proxy(exit_x=1, exit_y=8, shop_id=3, dest_x=2, dest_y=8, facing='west'),
         ]
     if _map.name == "Zuruth Plains":
         return [
-            Proxy(exit_x=1, exit_y=9, shop_id=seamus_in_zuruth_plains().id, dest_x=2, dest_y=9, ephemeral=True),
+            Proxy(exit_x=1, exit_y=9, shop_id=seamus_in_zuruth_plains().id, dest_x=2, dest_y=9, facing='west', ephemeral=True),
         ]
     if _map.name == "Mausoleum":
         return [Proxy(exit_x=15, exit_y=7, shop_id=the_final_leap().id)]  # entering the final level, before the dragon
     if _map.name == "Trade Tunnel":
         return []  # Removing all existing shops
     if _map.name == "Dead Walkways":
-        return [Proxy(exit_x=9, exit_y=3, shop_id=seamus_transformation().id, dest_x=9, dest_y=2, ephemeral=True)]
+        return [Proxy(exit_x=9, exit_y=3, shop_id=seamus_transformation().id, dest_x=9, dest_y=2, facing='south', ephemeral=True)]
     return _map.shops

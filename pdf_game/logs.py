@@ -188,8 +188,8 @@ def diff_game_states(gs1, gs2):
         print(f'Differing ATK bonus: {gs1.bonus_atk} != {gs2.bonus_atk}')
     if gs1.items != gs2.items:
         print(f'Differing items: {gs1.items} != {gs2.items}')
-    if gs1.rolling_boulder != gs2.rolling_boulder:
-        print(f'Differing rolling boulder: {gs1.rolling_boulder} != {gs2.rolling_boulder}')
+    if gs1.rolling_boulders != gs2.rolling_boulders:
+        print(f'Differing rolling boulders: {gs1.rolling_boulders} != {gs2.rolling_boulders}')
     if gs1.shop_id != gs2.shop_id:
         print(f'Differing shop ID: {gs1.shop_id} != {gs2.shop_id}')
     if gs1.message != gs2.message:

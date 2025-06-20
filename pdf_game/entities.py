@@ -245,7 +245,7 @@ class GameState(NamedTuple):
     items: Tuple[str] = ()
     hidden_triggers: Tuple[str] = ()
     puzzle_step: Optional[int] = None
-    rolling_boulder: Optional[RollingBoulder] = None
+    rolling_boulders: Tuple[RollingBoulder] = ()
     triggers_activated: Tuple[Tuple[int]] = ()  # sequence of coords
     # Tile-transient state:
     mode: GameMode = GameMode.EXPLORE
@@ -273,7 +273,7 @@ class GameState(NamedTuple):
                              milestone=GameMilestone.NONE,
                              book=None, treasure_id=0, extra_render=None, sfx=None,
                              music='', music_btn_pos=None,
-                             trick=None, puzzle_step=None if self.puzzle_step is None else 0,  # 0 indicates that staff is in slot
+                             trick=None, puzzle_step=None,
                              reverse_id=False, fixed_id=0,
                              combat=self.combat and self.combat._replace(
                                 avatar_log=None, enemy_log=None, action_name=None))
@@ -334,6 +334,7 @@ class DialogButtonType(IntEnum):
     DRINK_RED = 4
     DRINK_GREEN = 5
     TAKE_CRUCIFIX = 6
+    TALK_WITH_MONK = 7
     def action_name(self, index):
         if self in (self.BUY, self.NONE):
             return f'{self.name}_{index}'

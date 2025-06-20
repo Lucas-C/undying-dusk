@@ -22,7 +22,7 @@ jobs:
           git clone https://github.com/clintbellanger/heroine-dusk
       - name: Build PDF
         run: |
-          echo "__version__ = '$GITHUB_REF'" > pdf_game/__init__.py
+          echo "__version__ = '$GITHUB_REF_NAME'" > pdf_game/__init__.py
           NO_TQDM=1 PYTHONUNBUFFERED=1 ./gen_pdf.py --no-marked-content
           zip/gen_zips.sh
       - name: Create Release

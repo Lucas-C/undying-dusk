@@ -14,7 +14,8 @@ def power_enemy_attack(game_state, parry_item=None):
     _round = combat.combat_round
     if _round.run_away:
         assert not (_round.ask_for_mercy or _round.miss or _round.atk or _round.hp_drain or _round.mp_drain or _round.heal or _round.boneshield_up)
-        return game_state._replace(combat=combat._replace(enemy=combat.enemy._replace(hp=0, gold=0, reward=None)),
+        return game_state._replace(combat=combat._replace(enemy=combat.enemy._replace(hp=0, gold=0, reward=None),
+                                                          avatar_log=CombatLog(action="Attack!", result="Dodged!")),
                                    message='The enemy ran away'), {}
     if _round.ask_for_mercy:
         assert not (_round.miss or _round.atk or _round.hp_drain or _round.mp_drain or _round.heal or _round.boneshield_up)
@@ -95,7 +96,7 @@ def power_hero_attack(game_state):
         attack_damage = floor((atk_max + atk_min) / 2)
         # check crit: hero crits add max damage
         if _round.hero_crit:
-            attack_damage += atk_max
+            attack_damage *= 2
             log_action = "Critical hit!"
         if combat.enemy.withstand_logic:
             game_state, log_result = combat.enemy.withstand_logic(game_state, attack_damage)
@@ -209,20 +210,10 @@ def item_crucifix(game_state):
     return game_state._replace(combat=combat, items=new_items)
 
 
-def item_empty_bottle(game_state):
-    combat = game_state.combat._replace(avatar_log=CombatLog(action="throw bottle", result="no effect"))
-    new_items = tuple(item for item in game_state.items if item != 'BOTTLE')
-    return game_state._replace(combat=combat, items=new_items)
-
-
-def take_scepter(game_state):
-    combat = game_state.combat
-    assert 'TAKE_SCEPTER' in combat.enemy.custom_actions_names
-    new_custom_actions = tuple(cca for cca in combat.enemy.custom_actions if cca.name != 'TAKE_SCEPTER')
-    new_custom_actions += (CustomCombatAction('SCEPTER'),)
-    return game_state._replace(combat=combat._replace(avatar_log=CombatLog(action="scepter picked", result=''),
-                                                      enemy=combat.enemy._replace(custom_actions=new_custom_actions)),
-                               items=game_state.items + ('SCEPTER',))
+def item_bottle(game_state):
+    'No effect - Same when using EMPTY_BOTTLE or FULL_BOTTLE'
+    new_items = tuple(item for item in game_state.items if item not in ('EMPTY_BOTTLE', 'FULL_BOTTLE'))
+    return game_state._replace(combat=game_state.combat._replace(avatar_log=CombatLog(action="throw bottle", result="no effect")), items=new_items)
 
 
 def item_holy_water(game_state):
@@ -237,3 +228,13 @@ def item_holy_water(game_state):
     combat = game_state.combat._replace(enemy=_enemy, avatar_log=avatar_log)
     new_items = tuple(item for item in game_state.items if item != 'HOLY_WATER')
     return game_state._replace(combat=combat, items=new_items)
+
+
+def take_scepter(game_state):
+    combat = game_state.combat
+    assert 'TAKE_SCEPTER' in combat.enemy.custom_actions_names
+    new_custom_actions = tuple(cca for cca in combat.enemy.custom_actions if cca.name != 'TAKE_SCEPTER')
+    new_custom_actions += (CustomCombatAction('SCEPTER'),)
+    return game_state._replace(combat=combat._replace(avatar_log=CombatLog(action="scepter taken", result=''),
+                                                      enemy=combat.enemy._replace(custom_actions=new_custom_actions)),
+                               items=game_state.items + ('SCEPTER',))

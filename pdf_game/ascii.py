@@ -102,4 +102,14 @@ _TILE_AS_EMOJI = [
     ansi_wrap('GE', color='cyan', bold=True),  # 53: petrified_gorgon_with_staff
     ansi_wrap('GE', color='cyan'),             # 54: petrified_gorgon
     ansi_wrap('AA', color='yellow'),           # 55: tree_alt
+    'Gs',                                      # 56: grave_stone_shield
+    '++',                                      # 57: grass_konami
+    '()',                                      # 58: dungeon_mirror
+    'G+',                                      # 59: grave_stone_cross
+    'GP',                                      # 60: grave_stone_pentacle
+    'GR',                                      # 61: grave_stone_rip
+    'GW',                                      # 62: grave_stone_writing
+    '  ',                                      # 63: dungeon_boulder_hole
+    ansi_wrap('OO', color='cyan'),             # 64: boulder_hole_boulder
+    'Dx',                                      # 65: medieval_locked_door
 ]

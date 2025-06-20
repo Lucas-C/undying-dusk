@@ -55,7 +55,7 @@ def main():
     assert not pdf._drawing_graphics_state_registry, "No /ExtGState are needed in Undying Dusk"  # pylint: disable=protected-access
     with trace_time() as trace:
         pdf.pdf_version = "1.3"  # Optimization: avoids 55bytes/page due to the transparency group
-        pdf.output('undying-dusk.pdf')
+        pdf.output(f'{args.output_pdf}.pdf')
     print(f'Output generation took: {trace.time:.2f}s')
     print_perf_stats()
     pdf.print_perf_stats()
@@ -74,6 +74,7 @@ def parse_args():
     parser.add_argument("--no-pdf", action="store_true", help=" ")
     parser.add_argument("--detect-deadends", action="store_true", help="Sanity check")
     parser.add_argument("--print-reduced-views", action="store_true", help=" ")
+    parser.add_argument("--output-pdf", "-o", type=str, default="undying-dusk", help="Name of the output PDF file (without the .pdf extension)")
     return parser.parse_args()
 
 

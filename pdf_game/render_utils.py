@@ -13,7 +13,7 @@ except ImportError:
 
 
 BACKGROUNDS = 'black,nightsky,tempest,interior'.split(',')
-ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE,FISH_ON_A_STICK,COMBINE_WITH_TWIG,SMOKED_FISH_ON_A_STICK,ATK_BOOST,PUT_STICK_IN_LEVER,STAFF,HAND_MIRROR,SCEPTER,BEHIND_IVY'.split(',')  # order matches position in .png
+ACTION_BUTTONS = 'ATTACK,RUN,HEAL,BURN,UNLOCK,LIGHT,FREEZE,REFLECT,HOLY_WATER,SCROLL,BOOTS,PRAY,FISH,BLUE_KEY,MUSIC,BUCKLER,PUSH,EXAMINE,PLATINO,NO_PUSH,EMPTY_BOTTLE,AMULET,CRUCIFIX,TALK,ARMOR,GLIMPSE,FISH_ON_A_STICK,COMBINE_WITH_TWIG,SMOKED_FISH_ON_A_STICK,ATK_BOOST,PUT_STICK_IN_LEVER,STAFF,HAND_MIRROR,SCEPTER,BEHIND_IVY,FULL_BOTTLE'.split(',')  # order matches position in .png
 INFO_SCREEN_ITEM_SLOT_POS = (
     Position(x=100, y=88),
     Position(x=120, y=88),
@@ -47,6 +47,7 @@ ACTION_BUTTON_POS = {
     'CRUCIFIX':           Position(x=140, y=88),
     'HAND_MIRROR':        Position(x=140, y=88),
     'EMPTY_BOTTLE':       Position(x=120, y=88),  # can be carried with CRUCIFIX and used at the same place!
+    'FULL_BOTTLE':        Position(x=120, y=88),  # can be carried with CRUCIFIX and used at the same place!
     'FISH':               Position(x=140, y=88),
     'FISH_ON_A_STICK':    Position(x=140, y=88),
     'PUT_STICK_IN_LEVER': Position(x=136, y=97),
@@ -57,8 +58,9 @@ ACTION_BUTTON_POS = {
     # FISH_ON_A_STICK     -> already present as a contextual action
     'SMOKED_FISH_ON_A_STICK': Position(x=140, y=88),
     # Combat items:
-    # 'CRUCIFIX'    -> already present as a contextual action
-    # 'EMPTY_BOTTLE'-> already present as a contextual action
+    # 'CRUCIFIX'     -> already present as a contextual action
+    # 'EMPTY_BOTTLE' -> already present as a contextual action
+    # 'FULL_BOTTLE'  -> already present as a contextual action
     'HOLY_WATER':   INFO_SCREEN_ITEM_SLOT_POS[0],
     # Extra display:
     'ATK_BOOST': Position(x=-4, y=82),

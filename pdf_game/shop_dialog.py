@@ -85,6 +85,8 @@ def _exit_shop(game_state):
             new_game_state = new_game_state._replace(x=map_shop.dest_x, y=map_shop.dest_y)
         except KeyError:  # for new shops, assuming no dest_x/dest_y means it is also an exit
             new_game_state = enter_map(new_game_state, mazemap_is_exit(_map, game_state.x, game_state.y))
+        if map_shop.get('facing') is not None:
+            new_game_state = new_game_state._replace(facing=map_shop.facing)
         try:
             if map_shop.ephemeral:
                 new_game_state = new_game_state.with_trigger_activated(game_state.coords)

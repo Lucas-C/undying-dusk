@@ -59,25 +59,28 @@ def render_credit_pages(pdf, links_to_credits):
     with bitfont_color_red():
         bitfont_render(pdf, 'dedicated subreddit', 43, 95, url='https://www.reddit.com/r/UndyingDuskPdfGame/')
     bitfont_render(pdf, '-Lucas', 80, 105, Justify.CENTER)
+    white_arrow_render(pdf, 'NEXT', 140, 105, page_id=pdf.page+1)
 
     pdf.add_page()
     pdf.image(REL_RELEASE_DIR + 'images/backgrounds/black.png', x=0, y=0)
-    bitfont_render(pdf, 'CREDITS', 80, 5, Justify.CENTER)
+    y = 5
+    bitfont_render(pdf, 'CREDITS', 80, y, Justify.CENTER)
     white_arrow_render(pdf, 'BACK', 140, 3, page_id=pdf.page - 1)
 
-    bitfont_render(pdf, 'Game made by', 80, 20, Justify.CENTER)
+    y+=15; bitfont_render(pdf, 'Game made by', 80, y, Justify.CENTER)
     with bitfont_color_red():
-        bitfont_render(pdf, 'Lucas Cimon (2020)', 80, 30, Justify.CENTER, url='https://chezsoi.org')
+        y+=10; bitfont_render(pdf, 'Lucas Cimon (2020)', 80, y, Justify.CENTER, url='https://chezsoi.org')
+        y+=10; bitfont_render(pdf, '& Phoenyx(2024)', 80, y, Justify.CENTER, url='https://www.reddit.com/user/Phoenyx65535/')
 
-    bitfont_render(pdf, 'Original game', 80, 45, Justify.CENTER)
+    y+=15; bitfont_render(pdf, 'Original game', 80, y, Justify.CENTER)
     with bitfont_color_red():
-        bitfont_render(pdf, 'Heroine Dusk', 80, 55, Justify.CENTER, url='http://heroinedusk.com')
-        bitfont_render(pdf, 'by Clint Bellinger (2013)', 80, 65, Justify.CENTER, url='http://clintbellanger.net')
+        y+=10; bitfont_render(pdf, 'Heroine Dusk', 80, y, Justify.CENTER, url='http://heroinedusk.com')
+        y+=10; bitfont_render(pdf, 'by Clint Bellinger (2013)', 80, y, Justify.CENTER, url='http://clintbellanger.net')
 
-    bitfont_render(pdf, 'This game exists thanks', 80, 80, Justify.CENTER)
-    bitfont_render(pdf, 'to many generous people:', 80, 90, Justify.CENTER)
+    y+=15; bitfont_render(pdf, 'This game exists thanks', 80, y, Justify.CENTER)
+    y+=10; bitfont_render(pdf, 'to many generous people:', 80, y, Justify.CENTER)
     with bitfont_color_red():
-        bitfont_render(pdf, '>full credits<', 80, 100, Justify.CENTER, url='https://github.com/Lucas-C/undying-dusk#credits--attribution')
+        y+=10; bitfont_render(pdf, '>full credits<', 80, y, Justify.CENTER, url='https://github.com/Lucas-C/undying-dusk#credits--attribution')
 
     bitfont_render(pdf, f'v{__version__}', 159, 115, Justify.RIGHT, size=4)
 
