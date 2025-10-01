@@ -1,10 +1,10 @@
 <!-- NEXT STEPS:
 - make an executable PDF with sumatra PDF, cf. https://github.com/mwenge/iatheory/releases/tag/0.1
 - also publish a .7z compressed version - cf. https://itch.io/post/9281947
+    ? provide a smaller .rar compressed PDF
 - submit on https://www.dungeoncrawlers.org
 - make online MP3s to loop forever
 - map bug on cedar village : a door appears initially at the portal position, when it's not open
-- provide a smaller .rar compressed PDF
 - size optims:
   * 10 bytes could be removed from the uncompressed stream of every page without text: "2 J\n0.57 w"
   * get rid of the /MediaBox on every page
