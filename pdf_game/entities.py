@@ -414,7 +414,7 @@ class GameView:
     Mutable so that references to it can be made before page IDs are set.
     There should always be a unique mapping 1 GameView <-> 1 GameState.
 
-    Exceptionnally, a GameView can also be a "filler" or "trick" page.
+    Exceptionally, a GameView can also be a "filler" or "trick" page.
     Then, it has no GameState associated, only a "renderer" function.
     '''
     def __init__(self, game_state=None, src_view=None, renderer=None):
