@@ -1,5 +1,6 @@
 {
-  "extends": [
-    "config:base"
-  ]
+  "extends": ["config:best-practices"],
+  "labels": ["dependencies"],
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {"enabled": true}
 }
