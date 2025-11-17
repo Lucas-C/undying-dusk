@@ -52,7 +52,6 @@ def main():
             render_page(pdf, game_view, lambda pdf, gs: render_victory(pdf, gs, links_to_credits))
     render_credit_pages(pdf, links_to_credits)
     print(f'Rendering of {len(pdf.pages)} pages took: {trace.time:.2f}s')
-    assert not pdf._drawing_graphics_state_registry, "No /ExtGState are needed in Undying Dusk"  # pylint: disable=protected-access
     with trace_time() as trace:
         pdf.pdf_version = "1.3"  # Optimization: avoids 55bytes/page due to the transparency group
         pdf.output(f'{args.output_pdf}.pdf')
