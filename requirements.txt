@@ -1,5 +1,5 @@
 fpdf2==2.8.5
 humanfriendly==10.0  # purely optional
-pillow==12.0.0
+pillow==12.1.0
 pyduktape2==0.5.0
 tqdm==4.67.1  # purely optional
