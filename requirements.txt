@@ -1,4 +1,4 @@
-fpdf2==2.8.5
+fpdf2==2.8.6
 humanfriendly==10.0  # purely optional
 pillow==12.1.1
 pyduktape2==0.5.0
